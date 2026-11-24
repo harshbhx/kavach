@@ -27,7 +27,7 @@ Everything is optional. A request that sends none of these runs exactly like any
 
 ## Limits
 
-A bring-your-own-prompt run is capped at **3 rounds and 3 attacks per agent**, because every run makes real model calls. Only one run can be active at a time. Kavach does not log the prompt text; it is stored in the run's recording (`runs/<id>.jsonl`) with the configs, and the report shows your original prompt next to the hardened one.
+A bring-your-own-prompt run is capped at **3 rounds and 3 attacks per agent**, because every run makes real model calls. Only one run can be active at a time. Kavach does not write the prompt text to its server logs, but it is **stored with the run**: the event log (`runs/<id>.jsonl`) keeps it in the saved configs (the `replay.extras` record), the audit report shows your original prompt next to the hardened one, and anyone who can reach the API can read it back from `GET /api/runs/<id>/configs`. Treat a run's recording like any other file that holds your prompt, and do not paste secrets into it.
 
 Your prompt is sent to the target model (the one in `TARGET_MODEL`) and to the Lyzr agents that attack, patch and audit it. Do not paste secrets.
 
