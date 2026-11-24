@@ -76,12 +76,14 @@ def fill_markers(path: Path, name: str, content: str) -> bool:
     """Replace the text between <!-- name:start --> and <!-- name:end --> in a docs file."""
     if not path.exists():
         return False
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     pattern = re.compile(rf"(<!-- {name}:start -->)(.*?)(<!-- {name}:end -->)", re.S)
     if not pattern.search(text):
         return False
     sep = "\n" if "\n" in content else ""
-    path.write_text(pattern.sub(lambda m: f"{m.group(1)}{sep}{content}{sep}{m.group(3)}", text, count=1))
+    path.write_text(
+        pattern.sub(lambda m: f"{m.group(1)}{sep}{content}{sep}{m.group(3)}", text, count=1), encoding="utf-8"
+    )
     return True
 
 
@@ -108,7 +110,7 @@ async def record(attempts: int, rounds: int | None) -> int:
                 shutil.copy(target, target.with_suffix(".previous.jsonl"))
             shutil.copy(run.bus.log_path, target)
             if state.report_md:
-                (settings.runs_path / "demo_run.report.md").write_text(state.report_md)
+                (settings.runs_path / "demo_run.report.md").write_text(state.report_md, encoding="utf-8")
             print(f"\nsaved {target.relative_to(settings.runs_path.parent)} from {state.summary.run_id}.")
             root = settings.runs_path.parent
             filled = [

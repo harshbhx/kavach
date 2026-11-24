@@ -86,7 +86,7 @@ async def test_event_bus_history_and_subscribe(tmp_path):
     bus.close()
     await asyncio.wait_for(task, 1)
     assert got == ["a", "b"]
-    assert len((tmp_path / "r1.jsonl").read_text().splitlines()) == 2
+    assert len((tmp_path / "r1.jsonl").read_text(encoding="utf-8").splitlines()) == 2
 
 
 async def test_audit_vetoes_overblocking_and_approves_good(settings, v1, hardened):

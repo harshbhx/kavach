@@ -37,7 +37,7 @@ async def main() -> int:
 
     s = get_settings()
     v1 = load_v1_config()
-    lib = json.loads((DATA_DIR / "attack_library.json").read_text())["rounds"][args.round]
+    lib = json.loads((DATA_DIR / "attack_library.json").read_text(encoding="utf-8"))["rounds"][args.round]
     attacks = [
         Attack(agent=agent, **{k: a[k] for k in ("id", "technique", "goal", "message")})
         for agent in ("injection", "social")

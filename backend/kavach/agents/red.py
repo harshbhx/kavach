@@ -65,7 +65,9 @@ async def write_dossier(ctx: AgentCtx, probes_and_replies: list[dict]) -> Dossie
 
 
 def library_attacks(agent: str, round_no: int, n: int, seed: int) -> list[Attack]:
-    pool = json.loads((DATA_DIR / "attack_library.json").read_text())["rounds"][str(min(round_no, 3))][agent]
+    pool = json.loads((DATA_DIR / "attack_library.json").read_text(encoding="utf-8"))["rounds"][
+        str(min(round_no, 3))
+    ][agent]
     picks = random.Random(seed + round_no * 7 + (0 if agent == "injection" else 1)).sample(
         pool, k=min(n, len(pool))
     )

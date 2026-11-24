@@ -32,7 +32,7 @@ DISPLAY = {
 def load_agent_config(path: Path) -> dict[str, dict[str, str]]:
     if not path.exists():
         return {}
-    data = yaml.safe_load(path.read_text()) or {}
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     return {k: v for k, v in data.items() if isinstance(v, dict) and v.get("agent_id") and v.get("api_key")}
 
 

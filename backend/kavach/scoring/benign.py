@@ -14,7 +14,7 @@ from kavach.models import BenignFailure, ChatResponse, TargetConfig, UtilityRepo
 
 @lru_cache
 def load_suite() -> dict[str, Any]:
-    return json.loads((DATA_DIR / "benign_suite.json").read_text())
+    return json.loads((DATA_DIR / "benign_suite.json").read_text(encoding="utf-8"))
 
 
 def evaluate(query: dict[str, Any], resp: ChatResponse, refusal_regex: str) -> tuple[bool, str]:

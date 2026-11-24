@@ -28,7 +28,7 @@ async def _run(rounds: int | None) -> int:
     print(f"events: {run.bus.log_path}")
     if state.report_md:
         out = run.bus.log_path.with_suffix(".report.md")
-        out.write_text(state.report_md)
+        out.write_text(state.report_md, encoding="utf-8")
         print(f"report: {out}")
     return 0 if state.summary.status == "completed" else 1
 

@@ -11,7 +11,7 @@ def test_update_env_keeps_comments_and_appends(tmp_path):
     env.write_text("# keys\nLYZR_API_KEY=\nBAND_ENABLED=true\n")
     changed = update_env(env, {"LYZR_API_KEY": "sk-1", "NEW_KEY": "x"})
     assert set(changed) == {"LYZR_API_KEY", "NEW_KEY"}
-    text = env.read_text()
+    text = env.read_text(encoding="utf-8")
     assert text.startswith("# keys\nLYZR_API_KEY=sk-1\nBAND_ENABLED=true\n")
     assert read_env(env) == {"LYZR_API_KEY": "sk-1", "BAND_ENABLED": "true", "NEW_KEY": "x"}
     assert update_env(env, {"LYZR_API_KEY": "sk-1"}) == []

@@ -11,7 +11,11 @@ from kavach.orchestrator.events import EventBus
 
 
 def load_events(path: Path) -> list[Event]:
-    return [Event.model_validate(json.loads(line)) for line in path.read_text().splitlines() if line.strip()]
+    return [
+        Event.model_validate(json.loads(line))
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
 
 
 async def replay(path: Path, bus: EventBus, summary: RunSummary, speed: float = 1.0) -> dict:

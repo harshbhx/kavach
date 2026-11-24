@@ -84,7 +84,7 @@ def render(src, dst, width):
 
 def write(name, content):
     p = OUT / name
-    p.write_text(content)
+    p.write_text(content, encoding="utf-8")
     return p
 
 
@@ -181,7 +181,7 @@ for name, (col, draw) in ICONS.items():
     body = (f'<circle cx="128" cy="128" r="128" fill="{SURFACE}"/>'
             f'<circle cx="128" cy="128" r="120" fill="none" stroke="{col}" stroke-width="8"/>{draw(col)}')
     p = OUT / "agents" / f"{name}.svg"
-    p.write_text(svg(256, 256, body))
+    p.write_text(svg(256, 256, body), encoding="utf-8")
     render(p, OUT / "agents" / f"{name}.png", 256)
 
 # 8. intro clip (logo strike + wordmark fade) as MP4 + GIF, for the video opening
@@ -225,7 +225,7 @@ for i in range(int(FPS * DUR)):
             f'<path transform="translate({bx + 128 * 2.2 + 40 + wm_dx:.1f} {CH / 2 + 150 * 0.36:.1f})" d="{clip_wm}" '
             f'fill="{TEXT}" opacity="{wm_op:.3f}"/>')
     f = tmp / f"f{i:03d}.svg"
-    f.write_text(svg(CW, CH, body))
+    f.write_text(svg(CW, CH, body), encoding="utf-8")
     render(f, tmp / f"f{i:03d}.png", CW)
 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", str(tmp / "f%03d.png"),
                 "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-crf", "18",

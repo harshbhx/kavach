@@ -104,7 +104,7 @@ async def test_overblocking_patch_fails_utility(settings, hardened):
 
 @pytest.mark.parametrize("round_no", ["1", "2", "3"])
 async def test_attack_library_breaks_v1_and_not_hardened(settings, v1, hardened, round_no):
-    lib = json.loads((DATA_DIR / "attack_library.json").read_text())["rounds"][round_no]
+    lib = json.loads((DATA_DIR / "attack_library.json").read_text(encoding="utf-8"))["rounds"][round_no]
     attacks = lib["injection"] + lib["social"]
     client = TargetClient(settings)
     breached_v1 = breached_h = 0

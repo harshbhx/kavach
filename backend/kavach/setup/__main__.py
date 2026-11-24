@@ -73,7 +73,7 @@ async def provision_band(env: dict[str, str], user_key: str, dry: bool) -> dict[
     p = BandProvisioner(
         user_api_key=user_key, base_url=env.get("BAND_API_BASE") or "https://app.band.ai/api/v1"
     )
-    creds = yaml.safe_load(AGENT_CONFIG.read_text()) if AGENT_CONFIG.exists() else {}
+    creds = yaml.safe_load(AGENT_CONFIG.read_text(encoding="utf-8")) if AGENT_CONFIG.exists() else {}
     creds = creds or {}
     print("\nBand: the shared room")
     me = await p.me()
@@ -95,7 +95,7 @@ async def provision_band(env: dict[str, str], user_key: str, dry: bool) -> dict[
         )
     if changed:
         header = "# Band remote-agent credentials, written by `make setup`. Gitignored. Keys are shown by Band only once.\n"
-        AGENT_CONFIG.write_text(header + yaml.safe_dump(creds, sort_keys=False))
+        AGENT_CONFIG.write_text(header + yaml.safe_dump(creds, sort_keys=False), encoding="utf-8")
         os.chmod(AGENT_CONFIG, 0o600)
     values = {"BAND_ENABLED": "true"}
     if owner:
@@ -133,7 +133,7 @@ async def checks() -> int:
         print(f"{WARN}BRAIN_PROVIDER={s.brain_provider} (Lyzr not used)")
     # Band
     if s.band_enabled:
-        creds = yaml.safe_load(AGENT_CONFIG.read_text()) if AGENT_CONFIG.exists() else {}
+        creds = yaml.safe_load(AGENT_CONFIG.read_text(encoding="utf-8")) if AGENT_CONFIG.exists() else {}
         p = BandProvisioner(user_api_key="", base_url=s.band_api_base)
         ok = 0
         for a in AGENTS:

@@ -54,7 +54,7 @@ class FakeBrain(Brain):
     def __init__(self, settings: Settings):
         super().__init__(settings)
         self.rng = random.Random(settings.seed)
-        self.library = json.loads((DATA_DIR / "attack_library.json").read_text())["rounds"]
+        self.library = json.loads((DATA_DIR / "attack_library.json").read_text(encoding="utf-8"))["rounds"]
 
     async def complete(self, agent: str, message: str, *, session_id: str, temperature: float) -> str:
         if self.settings.fake_delay_s > 0:

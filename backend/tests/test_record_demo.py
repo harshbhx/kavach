@@ -55,7 +55,7 @@ def test_results_fill_the_readme_markers(tmp_path):
     )
     assert fill_markers(readme, "results", results_table(s, "gpt-4o-mini"))
     assert fill_markers(readme, "breach-story", breach_story(s))
-    text = readme.read_text()
+    text = readme.read_text(encoding="utf-8")
     assert "| 1 | v1 | 6 | 100% | v2 | 100% | 1 |" in text
     assert "old" not in text
     assert "<!-- breach-story:start -->100% → 0%<!-- breach-story:end -->" in text

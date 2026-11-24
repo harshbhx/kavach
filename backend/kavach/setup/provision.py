@@ -49,7 +49,7 @@ def _section(md: str, title: str) -> str:
 
 
 def agent_payload(agent: str, provider: str, model: str, credential: str) -> dict[str, Any]:
-    md = (PROMPTS_DIR / "agents" / PROMPT_FILES[agent]).read_text()
+    md = (PROMPTS_DIR / "agents" / PROMPT_FILES[agent]).read_text(encoding="utf-8")
     return {
         "name": f"Kavach {DISPLAY[agent]}",
         "description": DESCRIPTION[agent],

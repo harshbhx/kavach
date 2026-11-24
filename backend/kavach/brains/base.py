@@ -31,7 +31,7 @@ class BrainError(RuntimeError):
 
 
 def system_prompt_for(agent: str) -> str:
-    return (PROMPTS_DIR / "agents" / PROMPT_FILES[agent]).read_text()
+    return (PROMPTS_DIR / "agents" / PROMPT_FILES[agent]).read_text(encoding="utf-8")
 
 
 def format_message(task: str, payload: dict) -> str:
