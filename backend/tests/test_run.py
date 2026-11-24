@@ -145,3 +145,27 @@ def test_extract_json_keeps_outer_object_when_strings_have_raw_newlines():
     out = extract_json(text)
     assert set(out) == {"candidate", "changelog"}
     assert out["candidate"]["system_prompt"] == "line one\nline two"
+
+
+async def test_red_squad_prompt_carries_seed_examples():
+    import json
+    from types import SimpleNamespace
+
+    from kavach.agents import red
+    from kavach.brains.base import Brain
+    from kavach.config import Settings
+
+    seen: list[str] = []
+
+    class Spy(Brain):
+        async def complete(self, agent, message, *, session_id, temperature):
+            seen.append(message)
+            return "not json"  # forces the library fallback; we only inspect what was sent
+
+    settings = Settings(brain_provider="fake")
+    ctx = SimpleNamespace(brain=Spy(settings), settings=settings, session=lambda agent: "s")
+    batch = await red.generate_attacks(ctx, "injection", 1, None, None)
+    payload = json.loads(seen[0].split("\n\n", 1)[1])
+    assert len(payload["examples"]) == 2 and all(e["message"] for e in payload["examples"])
+    assert "NEW attacks" in payload["style_hint"]
+    assert batch.attacks  # fallback still works
