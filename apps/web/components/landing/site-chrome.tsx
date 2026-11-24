@@ -98,7 +98,7 @@ export function SiteHeader() {
               GitHub
             </a>
             <a
-              href="/dashboard/?demo=sample"
+              href="/dashboard/?demo=live"
               className="flex h-10 items-center gap-2 rounded-lg bg-ink px-4 text-[14.5px] font-semibold whitespace-nowrap text-paper-2 shadow-[0_1px_0_rgb(255_255_255/0.12)_inset,0_6px_18px_-10px_rgb(14_35_28/0.7)] transition-colors hover:bg-hold"
             >
               <Play className="size-3.5 fill-current" aria-hidden />
@@ -146,7 +146,7 @@ const FOOTER: { title: string; items: [string, string][] }[] = [
   {
     title: 'Product',
     items: [
-      ['/dashboard/?demo=sample', 'Watch a recorded run'],
+      ['/dashboard/?demo=live', 'Watch a recorded run'],
       ['/#quickstart', 'Run it locally'],
       ['/#passbook', 'How a round runs'],
       ['/#features', 'Breach rules'],
@@ -186,7 +186,7 @@ export function SiteFooter() {
             still get help.
           </p>
           <a
-            href="/dashboard/?demo=sample"
+            href="/dashboard/?demo=live"
             className="mt-6 inline-flex h-10 items-center gap-2 rounded-lg border border-ink/20 bg-paper px-4 text-[14.5px] font-semibold text-ink transition-colors hover:border-ink/40"
           >
             <Play className="size-3.5 fill-current" aria-hidden />

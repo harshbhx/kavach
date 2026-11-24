@@ -55,7 +55,7 @@ export default function HomePage() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
-                  href="/dashboard/?demo=sample"
+                  href="/dashboard/?demo=live"
                   className="rounded-lg bg-ink px-5 py-3 text-[16px] font-semibold text-paper-2 transition-colors hover:bg-hold"
                 >
                   Watch a recorded run

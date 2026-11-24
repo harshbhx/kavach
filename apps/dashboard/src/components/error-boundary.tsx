@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
               >
                 Reload
               </button>
-              <a href="?demo=sample" className="inline-flex h-9 items-center rounded-lg border border-kv-border-strong px-4 text-[14px] font-semibold text-kv-text">
+              <a href="?demo=live" className="inline-flex h-9 items-center rounded-lg border border-kv-border-strong px-4 text-[14px] font-semibold text-kv-text">
                 Open the recorded run
               </a>
             </div>

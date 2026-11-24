@@ -76,7 +76,7 @@ python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, r
 - [ ] The repo is public, the README is complete, and there are no secrets.
 - [ ] `runs/demo_run.jsonl` is committed (`pnpm demo` fills the README results and the numbers above) and replay works from a fresh clone.
 - [ ] The video is ≤ 2:00, uploaded, and the link works in a private window.
-- [ ] The site is live on Cloudflare (*Actions → Deploy site*, after adding `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`); `/dashboard/?demo=sample` plays.
+- [ ] The site is live on Cloudflare (*Actions → Deploy site*, after adding `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`); `/dashboard/?demo=live` plays the recorded run. Use that link as Devpost's "Try it out".
 - [ ] Devpost: description, video URL, repo URL, live site URL, screenshots, "Built with", track chosen.
 - [ ] HiDevs: submitted on the hackathon page (Dr. Agent repo evaluation if prompted).
 - [ ] The HiDevs email line is in the Devpost description.

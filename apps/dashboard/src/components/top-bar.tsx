@@ -193,7 +193,7 @@ export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, o
             Start it from the repo root with <code className="font-mono text-kv-text">pnpm dev</code>, or{' '}
             <code className="font-mono text-kv-text">pnpm dev:offline</code> with no keys. This page reconnects on its own.
           </span>
-          <a href="?demo=sample" className="font-semibold text-kv-defend hover:underline sm:ml-auto">
+          <a href="?demo=live" className="font-semibold text-kv-defend hover:underline sm:ml-auto">
             Watch a recorded run instead
           </a>
         </div>

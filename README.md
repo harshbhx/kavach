@@ -15,7 +15,7 @@
 
 ![The Kavach dashboard after a three-round run](docs/assets/dashboard.png)
 
-<sub>The dashboard after a recorded run: round 1 is breached, the first patch is vetoed for blocking real customers, the second is approved, and rounds 2 and 3 hold. Open it in your browser with `pnpm dev:web` → http://localhost:3000/dashboard?demo=sample (no backend needed).</sub>
+<sub>The dashboard after a recorded run: round 1 is breached, the first patch is vetoed for blocking real customers, the second is approved, and rounds 2 and 3 hold. Open it in your browser with `pnpm dev:web` → http://localhost:3000/dashboard?demo=live (no backend needed; it plays the recorded live run, or the labelled sample until one exists).</sub>
 
 ## The problem
 
@@ -115,7 +115,7 @@ Fills in when you run `pnpm demo`. The bundled offline sample (`runs/sample_simu
 | DiwaliMart, the target bot | **Agent37** sandbox (`scripts/deploy_target_agent37.sh`), or locally |
 | Kavach API (orchestrator, scoring, live dashboard feed) | Wherever you run `pnpm dev` |
 
-**Deploy the site to Cloudflare:** add two repository secrets, `CLOUDFLARE_API_TOKEN` (the "Edit Cloudflare Workers" token template) and `CLOUDFLARE_ACCOUNT_ID`, then run *Actions → Deploy site*. Every push to `main` redeploys. The build is a static export (`pnpm --filter @kavach/web build:cf`), so the docs search, the llms files, the OG images and `/dashboard?demo=sample` all work with no server. To deploy from your own machine: `pnpm --filter @kavach/web deploy:cf` after `npx wrangler login`.
+**Deploy the site to Cloudflare:** add two repository secrets, `CLOUDFLARE_API_TOKEN` (the "Edit Cloudflare Workers" token template) and `CLOUDFLARE_ACCOUNT_ID`, then run *Actions → Deploy site*. Every push to `main` redeploys. The build is a static export (`pnpm --filter @kavach/web build:cf`), so the docs search, the llms files, the OG images and `/dashboard?demo=live` all work with no server. To deploy from your own machine: `pnpm --filter @kavach/web deploy:cf` after `npx wrangler login`.
 
 ## Architecture
 
