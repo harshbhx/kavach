@@ -1,5 +1,5 @@
-/* Kavach design tokens. Import once at the app root (e.g. in src/main.tsx). Dark theme first. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=JetBrains+Mono:wght@400;600&display=swap");
+/* Kavach design tokens. Import once at the app root. Dark theme first.
+   Fonts are loaded by each app (next/font in apps/web, fonts.css in apps/dashboard). */
 
 :root {
   color-scheme: dark;
@@ -35,7 +35,7 @@
   --kv-radius: 14px;
   --kv-radius-sm: 10px;
   --kv-font-sans: "Inter", system-ui, sans-serif;
-  --kv-font-display: "Inter Display", "Inter", system-ui, sans-serif;
+  --kv-font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
   --kv-font-mono: "JetBrains Mono", ui-monospace, monospace;
   --kv-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --kv-dur: 240ms;

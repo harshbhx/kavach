@@ -1,0 +1,20 @@
+{
+  "name": "@kavach/brand",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/KavachLogo.tsx",
+    "./tokens.css": "./src/tokens.css",
+    "./theme.css": "./src/theme.css",
+    "./fonts.css": "./src/fonts.css",
+    "./logo.css": "./src/kavach-logo.css"
+  },
+  "peerDependencies": {
+    "react": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "react": "^19.3.1"
+  }
+}

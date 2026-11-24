@@ -31,7 +31,7 @@
   transform-origin: center;
 }
 .kv-logo__wordmark {
-  font-family: "Inter Display", "Inter", system-ui, sans-serif;
+  font-family: var(--kv-font-wordmark, "Inter Display", "Inter", system-ui, sans-serif);
   font-optical-sizing: auto;
   font-weight: 700;
   letter-spacing: -0.02em;

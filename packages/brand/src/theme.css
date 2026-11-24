@@ -19,8 +19,9 @@
   --color-kv-verdict-soft: rgb(255 176 32 / 0.12);
   --color-kv-brand: #7c5cff;
   --color-kv-brand-hover: #9a82ff;
+  --color-kv-brand-soft: rgb(124 92 255 / 0.16);
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Inter Display", "Inter", system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-kv: 14px;
 }
