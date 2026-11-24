@@ -270,3 +270,58 @@ async def test_api_rejects_bad_input_with_422_and_caps_custom_runs(tmp_path, mon
     assert started.data["custom"]["prompt"] is True
     # a default run is not capped
     assert api.StartRun(rounds=9).options() is None
+
+
+# ── the Patcher's candidate is clamped to the run's own rules ──
+
+
+def _proposal(max_auto=500, codes=("DIWALI10", "FESTIVE50")):
+    from kavach.models import Candidate, GuardPolicy, PatchProposal
+
+    policy = GuardPolicy.model_validate(
+        {
+            "refund": {"max_auto_inr": max_auto},
+            "coupons": {"allowed_codes": list(codes) if codes is not None else None},
+        }
+    )
+    return PatchProposal(candidate=Candidate(system_prompt="p", guard_policy=policy), changelog=["fix"])
+
+
+def test_a_looser_refund_limit_is_clamped_to_the_visitors():
+    from kavach.agents.blue import enforce_run_rules
+
+    p = _proposal(max_auto=500)
+    enforce_run_rules(p, RunRules(refund_limit_inr=200))
+    assert p.candidate.guard_policy.refund.max_auto_inr == 200
+    assert "run rule: refund.max_auto_inr = 200" in p.changelog
+    p = _proposal(max_auto=None)  # no limit at all becomes theirs
+    enforce_run_rules(p, RunRules(refund_limit_inr=200))
+    assert p.candidate.guard_policy.refund.max_auto_inr == 200
+    p = _proposal(max_auto=100)  # an already stricter limit is kept, and nothing is noted
+    enforce_run_rules(p, RunRules(refund_limit_inr=200))
+    assert p.candidate.guard_policy.refund.max_auto_inr == 100 and p.changelog == ["fix"]
+    p = _proposal(
+        max_auto=500
+    )  # a higher limit than the default is honoured by raising nothing: min() keeps the stricter
+    enforce_run_rules(p, RunRules(refund_limit_inr=2000))
+    assert p.candidate.guard_policy.refund.max_auto_inr == 500
+
+
+def test_the_visitors_coupon_list_is_exact():
+    from kavach.agents.blue import enforce_run_rules
+
+    p = _proposal(codes=("DIWALI10", "FESTIVE50"))
+    enforce_run_rules(p, RunRules(allowed_coupons=["SAREE5"]))
+    assert p.candidate.guard_policy.coupons.allowed_codes == ["SAREE5"]
+    p = _proposal(codes=None)
+    enforce_run_rules(p, RunRules(allowed_coupons=["DIWALI10"]))
+    assert p.candidate.guard_policy.coupons.allowed_codes == ["DIWALI10"]
+
+
+def test_default_rules_change_nothing():
+    from kavach.agents.blue import enforce_run_rules
+
+    p = _proposal(max_auto=300)
+    before = p.model_dump()
+    enforce_run_rules(p, RunRules())
+    assert p.model_dump() == before

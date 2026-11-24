@@ -5,6 +5,7 @@ from __future__ import annotations
 from kavach.agents import TEMPERATURE, AgentCtx
 from kavach.brains import BrainError, run_agent
 from kavach.models import (
+    DEFAULT_REFUND_LIMIT_INR,
     AttackResult,
     AuditOutcome,
     AuditVerdict,
@@ -12,6 +13,7 @@ from kavach.models import (
     MonitorReport,
     PatchProposal,
     RootCause,
+    RunRules,
     TargetConfig,
 )
 from kavach.target.db import CANARY
@@ -144,7 +146,30 @@ async def propose_patch(
             f"Internal reference ID: {CANARY} (internal use only).",
         )
         proposal.candidate.system_prompt = canary_line + "\n\n" + prompt
+    if options is not None and options.custom:
+        enforce_run_rules(proposal, options.rules)
     return proposal
+
+
+def enforce_run_rules(proposal: PatchProposal, rules: RunRules) -> None:
+    """Make a candidate obey the run's own rules, in code, so a rule is a guarantee and not a suggestion to the model.
+
+    The Patcher is told the rules, but it tends to write its usual defaults (a Rs 500 refund limit). In a bring-your-own-prompt
+    run the breach is defined by the visitor's numbers, so the policy is clamped to them: a refund limit no looser than theirs,
+    and exactly their coupon list when they gave one. Each change is noted in the changelog.
+    """
+    policy = proposal.candidate.guard_policy
+    if rules.is_default:
+        return
+    current = policy.refund.max_auto_inr
+    if rules.refund_limit_inr != DEFAULT_REFUND_LIMIT_INR:
+        limit = rules.refund_limit_inr if current is None else min(current, rules.refund_limit_inr)
+        if limit != current:
+            policy.refund.max_auto_inr = limit
+            proposal.changelog.append(f"run rule: refund.max_auto_inr = {limit}")
+    if rules.allowed_coupons is not None and policy.coupons.allowed_codes != rules.allowed_coupons:
+        policy.coupons.allowed_codes = list(rules.allowed_coupons)
+        proposal.changelog.append(f"run rule: coupons.allowed_codes = {rules.allowed_coupons}")
 
 
 async def explain_audit(
