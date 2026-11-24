@@ -24,6 +24,14 @@ What it shows, in order:
 - `docs/assets/gifs/dashboard-breach-slip.gif`: the Breaches filter and a slip's detail sheet, from the same recorded run.
 - `docs/assets/gifs/attack-console-sample.gif`: the landing page's attack console switching builds (BREACH to HELD). It shows the offline sample run, so caption it that way.
 
+**The Devpost gallery set** (`docs/assets/devpost/`, 3:2, each under 5 MB, upload in this order; every GIF opens on a finished frame so the gallery thumbnail reads):
+1. `1-kavach-intro.gif`: the mark strikes into place over a guilloche rosette, with the tagline and what Kavach does.
+2. `2-kavach-breach.gif`: the recorded live run's override message, the executed `issue_refund` call and the BREACH stamp.
+3. `3-kavach-agents.gif`: the seven agents, animated, handing off around the room.
+4. `4-kavach-gate.gif`: the utility gate, VETOED then APPROVED. Labelled offline sample: the live runs approved their first patch.
+5. `5-kavach-dashboard.gif`: the recorded live run on the dashboard, from 83% breached to HARDENED, with captions.
+6. `6-kavach-outro.gif`: the mark, the two links, the seven agents and a HARDENED stamp.
+
 ## 2. Live finale plan (28 Nov, if shortlisted)
 
 - Run live with `ROUNDS=2` for speed; keep the replay ready as backup (one click).
