@@ -80,5 +80,26 @@ python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, r
 - [ ] Devpost: description, video URL, repo URL, live site URL, screenshots, "Built with", track chosen.
 - [ ] HiDevs: submitted on the hackathon page (Dr. Agent repo evaluation if prompted).
 - [ ] The HiDevs email line is in the Devpost description.
+- [ ] The organizers know the two emails are one person (Devpost Support's advice, 24 Nov): send the message under "Linking the two registrations" below through **Email the hackathon manager** at the bottom of the sidebar on the Devpost hackathon's Overview page.
 - [ ] Sponsor screenshots are in the README (Lyzr agents, Band room, Agent37 instance).
 - [ ] Devpost thumbnail uploaded (`docs/assets/brand/kavach-devpost-thumbnail.png`); GitHub social preview set (`kavach-social-card.png`).
+
+
+## Linking the two registrations
+
+Devpost registered Harsh as bhanushaliharsh434@gmail.com and HiDevs (Google sign-in only) as harshbhx@gmail.com, the renamed address of the same Google account. Devpost Support can't link them and asked him to tell the organizers. Send this through **Email the hackathon manager** (Devpost hackathon page, Overview, bottom of the sidebar), logged in to Devpost:
+
+**Subject:** Same participant on Devpost and HiDevs: bhanushaliharsh434@gmail.com and harshbhx@gmail.com
+
+> Hi Diwali Festiverse team,
+>
+> I'm Harsh Bhanushali, registered for Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition).
+>
+> My Devpost account uses bhanushaliharsh434@gmail.com. I later renamed that Google account to harshbhx@gmail.com, and because HiDevs only allows Google sign-in, my HiDevs registration is under harshbhx@gmail.com. Both addresses are the same Google account and the same person. I can't change my Devpost email because other things are linked to it.
+>
+> Devpost Support asked me to tell you directly. Could you please treat the two as one registration? My project is Kavach (https://github.com/harshbhx/kavach), and I'm submitting it today on both platforms.
+>
+> Thanks,
+> Harsh Bhanushali
+
+Also put the same line in the HiDevs submission's description: *Devpost account: bhanushaliharsh434@gmail.com (same person as this HiDevs account).*

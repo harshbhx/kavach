@@ -114,7 +114,10 @@ AGENT37_API_KEY=... ANTHROPIC_API_KEY=... ./scripts/deploy_target_agent37.sh
 ```
 Put the `TARGET_URL` and `TARGET_EXTRA_HEADERS` lines it prints into `.env`, run step 6 again, and take the Agent37 screenshot. Delete the instance after the hackathon with `./scripts/deploy_target_agent37.sh delete <id>`.
 
-### 9. Report back
+### 9. Tell the organizers the two emails are one person
+Harsh's Devpost account is bhanushaliharsh434@gmail.com; his HiDevs account is harshbhx@gmail.com (the same Google account, renamed). Devpost Support asked him to tell the organizers. In the browser where Harsh is logged in to Devpost, open the Diwali Festiverse hackathon's **Overview** page, click **Email the hackathon manager** at the bottom of the sidebar, and paste the message under "Linking the two registrations" in `docs/DEMO_AND_SUBMISSION.md`. **Show Harsh the filled form and send only when he says yes.**
+
+### 10. Report back
 Give Harsh this, filled in, to paste to his cloud Claude session, then tell him to say **"start motion"** there:
 
 ```
@@ -125,5 +128,6 @@ Local run done.
 - Sponsor screenshots: Lyzr yes/no, Band yes/no, Agent37 yes/no
 - Target ran on Agent37: yes/no.   AdaL used on the project: yes/no (ask Harsh)
 - Code changes I made: … (or none)
+- Organizers told about the two emails: yes/no
 - Problems left: … (or none)
 ```
