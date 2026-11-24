@@ -209,6 +209,7 @@ export function useRun(onEvent?: (ev: KavachEvent) => void) {
     listener.current = onEvent
   })
   const seen = useRef(-1)
+  const demoToken = useRef(0)
   const demo = useRef<{ run: DemoRun; events: KavachEvent[]; cancel: () => void } | null>(null)
 
   const stopDemo = () => {
@@ -217,6 +218,7 @@ export function useRun(onEvent?: (ev: KavachEvent) => void) {
   }
 
   const attach = (runId: string, mode: 'live' | 'replay') => {
+    demoToken.current++
     source.current?.close()
     stopDemo()
     dispatch({ type: 'reset', runId, mode })
@@ -250,9 +252,13 @@ export function useRun(onEvent?: (ev: KavachEvent) => void) {
 
   /** Play a recorded run bundled with the static build (no API). */
   const attachDemo = async (name: string, speed = 1.5) => {
+    const mine = ++demoToken.current
     source.current?.close()
     stopDemo()
     const run = await loadDemo(name)
+    if (mine !== demoToken.current) return // a newer pick (or a live attach) took over while this one loaded
+    source.current?.close()
+    stopDemo()
     dispatch({ type: 'reset', runId: `demo-${run.name}`, mode: 'demo' })
     const events: KavachEvent[] = []
     const cancel = playDemo(

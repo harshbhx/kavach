@@ -179,7 +179,9 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
                 <RotateCcw className="size-3.5" /> Play again
               </Button>
               <Button asChild className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
-                <a href="https://github.com/harshbhx/kavach#quickstart">Run it yourself</a>
+                <a href="https://github.com/harshbhx/kavach#quickstart" target="_blank" rel="noreferrer">
+                  Run it yourself <ExternalLink className="size-3" aria-hidden />
+                </a>
               </Button>
             </>
           ) : running ? (

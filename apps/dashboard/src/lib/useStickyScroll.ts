@@ -32,7 +32,7 @@ export function useStickyScroll(count: number) {
   const jump = useCallback(() => {
     const el = box.current
     if (!el) return
-    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+    el.scrollTo({ top: el.scrollHeight, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
     pinned.current = true
     setBehind(0)
   }, [])

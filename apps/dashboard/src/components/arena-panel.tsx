@@ -40,7 +40,7 @@ function Slip({ card, attack, newest, onOpen }: { card: ToolCard; attack?: Attac
         onClick={onOpen}
         className={cn(
           'group relative grid w-full grid-cols-[6.5rem_1fr_auto] gap-x-4 border-b border-dotted border-kv-border-strong/70 px-4 py-3 text-left transition-colors',
-          'hover:bg-kv-surface-2/80 focus-visible:bg-kv-surface-2 focus-visible:outline-none',
+          'hover:bg-kv-surface-2/80 focus-visible:bg-kv-surface-2 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-kv-defend focus-visible:outline-none',
           newest && card.verdict === 'breach' && 'bg-kv-attack-soft/60',
         )}
       >

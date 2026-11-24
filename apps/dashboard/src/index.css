@@ -16,14 +16,14 @@
   --color-kv-border-strong: #94b0a3;
   --color-kv-text: #0e231c;
   --color-kv-muted: #3a574c;
-  --color-kv-faint: #56706a;
+  --color-kv-faint: #4a625c;
   --color-kv-attack: #c8203f;
   --color-kv-attack-soft: rgb(200 32 63 / 0.09);
   --color-kv-defend: #0b6e7f;
   --color-kv-defend-soft: rgb(11 110 127 / 0.09);
   --color-kv-secure: #1f7a4d;
   --color-kv-secure-soft: rgb(31 122 77 / 0.1);
-  --color-kv-verdict: #9a6a0e;
+  --color-kv-verdict: #84590a;
   --color-kv-verdict-soft: rgb(176 125 26 / 0.12);
   --color-kv-brand: #0e231c;
   --color-kv-brand-hover: #0b6e7f;
@@ -45,11 +45,11 @@
   --kv-border-strong: #94b0a3;
   --kv-text: #0e231c;
   --kv-muted: #3a574c;
-  --kv-faint: #56706a;
+  --kv-faint: #4a625c;
   --kv-attack: #c8203f;
   --kv-defend: #0b6e7f;
   --kv-secure: #1f7a4d;
-  --kv-verdict: #9a6a0e;
+  --kv-verdict: #84590a;
   --kv-font-wordmark: "IBM Plex Sans Variable", system-ui, sans-serif;
 
   /* shadcn/ui */

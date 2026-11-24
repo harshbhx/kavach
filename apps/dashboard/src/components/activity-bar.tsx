@@ -46,15 +46,13 @@ export function ActivityBar({ run, starting }: { run: RunView; starting: boolean
   const slow = waitedFor >= 20
 
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-kv-defend/30 bg-kv-defend-soft/60 px-4 py-2.5"
-    >
+    <div className="mx-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-kv-defend/30 bg-kv-defend-soft/60 px-4 py-2.5">
       <LoaderCircle className="size-4 animate-spin text-kv-defend" aria-hidden />
       <div className="min-w-0 flex-1 basis-64">
-        <p className="text-[13.5px] font-semibold text-kv-text">{headline}</p>
-        <p className="text-[12.5px] text-kv-muted">
+        <p role="status" className="text-[13.5px] font-semibold text-kv-text">
+          {headline}
+        </p>
+        <p aria-hidden className="text-[12.5px] text-kv-muted">
           {starting
             ? 'This takes a few seconds. You only need to click once.'
             : slow
@@ -89,10 +87,12 @@ export function ActivityBar({ run, starting }: { run: RunView; starting: boolean
 /** The ending: what the run proved, in one line a viewer can read at a glance. */
 function VerdictBanner({ run }: { run: RunView }) {
   const rounds = Object.values(run.rounds).sort((a, b) => a.round - b.round)
-  const first = rounds[0]?.breach_rate ?? null
-  const last = run.final?.final_breach_rate ?? rounds[rounds.length - 1]?.breach_rate ?? null
-  const hardened = first !== null && first > 0 && last !== null && last < first
-  const held = first === 0
+  const rates = rounds.map((r) => r.breach_rate)
+  const worst = rates.length ? Math.max(...rates) : null
+  const last = run.final?.final_breach_rate ?? rates[rates.length - 1] ?? null
+  // Same rule as scripts/build_gallery.py: HELD only if no round was ever breached, HARDENED if the last round is below the worst.
+  const held = worst === 0
+  const hardened = worst !== null && worst > 0 && last !== null && last < worst
   const tone = hardened ? 'secure' : held ? 'defend' : 'attack'
   const word = hardened ? 'HARDENED' : held ? 'HELD' : 'STILL BREACHED'
   const tth = rounds.map((r) => r.tth_seconds).find((v) => v !== null && v !== undefined)

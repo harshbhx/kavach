@@ -110,10 +110,26 @@ def inline(s: str) -> str:
 
 
 def sections(md: str) -> dict[str, str]:
+    """Split the report on its '## ' headings, ignoring headings inside code fences (prompts contain their own)."""
     out: dict[str, str] = {}
-    for part in re.split(r"^## ", md, flags=re.M)[1:]:
-        title, _, body = part.partition("\n")
-        out[title.strip()] = body.strip("\n")
+    title: str | None = None
+    buf: list[str] = []
+    fence: str | None = None
+    for line in md.split("\n"):
+        m = re.match(r"^(`{3,})", line)
+        if m:
+            if fence is None:
+                fence = m.group(1)
+            elif line.strip() == fence:
+                fence = None
+        if fence is None and not m and line.startswith("## "):
+            if title is not None:
+                out[title] = "\n".join(buf).strip("\n")
+            title, buf = line[3:].strip(), []
+        elif title is not None:
+            buf.append(line)
+    if title is not None:
+        out[title] = "\n".join(buf).strip("\n")
     return out
 
 
@@ -252,10 +268,12 @@ def build_html(run: dict) -> tuple[str, str]:
     md = run["report_md"]
     sec = sections(md)
     rounds = run["rounds"]
-    first = rounds[0]["breach_rate"] if rounds else None
-    last = run["final"].get("final_breach_rate", rounds[-1]["breach_rate"] if rounds else None)
-    hardened = first is not None and first > 0 and last is not None and last < first
-    held = first == 0
+    rates = [r["breach_rate"] for r in rounds]
+    worst = max(rates) if rates else None
+    last = run["final"].get("final_breach_rate", rates[-1] if rates else None)
+    # HELD only if no round was ever breached; HARDENED if the last round is below the worst one.
+    held = worst == 0
+    hardened = worst is not None and worst > 0 and last is not None and last < worst
     word = "HARDENED" if hardened else "HELD" if held else "NOT HARDENED"
     color = "#0b6e7f" if (hardened or held) else "#c8203f"
     util = run["final"].get("final_utility")
@@ -275,6 +293,9 @@ def build_html(run: dict) -> tuple[str, str]:
         if "sample" in str(run.get("source", "")).lower()
         else "recorded live run"
     )
+    intro = re.split(r"^## ", md, maxsplit=1, flags=re.M)[0]
+    custom = next((ln for ln in intro.splitlines() if ln.startswith("**Custom prompt run.**")), "")
+    custom_row = f"<dt>Prompt</dt><dd>{inline(custom)}</dd>" if custom else ""
     target = re.search(r"Target: \*\*(.+?)\*\*", md)
     target = target.group(1) if target else "DiwaliMart Support"
     version = run["final"].get("deployed_version", "")
@@ -323,7 +344,8 @@ def build_html(run: dict) -> tuple[str, str]:
       <dt>Run</dt><dd><code>{html.escape(run_id)}</code></dd>
       <dt>Issued</dt><dd>{html.escape(when) or '–'}</dd>
       <dt>Target</dt><dd>{html.escape(target)}, deployed <code>{html.escape(version)}</code>{f', {exploits} exploits found and fixed' if exploits != '' else ''}</dd>
-      <dt>Method</dt><dd>Three rounds. Each attacks whatever the last one shipped. Five fixed rules read the bot's tool-call log.</dd>
+      {custom_row}
+      <dt>Method</dt><dd>{len(rounds)} rounds. Each attacks whatever the last one shipped. Five fixed rules read the bot's tool-call log.</dd>
     </dl>
   </div>
   <div class="cast"><p>Seven agents, one room</p><div class="row">{cast}</div></div>

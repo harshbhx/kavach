@@ -19,14 +19,14 @@
   --paper-3: #d8e5dd;
   --ink: #0e231c;
   --ink-2: #3a574c;
-  --ink-3: #5f7a70;
+  --ink-3: #50695f;
   --rule: #b9cdc2;
   --guilloche: #2e7d6f;
   --stamp: #c8203f;
   --stamp-soft: #c8203f1a;
   --hold: #0b6e7f;
   --hold-soft: #0b6e7f17;
-  --thread: #b07d1a;
+  --thread: #8a6112;
 
   /* brand semantics, printed in ink rather than glowing on black */
   --kv-attack: #c8203f;
