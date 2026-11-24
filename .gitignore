@@ -7,6 +7,7 @@ agent_config.yaml
 # run logs (keep the recorded demo)
 runs/*.jsonl
 !runs/demo_run.jsonl
+!runs/sample_simulated_run.jsonl
 
 # python
 __pycache__/
