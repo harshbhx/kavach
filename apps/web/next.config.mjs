@@ -10,6 +10,9 @@ const config = {
   typescript: { ignoreBuildErrors: true },
   async rewrites() {
     return [
+      // the dashboard demo is a static Vite build copied into public/dashboard
+      { source: '/dashboard', destination: '/dashboard/index.html' },
+      { source: '/dashboard/', destination: '/dashboard/index.html' },
       {
         source: '/docs/:path*.md',
         destination: '/llms.mdx/docs/:path*.md',

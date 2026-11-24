@@ -27,3 +27,6 @@ next-env.d.ts
 # generated from ../../docs by scripts/sync-docs.mjs
 /content/docs/*.md
 /content/docs/architecture.mdx
+
+# the dashboard demo, built by `pnpm --filter @kavach/dashboard build:site`
+/public/dashboard/
