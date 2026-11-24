@@ -1,0 +1,9 @@
+# Keep LF endings on every OS so scripts that parse text (docs sync, JSONL runs) behave the same on Windows.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff2 binary
+*.mp4 binary

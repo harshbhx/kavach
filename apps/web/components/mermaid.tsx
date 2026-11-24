@@ -15,6 +15,9 @@ export function Mermaid({ chart }: { chart: string }) {
         startOnLoad: false,
         securityLevel: 'strict',
         theme: 'base',
+        // Draw at a readable size and let wide charts scroll, instead of shrinking them to fit the column.
+        flowchart: { useMaxWidth: false, nodeSpacing: 36, rankSpacing: 44, padding: 10, htmlLabels: true },
+        sequence: { useMaxWidth: false, actorMargin: 40, messageMargin: 32 },
         fontFamily: 'var(--font-plex), system-ui, sans-serif',
         themeVariables: {
           background: '#f1f6f2',
@@ -38,6 +41,7 @@ export function Mermaid({ chart }: { chart: string }) {
           labelBoxBkgColor: '#e6efe9',
           loopTextColor: '#3a574c',
           edgeLabelBackground: '#f1f6f2',
+          fontSize: '15px',
         },
       });
       try {
@@ -55,7 +59,7 @@ export function Mermaid({ chart }: { chart: string }) {
   if (error) return <pre className="overflow-x-auto rounded-lg border p-4 text-xs">{chart}</pre>;
   return (
     <div
-      className="not-prose my-6 flex justify-center overflow-x-auto rounded-xl border border-rule bg-paper-2 p-4 [&_svg]:h-auto [&_svg]:max-w-full"
+      className="not-prose my-6 overflow-x-auto rounded-xl border border-rule bg-paper-2 p-5 [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-none"
       aria-label="Diagram"
       dangerouslySetInnerHTML={{ __html: svg }}
     />

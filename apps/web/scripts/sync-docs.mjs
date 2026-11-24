@@ -39,7 +39,8 @@ function toMermaidMdx(md) {
 
 await mkdir(out, { recursive: true });
 for (const [file, slug, title, description] of PAGES) {
-  let md = await readFile(path.join(repo, 'docs', file), 'utf8');
+  // Windows checkouts can have CRLF endings; normalise so the title strip and the mermaid conversion match everywhere.
+  let md = (await readFile(path.join(repo, 'docs', file), 'utf8')).replace(/\r\n?/g, '\n');
   md = md.replace(/^# .*\n+/, ''); // the title comes from frontmatter
   md = rewriteLinks(md);
   const hasMermaid = md.includes('```mermaid');
