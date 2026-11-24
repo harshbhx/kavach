@@ -79,7 +79,7 @@ export function SlipSheet({
 
   return (
     <Sheet open={card != null} onOpenChange={(o) => !o && onIndex(null)}>
-      <SheetContent side="right" className="w-full gap-0 border-kv-border-strong bg-kv-surface p-0 sm:max-w-[480px]">
+      <SheetContent data-film="drawer" side="right" className="w-full gap-0 border-kv-border-strong bg-kv-surface p-0 sm:max-w-[480px]">
         {card && (
           <>
             <div className="kv-band h-2.5 border-b border-kv-border" aria-hidden />

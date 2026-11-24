@@ -29,3 +29,6 @@ frontend/dist/
 .next/
 .source/
 runs/video/
+runs/film/
+runs/*.report.md
+!runs/demo_run.report.md

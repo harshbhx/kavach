@@ -55,7 +55,7 @@ export function KpiStrip({ run }: { run: RunView }) {
   const any = run.toolCards.length > 0;
 
   return (
-    <div className="relative grid grid-cols-2 content-center overflow-hidden rounded-xl border border-kv-border-strong/70 bg-kv-surface shadow-[0_18px_40px_-28px_rgb(14_35_28/0.45)] sm:grid-cols-[1fr_1.15fr_1fr_1fr]">
+    <div data-film="counters" className="relative grid grid-cols-2 content-center overflow-hidden rounded-xl border border-kv-border-strong/70 bg-kv-surface shadow-[0_18px_40px_-28px_rgb(14_35_28/0.45)] sm:grid-cols-[1fr_1.15fr_1fr_1fr]">
       <div className="px-4 py-3">
         <p className="truncate text-[12.5px] text-kv-muted">
           Breach rate, round {run.currentRound || 1}

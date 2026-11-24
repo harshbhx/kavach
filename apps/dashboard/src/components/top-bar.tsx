@@ -110,7 +110,7 @@ export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, o
       : []
 
   return (
-    <header className="relative">
+    <header data-film="header" className="relative">
       <div className="kv-band h-3 border-b border-kv-border" aria-hidden />
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3 px-5 py-3">
         <div className="flex items-center gap-2.5">

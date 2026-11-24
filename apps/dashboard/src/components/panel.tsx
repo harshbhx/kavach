@@ -14,6 +14,7 @@ interface PanelProps {
 export function Panel({ title, hint, actions, children, className, bodyClassName }: PanelProps) {
   return (
     <section
+      data-panel={title}
       className={cn(
         'relative flex min-h-0 flex-col overflow-hidden rounded-xl border border-kv-border-strong/70 bg-kv-surface shadow-[0_18px_40px_-28px_rgb(14_35_28/0.45),0_1px_2px_rgb(14_35_28/0.06)]',
         className,

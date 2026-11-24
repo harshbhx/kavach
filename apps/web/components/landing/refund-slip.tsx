@@ -102,7 +102,7 @@ export function RefundSlip() {
   const voided = version === 'v2' && stamped;
 
   return (
-    <figure className="relative">
+    <figure data-film="slip" className="relative">
       <div role="tablist" aria-label="Which guardrail handles the request" className="relative z-10 flex gap-1 pl-6">
         {(['v1', 'v2'] as Version[]).map((v) => (
           <button

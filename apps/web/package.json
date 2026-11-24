@@ -14,7 +14,8 @@
     "start": "next start",
     "lint": "next typegen && oxlint && tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "video": "node scripts/record-video.mjs"
+    "video": "node scripts/record-video.mjs",
+    "film:lift": "node scripts/film-lift.mjs"
   },
   "dependencies": {
     "@kavach/brand": "workspace:*",

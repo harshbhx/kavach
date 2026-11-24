@@ -23,7 +23,7 @@ const OUTCOME = {
 export function RoundRail({ run, total }: { run: RunView; total: number }) {
   const n = Math.max(total, run.currentRound)
   return (
-    <div className="grid overflow-hidden rounded-xl border border-kv-border-strong/70 bg-kv-surface shadow-[0_18px_40px_-28px_rgb(14_35_28/0.45)] md:grid-cols-3">
+    <div data-film="rounds" className="grid overflow-hidden rounded-xl border border-kv-border-strong/70 bg-kv-surface shadow-[0_18px_40px_-28px_rgb(14_35_28/0.45)] md:grid-cols-3">
       {Array.from({ length: n }, (_, i) => i + 1).map((r) => {
         const p = run.progress[r]
         const summary = run.rounds[r]
