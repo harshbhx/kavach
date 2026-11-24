@@ -197,6 +197,8 @@ body { font-family:'Plex','Segoe UI',system-ui,sans-serif; color:var(--ink); fon
 .band.top { top:0 } .band.bot { bottom:0 }
 .inner { position:absolute; inset:17mm 17mm 20mm 17mm }
 .rosette { position:absolute; width:190mm; right:-62mm; top:-48mm; opacity:.55 }
+.runhead { position:absolute; top:11.6mm; left:17mm; right:17mm; display:flex; justify-content:space-between; font:600 6.8pt 'PlexMono',monospace; letter-spacing:.16em; text-transform:uppercase; color:var(--ink3) }
+.runhead b { color:var(--hold); font-weight:600 }
 .foot { position:absolute; left:17mm; right:17mm; bottom:12mm; display:flex; justify-content:space-between; font-family:'PlexMono',monospace; font-size:7.4pt; color:var(--ink3);
         border-top:.4pt solid var(--rule); padding-top:2.2mm }
 .logo { height:11mm; display:block }
@@ -221,7 +223,7 @@ ul { margin:0 0 3mm 4.4mm; color:var(--ink2) } li { margin:0 0 1.2mm }
 .meta dd { color:var(--ink) }
 .seal { position:absolute; width:46mm; height:46mm; right:19mm; bottom:34mm; transform:rotate(-9deg); opacity:.92 }
 .cast { position:absolute; left:17mm; bottom:30mm } .cast .row { display:flex; gap:2.2mm } .cast p { margin:0 0 2.4mm }
-.cast img { width:14mm; height:14mm; border-radius:50% }
+.cast img { width:14mm; height:14mm; border-radius:22% }
 .cast p { font:600 7.4pt 'PlexMono',monospace; letter-spacing:.12em; text-transform:uppercase; color:var(--ink3); line-height:1.4 }
 table { width:100%; border-collapse:collapse; font-size:8.7pt; margin:1mm 0 5mm; background:var(--paper2); border:.6pt solid var(--rule); border-radius:2mm }
 th { text-align:left; font:600 7pt 'PlexMono',monospace; letter-spacing:.1em; text-transform:uppercase; color:var(--ink3); padding:2mm 2.4mm; border-bottom:.8pt solid var(--ink); background:var(--paper3) }
@@ -234,7 +236,7 @@ table.rounds th:nth-child(1){width:6%} table.rounds th:nth-child(2){width:8%} ta
 pre { font-family:'PlexMono',monospace; font-size:7.5pt; line-height:1.55; background:var(--paper2); border:.6pt solid var(--rule); border-left:2pt solid var(--hold); border-radius:1.6mm;
       padding:3.2mm 4mm; white-space:pre-wrap; color:var(--ink) }
 .sig { display:grid; grid-template-columns:repeat(7,1fr); gap:2mm; margin-top:4mm }
-.sig div { text-align:center } .sig img { width:16mm; height:16mm; border-radius:50% } .sig b { display:block; font-size:8pt; margin-top:1.2mm }
+.sig div { text-align:center } .sig img { width:17mm; height:17mm; border-radius:22%; box-shadow:0 0 0 .5pt var(--rule) } .sig b { display:block; font-size:8pt; margin-top:1.2mm }
 .sig span { font:600 6.4pt 'PlexMono',monospace; letter-spacing:.05em; text-transform:uppercase; color:var(--ink3) }
 .sig .red b { color:var(--stamp) } .sig .blue b { color:var(--hold) } .sig .gold b { color:var(--thread) }
 .cols ul { columns:2; column-gap:8mm } .cols li { break-inside:avoid }
@@ -292,7 +294,8 @@ def build_html(run: dict) -> tuple[str, str]:
         return f'<div class="foot"><span>KAVACH · AUDIT REPORT · {html.escape(run_id)}</span><span>PAGE {n} OF 4 · FAKE DATA · SCORED BY CODE</span></div>'
 
     def page(n: int, body: str) -> str:
-        return f'<section class="page"><div class="band top"></div><div class="inner">{body}</div>{foot(n)}<div class="band bot"></div></section>'
+        head = f'<div class="runhead"><span><b>Kavach</b> · Security audit report</span><span>{html.escape(target)} · {html.escape(version)}</span></div>'
+        return f'<section class="page"><div class="band top"></div>{head}<div class="inner">{body}</div>{foot(n)}<div class="band bot"></div></section>'
 
     cover = f"""
 <section class="page cover" style="--vc:{color}">

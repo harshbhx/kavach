@@ -12,6 +12,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "brand:avatars": "node scripts/build-agent-avatars.mjs",
     "deploy:site": "pnpm --filter @kavach/web deploy:cf"
   },
   "devDependencies": {
