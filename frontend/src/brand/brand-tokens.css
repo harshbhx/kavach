@@ -1,0 +1,59 @@
+/* Kavach design tokens. Import once at the app root (e.g. in src/main.tsx). Dark theme first. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  color-scheme: dark;
+
+  /* surfaces */
+  --kv-bg: #0a0a16;          /* page */
+  --kv-surface: #12121f;     /* panels */
+  --kv-surface-2: #1a1a2b;   /* cards, inputs, chips */
+  --kv-border: #26263a;      /* hairlines */
+  --kv-border-strong: #3a3a55;
+
+  /* text */
+  --kv-text: #f5f5fa;
+  --kv-muted: #a1a1b5;
+  --kv-faint: #6b6b80;
+
+  /* semantic */
+  --kv-attack: #ff4d6d;      /* red agents, breaches */
+  --kv-attack-soft: rgba(255, 77, 109, 0.14);
+  --kv-defend: #22d3ee;      /* blue agents, guardrails, BLOCKED */
+  --kv-defend-soft: rgba(34, 211, 238, 0.12);
+  --kv-secure: #34d399;      /* APPROVED, utility line */
+  --kv-secure-soft: rgba(52, 211, 153, 0.12);
+  --kv-verdict: #ffb020;     /* referee, scores, VETOED outline */
+  --kv-verdict-soft: rgba(255, 176, 32, 0.12);
+
+  /* brand accent: primary buttons, links, focus */
+  --kv-brand: #7c5cff;
+  --kv-brand-hover: #9a82ff;
+  --kv-brand-soft: rgba(124, 92, 255, 0.16);
+
+  /* shape + type + motion */
+  --kv-radius: 14px;
+  --kv-radius-sm: 10px;
+  --kv-font-sans: "Inter", system-ui, sans-serif;
+  --kv-font-display: "Inter Display", "Inter", system-ui, sans-serif;
+  --kv-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --kv-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --kv-dur: 240ms;
+}
+
+html,
+body {
+  background: var(--kv-bg);
+  color: var(--kv-text);
+  font-family: var(--kv-font-sans);
+  font-optical-sizing: auto;
+}
+
+::selection {
+  background: var(--kv-brand-soft);
+}
+
+:focus-visible {
+  outline: 2px solid var(--kv-brand);
+  outline-offset: 2px;
+}

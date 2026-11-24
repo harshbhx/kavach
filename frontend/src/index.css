@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import "./brand/tailwind-theme.css";
+
+@layer base {
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgb(124 92 255 / 0.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgb(34 211 238 / 0.06), transparent 60%),
+      var(--kv-bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--kv-border-strong);
+    border-radius: 8px;
+  }
+}
+
+.kv-fade-in {
+  animation: kv-fade-in 260ms var(--kv-ease) both;
+}
+@keyframes kv-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kv-fade-in {
+    animation: none;
+  }
+}

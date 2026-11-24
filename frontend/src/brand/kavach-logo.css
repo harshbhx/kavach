@@ -1,0 +1,120 @@
+/* Kavach logo states. Colours come from brand-tokens.css (falls back to the hex values). */
+.kv-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  line-height: 1;
+}
+.kv-logo svg {
+  overflow: visible;
+  flex: none;
+}
+.kv-logo__rail {
+  fill: var(--kv-defend, #22d3ee);
+  transition: fill 300ms ease;
+}
+.kv-logo__chevron {
+  stroke: var(--kv-attack, #ff4d6d);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+.kv-logo__chevron polyline {
+  stroke: inherit;
+}
+.kv-logo__spark {
+  stroke: var(--kv-verdict, #ffb020);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.kv-logo__body {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.kv-logo__wordmark {
+  font-family: "Inter Display", "Inter", system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--kv-text, #f5f5fa);
+}
+
+/* idle: the rail breathes */
+.kv-logo--idle .kv-logo__rail {
+  animation: kv-breathe 3.2s ease-in-out infinite;
+}
+
+/* attack: chevron strikes, rail flashes, spark ring */
+.kv-logo--attack .kv-logo__chevron {
+  animation: kv-strike 2.8s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+}
+.kv-logo--attack .kv-logo__rail {
+  animation: kv-flash 2.8s ease infinite;
+}
+.kv-logo--attack .kv-logo__spark {
+  animation: kv-spark 2.8s ease-out infinite;
+}
+
+/* breach: chevron punches past the rail, rail turns rose, whole mark shakes */
+.kv-logo--breach .kv-logo__rail {
+  fill: var(--kv-attack, #ff4d6d);
+}
+.kv-logo--breach .kv-logo__chevron {
+  animation: kv-punch 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.kv-logo--breach .kv-logo__body {
+  animation: kv-shake 0.5s ease-in-out 0.25s 2;
+}
+
+/* secured: rail turns mint, chevron rests faded, gold ring pulses once */
+.kv-logo--secured .kv-logo__rail {
+  fill: var(--kv-secure, #34d399);
+}
+.kv-logo--secured .kv-logo__chevron {
+  opacity: 0.55;
+}
+.kv-logo--secured .kv-logo__spark {
+  animation: kv-spark-once 1.1s ease-out both;
+}
+
+@keyframes kv-breathe {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; }
+}
+@keyframes kv-strike {
+  0% { transform: translateX(34px); opacity: 0; }
+  28% { transform: translateX(0); opacity: 1; }
+  36% { transform: translateX(7px); }
+  46%, 82% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(34px); opacity: 0; }
+}
+@keyframes kv-flash {
+  0%, 26% { fill: var(--kv-defend, #22d3ee); }
+  30% { fill: #ffffff; }
+  44%, 100% { fill: var(--kv-defend, #22d3ee); }
+}
+@keyframes kv-spark {
+  0%, 26% { transform: scale(0); opacity: 0; }
+  30% { transform: scale(1); opacity: 1; }
+  50%, 100% { transform: scale(1.9); opacity: 0; }
+}
+@keyframes kv-spark-once {
+  0% { transform: scale(0.4); opacity: 0; }
+  30% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes kv-punch {
+  0% { transform: translateX(34px); }
+  55% { transform: translateX(-14px); }
+  100% { transform: translateX(-6px); }
+}
+@keyframes kv-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kv-logo * {
+    animation: none !important;
+  }
+}
