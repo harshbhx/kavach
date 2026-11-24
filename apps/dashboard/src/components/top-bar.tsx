@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react'
 import ShinyText from '@/components/ShinyText'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { api } from '@/lib/api'
 import type { Health } from '@/lib/types'
 import type { RunView } from '@/lib/useRun'
-import { cn } from '@/lib/utils'
+import { Stamp } from './panel'
 
 interface Props {
   run: RunView
@@ -21,10 +22,17 @@ interface Props {
 }
 
 function targetLabel(h: Health | null) {
-  if (!h) return 'Target unknown'
-  if (h.target_url.includes('agent37')) return 'Target in Agent37 sandbox'
-  if (h.target_url === 'inprocess') return 'Target in-process'
-  return 'Target on localhost'
+  if (!h) return null
+  if (h.target_url.includes('agent37')) return 'Agent37 sandbox'
+  if (h.target_url === 'inprocess') return 'in-process'
+  return 'localhost'
+}
+
+function brainLabel(p?: string) {
+  if (p === 'lyzr') return 'Lyzr agents'
+  if (p === 'direct') return 'direct model agents'
+  if (p === 'fake') return 'scripted agents'
+  return 'agents'
 }
 
 function runLabel(file: string) {
@@ -35,11 +43,21 @@ function runLabel(file: string) {
   return m ? `Run ${m[3]}/${m[2]} ${m[4]}:${m[5]}` : name
 }
 
-function brainLabel(p?: string) {
-  if (p === 'lyzr') return 'Lyzr agents'
-  if (p === 'direct') return 'Direct model agents'
-  if (p === 'fake') return 'Scripted agents (offline)'
-  return 'Agents'
+function SpeedSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="h-9 w-20 border-kv-border-strong bg-kv-surface text-sm" aria-label="Replay speed">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {['1', '1.5', '2', '4'].map((s) => (
+          <SelectItem key={s} value={s}>
+            {s}×
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
 }
 
 export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, onStop }: Props) {
@@ -69,137 +87,113 @@ export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, o
       .catch(() => setReplays([]))
   }, [run.status, demo])
 
-  return (
-    <header className="flex flex-wrap items-center gap-x-5 gap-y-3 px-5 py-3">
-      <KavachLogo size={30} state={logoState} wordmark />
+  const title = demo ?? (run.runId ? `Run ${run.runId.replace(/^kv-/, '')}` : 'No run yet')
+  const facts = demo
+    ? ['played in your browser, no backend']
+    : health
+      ? [brainLabel(health.brain_provider), `target ${targetLabel(health)}`]
+      : []
 
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        <StatusPill run={run} apiDown={apiDown && !demo} />
-        {demo && <span className="rounded-full bg-kv-surface-2 px-2.5 py-1 text-kv-muted">{demo}, played in your browser</span>}
-        {health && (
-          <>
-            <span className="rounded-full bg-kv-surface-2 px-2.5 py-1 text-kv-muted">{brainLabel(health.brain_provider)}</span>
-            <span className="rounded-full bg-kv-surface-2 px-2.5 py-1 text-kv-muted">{targetLabel(health)}</span>
-          </>
-        )}
-        <span className="rounded-full bg-kv-surface-2 px-2.5 py-1 font-medium text-kv-text">
-          Deployed <span className="font-mono text-kv-secure">{run.deployedVersion}</span>
-        </span>
+  return (
+    <header className="relative">
+      <div className="kv-band h-3 border-b border-kv-border" aria-hidden />
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3 px-5 py-3">
+        <div className="flex items-center gap-2.5">
+          <KavachLogo size={30} state={logoState} wordmark />
+          <span className="font-display text-xl leading-none text-kv-faint" lang="hi">
+            कवच
+          </span>
+        </div>
+        <Separator orientation="vertical" className="h-9 bg-kv-border-strong/60" />
+        <div className="min-w-0">
+          <p className="truncate font-display text-[19px] leading-tight text-kv-text">{title}</p>
+          <p className="truncate text-[12.5px] text-kv-faint">
+            DiwaliMart Support, deployed <span className="font-mono text-kv-secure">{run.deployedVersion}</span>
+            {facts.map((f) => (
+              <span key={f}>, {f}</span>
+            ))}
+          </p>
+        </div>
+        <StatusStamp run={run} apiDown={apiDown && !demo} />
         {run.bandUrl && (
           <a
             href={run.bandUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 rounded-full border border-kv-brand/40 px-2.5 py-1 text-kv-brand-hover hover:bg-kv-brand-soft"
+            className="inline-flex items-center gap-1 text-[13px] font-semibold text-kv-defend underline-offset-4 hover:underline"
           >
             Open the Band room <ExternalLink className="size-3" />
           </a>
         )}
         {run.bandErrors > 0 && (
-          <span className="rounded-full bg-kv-verdict-soft px-2.5 py-1 text-kv-verdict">
-            Band unavailable for {run.bandErrors} message{run.bandErrors === 1 ? '' : 's'}; the room below still has everything
+          <span className="text-[12.5px] text-kv-verdict">
+            Band missed {run.bandErrors} message{run.bandErrors === 1 ? '' : 's'}; the room below has all of them
           </span>
         )}
-      </div>
 
-      <div className="ml-auto flex flex-wrap items-center gap-2">
-        {demo ? (
-          <>
-            <Select value={speed} onValueChange={setSpeed}>
-              <SelectTrigger className="h-9 w-20 border-kv-border bg-kv-surface-2 text-sm" aria-label="Replay speed">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-kv-border bg-kv-surface-2">
-                {['1', '1.5', '2', '4'].map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}×
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={() => onReplayDemo(Number(speed))} className="border-kv-border-strong bg-transparent">
-              <RotateCcw className="size-3.5" /> Play again
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          {demo ? (
+            <>
+              <SpeedSelect value={speed} onChange={setSpeed} />
+              <Button variant="outline" onClick={() => onReplayDemo(Number(speed))} className="border-kv-border-strong bg-transparent">
+                <RotateCcw className="size-3.5" /> Play again
+              </Button>
+              <Button asChild className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
+                <a href="https://github.com/harshbhx/kavach#quickstart">Run it yourself</a>
+              </Button>
+            </>
+          ) : running ? (
+            <Button variant="outline" onClick={onStop} className="border-kv-border-strong bg-transparent">
+              <Square className="size-3.5 fill-current" /> Stop run
             </Button>
-            <Button asChild className="bg-kv-brand font-semibold text-kv-bg hover:bg-kv-brand-hover">
-              <a href="https://github.com/harshbhx/kavach#quickstart">Run it yourself</a>
-            </Button>
-          </>
-        ) : running ? (
-          <Button variant="outline" onClick={onStop} className="border-kv-border-strong bg-transparent">
-            <Square className="size-3.5 fill-current" /> Stop run
-          </Button>
-        ) : (
-          <>
-            <Select value={file} onValueChange={setFile} disabled={replays.length === 0}>
-              <SelectTrigger className="h-9 w-56 border-kv-border bg-kv-surface-2 text-sm" aria-label="Recorded run">
-                <SelectValue placeholder="No recorded runs yet" />
-              </SelectTrigger>
-              <SelectContent className="border-kv-border bg-kv-surface-2">
-                {replays.map((r) => (
-                  <SelectItem key={r} value={r}>
-                    {runLabel(r)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={speed} onValueChange={setSpeed}>
-              <SelectTrigger className="h-9 w-20 border-kv-border bg-kv-surface-2 text-sm" aria-label="Replay speed">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="border-kv-border bg-kv-surface-2">
-                {['1', '1.5', '2', '4'].map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}×
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              disabled={!file}
-              onClick={() => onReplay(file, Number(speed))}
-              className="border-kv-border-strong bg-transparent"
-            >
-              <RotateCcw className="size-3.5" /> Replay
-            </Button>
-            <Button onClick={onLive} disabled={apiDown} className="bg-kv-brand font-semibold text-kv-bg hover:bg-kv-brand-hover">
-              <Play className="size-3.5 fill-current" /> Start live run
-            </Button>
-          </>
-        )}
+          ) : (
+            <>
+              <Select value={file} onValueChange={setFile} disabled={replays.length === 0}>
+                <SelectTrigger className="h-9 w-56 border-kv-border-strong bg-kv-surface text-sm" aria-label="Recorded run">
+                  <SelectValue placeholder="No recorded runs yet" />
+                </SelectTrigger>
+                <SelectContent>
+                  {replays.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {runLabel(r)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <SpeedSelect value={speed} onChange={setSpeed} />
+              <Button variant="outline" disabled={!file} onClick={() => onReplay(file, Number(speed))} className="border-kv-border-strong bg-transparent">
+                <RotateCcw className="size-3.5" /> Replay
+              </Button>
+              <Button onClick={onLive} disabled={apiDown} className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
+                <Play className="size-3.5 fill-current" /> Start live run
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </header>
   )
 }
 
-function StatusPill({ run, apiDown }: { run: RunView; apiDown: boolean }) {
-  if (apiDown)
-    return (
-      <span className="rounded-full bg-kv-attack-soft px-2.5 py-1 font-medium text-kv-attack">
-        API offline: start it with make api
-      </span>
-    )
+function StatusStamp({ run, apiDown }: { run: RunView; apiDown: boolean }) {
+  if (apiDown) return <Stamp tone="attack">API offline: run make api</Stamp>
   if (run.status === 'running')
     return (
-      <span className="inline-flex items-center gap-2 rounded-full border border-kv-defend/30 bg-kv-defend-soft px-2.5 py-1 font-medium">
+      <span className="inline-flex items-center gap-2 rounded-full border border-kv-defend/40 bg-kv-defend-soft px-3 py-1 text-[13px] font-semibold">
         <span className="relative flex size-2">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-kv-defend opacity-60" />
           <span className="relative inline-flex size-2 rounded-full bg-kv-defend" />
         </span>
         <ShinyText
           text={`${run.mode === 'live' ? 'Live' : 'Replaying'}, round ${run.currentRound || 1}`}
-          color="#67e8f9"
-          shineColor="#ecfeff"
+          color="#0b6e7f"
+          shineColor="#7fd6e2"
           speed={2.5}
         />
       </span>
     )
-  const map = {
-    idle: ['Ready', 'bg-kv-surface-2 text-kv-muted'],
-    completed: ['Run complete', 'bg-kv-secure-soft text-kv-secure'],
-    failed: ['Run failed', 'bg-kv-attack-soft text-kv-attack'],
-    stopped: ['Stopped', 'bg-kv-verdict-soft text-kv-verdict'],
-  } as const
-  const [label, cls] = map[run.status as keyof typeof map]
-  return <span className={cn('rounded-full px-2.5 py-1 font-medium', cls)}>{label}</span>
+  if (run.status === 'completed') return <Stamp tone="secure">COMPLETE</Stamp>
+  if (run.status === 'failed') return <Stamp tone="attack">FAILED</Stamp>
+  if (run.status === 'stopped') return <Stamp tone="verdict">STOPPED</Stamp>
+  return <span className="text-[13px] text-kv-faint">Ready</span>
 }

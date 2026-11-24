@@ -105,7 +105,10 @@ export default function App() {
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}
           onStop={() => run.runId && api.stop(run.runId)}
         />
-        <RoundRail run={run} total={ROUNDS} />
+        <div className="grid gap-3 px-4 min-[2200px]:grid-cols-[1.5fr_1fr]">
+          <RoundRail run={run} total={ROUNDS} />
+          <KpiStrip run={run} />
+        </div>
         {run.errors.length > 0 && (
           <p className="mx-4 rounded-xl border border-kv-verdict/40 bg-kv-verdict-soft px-4 py-2 text-xs text-kv-verdict">{run.errors[run.errors.length - 1]}</p>
         )}
@@ -114,7 +117,6 @@ export default function App() {
             <RoomPanel run={run} />
           </div>
           <div className="flex min-h-0 min-w-0 flex-col gap-3 xl:col-span-5">
-            <KpiStrip run={run} />
             <div className="h-[480px] min-h-0 xl:h-auto xl:flex-1">
               <ArenaPanel run={run} />
             </div>
@@ -127,7 +129,7 @@ export default function App() {
           </div>
         </main>
       </div>
-      {NARRATE ? <Narration latest={caption} /> : <Toaster position="bottom-right" richColors closeButton />}
+      {NARRATE ? <Narration latest={caption} /> : <Toaster position="bottom-center" richColors closeButton />}
     </TooltipProvider>
   )
 }
