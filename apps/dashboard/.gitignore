@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# bundled at build time by scripts/copy-runs.mjs
+public/runs/

@@ -12,7 +12,7 @@ export const AGENTS: Record<AgentName, { name: string; squad: 'red' | 'blue' | '
 
 export const SQUAD_COLOR = { red: 'var(--kv-attack)', blue: 'var(--kv-defend)', neutral: 'var(--kv-verdict)' } as const
 
-export const avatar = (agent: string) => `/agents/${agent}.png`
+export const avatar = (agent: string) => `${import.meta.env.BASE_URL}agents/${agent}.png`
 
 export const pct = (v: number | null | undefined) => (v === null || v === undefined ? '–' : `${Math.round(v * 100)}%`)
 

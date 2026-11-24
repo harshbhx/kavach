@@ -12,6 +12,9 @@ import { cn } from '@/lib/utils'
 interface Props {
   run: RunView
   logoState: KavachLogoState
+  /** label of the bundled recording when the dashboard runs without an API */
+  demo: string | null
+  onReplayDemo: (speed: number) => void
   onLive: () => void
   onReplay: (file: string, speed: number) => void
   onStop: () => void
@@ -39,7 +42,7 @@ function brainLabel(p?: string) {
   return 'Agents'
 }
 
-export function TopBar({ run, logoState, onLive, onReplay, onStop }: Props) {
+export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, onStop }: Props) {
   const [health, setHealth] = useState<Health | null>(null)
   const [apiDown, setApiDown] = useState(false)
   const [replays, setReplays] = useState<string[]>([])
@@ -48,6 +51,7 @@ export function TopBar({ run, logoState, onLive, onReplay, onStop }: Props) {
   const running = run.status === 'running'
 
   useEffect(() => {
+    if (demo) return
     api
       .health()
       .then((h) => {
@@ -63,14 +67,15 @@ export function TopBar({ run, logoState, onLive, onReplay, onStop }: Props) {
         setFile((cur) => (cur && files.includes(cur) ? cur : (files[0] ?? '')))
       })
       .catch(() => setReplays([]))
-  }, [run.status])
+  }, [run.status, demo])
 
   return (
     <header className="flex flex-wrap items-center gap-x-5 gap-y-3 px-5 py-3">
       <KavachLogo size={30} state={logoState} wordmark />
 
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <StatusPill run={run} apiDown={apiDown} />
+        <StatusPill run={run} apiDown={apiDown && !demo} />
+        {demo && <span className="rounded-full bg-kv-surface-2 px-2.5 py-1 text-kv-muted">{demo}, played in your browser</span>}
         {health && (
           <>
             <span className="rounded-full bg-kv-surface-2 px-2.5 py-1 text-kv-muted">{brainLabel(health.brain_provider)}</span>
@@ -98,7 +103,28 @@ export function TopBar({ run, logoState, onLive, onReplay, onStop }: Props) {
       </div>
 
       <div className="ml-auto flex flex-wrap items-center gap-2">
-        {running ? (
+        {demo ? (
+          <>
+            <Select value={speed} onValueChange={setSpeed}>
+              <SelectTrigger className="h-9 w-20 border-kv-border bg-kv-surface-2 text-sm" aria-label="Replay speed">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="border-kv-border bg-kv-surface-2">
+                {['1', '1.5', '2', '4'].map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}×
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" onClick={() => onReplayDemo(Number(speed))} className="border-kv-border-strong bg-transparent">
+              <RotateCcw className="size-3.5" /> Play again
+            </Button>
+            <Button asChild className="bg-kv-brand font-semibold text-kv-bg hover:bg-kv-brand-hover">
+              <a href="https://github.com/harshbhx/kavach#quickstart">Run it yourself</a>
+            </Button>
+          </>
+        ) : running ? (
           <Button variant="outline" onClick={onStop} className="border-kv-border-strong bg-transparent">
             <Square className="size-3.5 fill-current" /> Stop run
           </Button>
@@ -136,7 +162,7 @@ export function TopBar({ run, logoState, onLive, onReplay, onStop }: Props) {
             >
               <RotateCcw className="size-3.5" /> Replay
             </Button>
-            <Button onClick={onLive} disabled={apiDown} className="bg-kv-brand font-semibold text-white hover:bg-kv-brand-hover">
+            <Button onClick={onLive} disabled={apiDown} className="bg-kv-brand font-semibold text-kv-bg hover:bg-kv-brand-hover">
               <Play className="size-3.5 fill-current" /> Start live run
             </Button>
           </>
@@ -161,7 +187,7 @@ function StatusPill({ run, apiDown }: { run: RunView; apiDown: boolean }) {
           <span className="relative inline-flex size-2 rounded-full bg-kv-defend" />
         </span>
         <ShinyText
-          text={`${run.mode === 'replay' ? 'Replaying' : 'Live'}, round ${run.currentRound || 1}`}
+          text={`${run.mode === 'live' ? 'Live' : 'Replaying'}, round ${run.currentRound || 1}`}
           color="#67e8f9"
           shineColor="#ecfeff"
           speed={2.5}

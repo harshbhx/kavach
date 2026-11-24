@@ -11,6 +11,7 @@ import { TrendPanel } from '@/components/trend-panel'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
+import { DEMO_RUNS, demoParam } from '@/lib/demo'
 import { RULE_LABEL } from '@/lib/format'
 import type { KavachEvent } from '@/lib/types'
 import { useRun } from '@/lib/useRun'
@@ -38,7 +39,8 @@ function useRunToasts() {
 
 export default function App() {
   const onEvent = useRunToasts()
-  const { state: run, attach } = useRun(onEvent)
+  const { state: run, attach, attachDemo, demoData } = useRun(onEvent)
+  const demo = demoParam()
   const [logo, setLogo] = useState<KavachLogoState>('idle')
 
   // Logo follows the run (docs/assets/brand/BRAND.md, "Logo states")
@@ -58,6 +60,10 @@ export default function App() {
   // ?run=<id>[&mode=replay] re-attaches after a refresh
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
+    if (demo) {
+      attachDemo(demo).catch((e) => toast.error('Could not load the recorded run', { description: String(e) }))
+      return
+    }
     const id = q.get('run')
     if (id) attach(id, q.get('mode') === 'replay' ? 'replay' : 'live')
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,6 +85,8 @@ export default function App() {
         <TopBar
           run={run}
           logoState={logo}
+          demo={demo ? (DEMO_RUNS[demo] ?? DEMO_RUNS.sample).label : null}
+          onReplayDemo={(speed) => demo && attachDemo(demo, speed)}
           onLive={() => start(() => api.startLive(), 'live')}
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}
           onStop={() => run.runId && api.stop(run.runId)}
@@ -100,7 +108,7 @@ export default function App() {
           <div className="flex min-h-0 min-w-0 flex-col gap-3 xl:col-span-3">
             <TrendPanel run={run} rounds={ROUNDS} />
             <div className="h-[460px] min-h-0 xl:h-auto xl:flex-1">
-              <PatchPanel run={run} />
+              <PatchPanel run={run} demoData={demoData} />
             </div>
           </div>
         </main>

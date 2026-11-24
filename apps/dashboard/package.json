@@ -4,9 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/copy-runs.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/copy-runs.mjs",
     "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "build:site": "node scripts/copy-runs.mjs && tsc -b && vite build --base=/dashboard/ --outDir ../web/public/dashboard --emptyOutDir",
+    "lint": "oxlint && tsc -b",
     "preview": "vite preview"
   },
   "dependencies": {

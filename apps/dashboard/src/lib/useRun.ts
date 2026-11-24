@@ -1,5 +1,6 @@
 import { useEffect, useReducer, useRef } from 'react'
 import { api } from './api'
+import { configsSoFar, loadDemo, playDemo, type DemoRun } from './demo'
 import type {
   AgentMessage,
   AgentName,
@@ -38,7 +39,7 @@ export interface ChartPoint {
 
 export interface RunView {
   runId: string | null
-  mode: 'live' | 'replay' | null
+  mode: 'live' | 'replay' | 'demo' | null
   status: 'idle' | 'running' | 'completed' | 'failed' | 'stopped'
   currentRound: number
   deployedVersion: string
@@ -84,7 +85,7 @@ export const emptyRun: RunView = {
   speaker: null,
 }
 
-type Action = { type: 'reset'; runId: string; mode: 'live' | 'replay' } | { type: 'event'; ev: KavachEvent } | { type: 'closed' }
+type Action = { type: 'reset'; runId: string; mode: 'live' | 'replay' | 'demo' } | { type: 'event'; ev: KavachEvent } | { type: 'closed' }
 
 const progressOf = (s: RunView, r: number): RoundProgress =>
   s.progress[r] ?? { phase: 'attack', reached: 0, attempts: 0, vetoes: 0, breachRate: null }
@@ -203,9 +204,16 @@ export function useRun(onEvent?: (ev: KavachEvent) => void) {
     listener.current = onEvent
   })
   const seen = useRef(-1)
+  const demo = useRef<{ run: DemoRun; events: KavachEvent[]; cancel: () => void } | null>(null)
+
+  const stopDemo = () => {
+    demo.current?.cancel()
+    demo.current = null
+  }
 
   const attach = (runId: string, mode: 'live' | 'replay') => {
     source.current?.close()
+    stopDemo()
     dispatch({ type: 'reset', runId, mode })
     seen.current = -1
     const es = new EventSource(api.eventsUrl(runId))
@@ -235,10 +243,42 @@ export function useRun(onEvent?: (ev: KavachEvent) => void) {
     }
   }
 
-  useEffect(() => () => source.current?.close(), [])
+  /** Play a recorded run bundled with the static build (no API). */
+  const attachDemo = async (name: string, speed = 1.5) => {
+    source.current?.close()
+    stopDemo()
+    const run = await loadDemo(name)
+    dispatch({ type: 'reset', runId: `demo-${run.name}`, mode: 'demo' })
+    const events: KavachEvent[] = []
+    const cancel = playDemo(
+      run,
+      speed,
+      (ev) => {
+        events.push(ev)
+        dispatch({ type: 'event', ev })
+        listener.current?.(ev)
+      },
+      () => dispatch({ type: 'closed' }),
+    )
+    demo.current = { run, events, cancel }
+  }
+
+  /** In demo mode the patch panel and the report come from the recording instead of the API. */
+  const demoData = () =>
+    demo.current
+      ? { configs: configsSoFar(demo.current.run, demo.current.events), reportMd: demo.current.run.reportMd }
+      : null
+
+  useEffect(
+    () => () => {
+      source.current?.close()
+      demo.current?.cancel()
+    },
+    [],
+  )
   useEffect(() => {
     if (state.status === 'completed' || state.status === 'failed' || state.status === 'stopped') source.current?.close()
   }, [state.status])
 
-  return { state, attach }
+  return { state, attach, attachDemo, demoData }
 }

@@ -22,13 +22,29 @@ function text(c: TargetConfig, view: View) {
 }
 
 /** What the Patcher changed, version by version, against the original v1. */
-export function PatchPanel({ run }: { run: RunView }) {
+interface DemoData {
+  configs: Record<string, TargetConfig>
+  reportMd: string | null
+}
+
+export function PatchPanel({ run, demoData }: { run: RunView; demoData?: () => DemoData | null }) {
   const [configs, setConfigs] = useState<Record<string, TargetConfig>>({})
   const [selected, setSelected] = useState('')
   const [view, setView] = useState<View>('policy')
 
+  const [reportHref, setReportHref] = useState<string | undefined>()
+
   useEffect(() => {
     if (!run.runId) return
+    if (run.mode === 'demo') {
+      const d = demoData?.()
+      if (d) {
+        setConfigs(d.configs)
+        const keys = Object.keys(d.configs).sort((a, b) => order(a) - order(b))
+        setSelected(keys[keys.length - 1] ?? '')
+      }
+      return
+    }
     const t = setTimeout(() => {
       api
         .configs(run.runId!)
@@ -40,7 +56,19 @@ export function PatchPanel({ run }: { run: RunView }) {
         .catch(() => undefined)
     }, 250)
     return () => clearTimeout(t)
-  }, [run.runId, run.configsVersion])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [run.runId, run.configsVersion, run.mode])
+
+  useEffect(() => {
+    if (!run.reportReady || !run.runId) return setReportHref(undefined)
+    if (run.mode !== 'demo') return setReportHref(api.reportUrl(run.runId))
+    const md = demoData?.()?.reportMd
+    if (!md) return setReportHref(undefined)
+    const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }))
+    setReportHref(url)
+    return () => URL.revokeObjectURL(url)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [run.reportReady, run.runId, run.mode])
 
   const keys = Object.keys(configs).sort((a, b) => order(a) - order(b))
   const base = configs.v1
@@ -134,16 +162,17 @@ export function PatchPanel({ run }: { run: RunView }) {
       )}
       <div className="relative border-t border-kv-border/80 p-3">
         <a
-          href={run.reportReady && run.runId ? api.reportUrl(run.runId) : undefined}
-          aria-disabled={!run.reportReady}
+          href={reportHref}
+          download={run.mode === 'demo' ? 'kavach-audit-report.md' : undefined}
+          aria-disabled={!reportHref}
           className={cn(
             'relative flex items-center justify-center gap-2 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors',
-            run.reportReady ? 'bg-kv-brand text-white hover:bg-kv-brand-hover' : 'pointer-events-none bg-kv-surface-2 text-kv-faint',
+            reportHref ? 'bg-kv-brand text-kv-bg hover:bg-kv-brand-hover' : 'pointer-events-none bg-kv-surface-2 text-kv-faint',
           )}
         >
           <Download className="size-4" />
-          {run.reportReady ? 'Download the audit report' : 'Audit report is ready when the run ends'}
-          {run.reportReady && <BorderBeam size={70} duration={5} colorFrom="#ffffff" colorTo="#22d3ee" />}
+          {reportHref ? 'Download the audit report' : 'Audit report is ready when the run ends'}
+          {reportHref && <BorderBeam size={70} duration={5} colorFrom="#0b1311" colorTo="#2fd3e6" />}
         </a>
       </div>
     </Panel>
