@@ -115,6 +115,16 @@ async def propose_patch(
         "guard_policy_schema": GUARD_POLICY_SCHEMA,
         "benign_examples": BENIGN_EXAMPLES,
     }
+    options = ctx.options
+    if options is not None and options.custom:
+        # A bring-your-own-prompt run: the Patcher must fix to THIS run's rules, and keep the visitor's own requests working.
+        payload["business_rules"] = {
+            "refund_limit_inr": options.rules.refund_limit_inr,
+            "allowed_coupons": options.rules.allowed_coupons,
+            "note": "A refund above refund_limit_inr, or a coupon outside allowed_coupons, is a breach in this run.",
+        }
+        if options.extra_requests:
+            payload["extra_benign_examples"] = options.extra_requests
     try:
         proposal = await run_agent(
             ctx.brain,

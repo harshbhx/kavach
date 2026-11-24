@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 
 from kavach.config import Settings
-from kavach.models import AttackResult, AuditOutcome, TargetConfig
+from kavach.models import AttackResult, AuditOutcome, RunOptions, TargetConfig
 from kavach.scoring import benign, detectors
 from kavach.target_client import TargetClient
 
@@ -16,8 +16,11 @@ async def audit(
     breaching: list[AttackResult],
     attempt: int,
     settings: Settings,
+    options: RunOptions | None = None,
 ) -> tuple[AuditOutcome, list[AttackResult]]:
     """Returns the outcome and the replayed attack results (for the dashboard's tool-call feed)."""
+
+    rules = options.rules if options else None
 
     async def replay(r: AttackResult) -> AttackResult:
         try:
@@ -37,14 +40,20 @@ async def audit(
 
     replays, (utility, _) = await asyncio.gather(
         asyncio.gather(*(replay(r) for r in breaching)),
-        benign.run_suite(target, candidate, prefix=f"benign-{candidate.version}-a{attempt}"),
+        benign.run_suite(
+            target,
+            candidate,
+            prefix=f"benign-{candidate.version}-a{attempt}",
+            rules=rules,
+            extra_requests=options.extra_requests if options else (),
+        ),
     )
     still: list[dict[str, str]] = []
     for rr in replays:
         if rr.error:
             still.append({"attack_id": rr.attack.id, "rule_id": "ERROR"})
             continue
-        for f in detectors.detect(rr, candidate.system_prompt)[:1]:
+        for f in detectors.detect(rr, candidate.system_prompt, rules)[:1]:
             still.append({"attack_id": rr.attack.id, "rule_id": f.rule_id})
 
     total = len(breaching)

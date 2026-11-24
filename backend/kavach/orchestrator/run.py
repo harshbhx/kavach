@@ -19,6 +19,7 @@ from kavach.models import (
     Finding,
     MonitorReport,
     RoundSummary,
+    RunOptions,
     RunSummary,
     TargetConfig,
 )
@@ -26,7 +27,7 @@ from kavach.orchestrator.audit import audit
 from kavach.orchestrator.events import EventBus
 from kavach.report.markdown import build_report
 from kavach.scoring import detectors, metrics
-from kavach.target.db import load_v1_config
+from kavach.target.db import custom_v1_config, load_v1_config
 from kavach.target_client import TargetClient
 
 log = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ class RunState:
     patch_history: list[dict] = field(default_factory=list)
     final_report: dict | None = None
     report_md: str | None = None
+    options: RunOptions | None = None  # set only on a bring-your-own-prompt run
 
 
 def policy_changes(old: dict, new: dict, prefix: str = "") -> list[str]:
@@ -80,15 +82,22 @@ class KavachRun:
         brain: Brain,
         target: TargetClient,
         band: BandRoom,
+        options: RunOptions | None = None,
     ):
         self.s = settings
         self.run_id = run_id
         self.bus = bus
-        self.ctx = AgentCtx(brain, settings, run_id)
+        self.options = options if options is not None and options.custom else None
+        self.ctx = AgentCtx(brain, settings, run_id, self.options)
         self.target = target
         self.band = band
-        self.state = RunState(summary=RunSummary(run_id=run_id, mode="live"))
-        self.deployed: TargetConfig = load_v1_config()
+        self.state = RunState(summary=RunSummary(run_id=run_id, mode="live"), options=self.options)
+        self.rules = self.options.rules if self.options else None  # breach thresholds for THIS run
+        self.deployed: TargetConfig = (
+            custom_v1_config(self.options.system_prompt)
+            if self.options and self.options.system_prompt
+            else load_v1_config()
+        )
         self.state.configs["v1"] = self.deployed
         self.dossier: Dossier | None = None
         self.patch_notes: str | None = None
@@ -135,7 +144,7 @@ class KavachRun:
                 round=round_no,
             )
         for c in resp.tool_calls:
-            verdict, rule = detectors.verdict_for_call(c, r.session_user)
+            verdict, rule = detectors.verdict_for_call(c, r.session_user, self.rules)
             self.emit(
                 "toolcall.intercepted",
                 {
@@ -159,17 +168,22 @@ class KavachRun:
     # ── main ──
     async def run(self) -> RunState:
         s = self.s
-        self.emit(
-            "run.started",
-            {
-                "mode": "live",
-                "rounds": s.rounds,
-                "attacks_per_agent": s.attacks_per_agent,
-                "brain_provider": s.brain_provider,
-                "target_url": s.target_url,
-                "target_model": s.target_model,
-            },
-        )
+        started = {
+            "mode": "live",
+            "rounds": s.rounds,
+            "attacks_per_agent": s.attacks_per_agent,
+            "brain_provider": s.brain_provider,
+            "target_url": s.target_url,
+            "target_model": s.target_model,
+        }
+        if self.options:  # never the prompt text itself: only that one was supplied, and the rules
+            started["custom"] = {
+                "prompt": bool(self.options.system_prompt),
+                "refund_limit_inr": self.options.rules.refund_limit_inr,
+                "allowed_coupons": self.options.rules.allowed_coupons,
+                "extra_requests": len(self.options.extra_requests),
+            }
+        self.emit("run.started", started)
         await self.band.open()
         self.state.summary.band_room_url = self.band.room_url
         if self.band.room_url:
@@ -262,7 +276,7 @@ class KavachRun:
         findings: list[Finding] = []
         for res in results:
             self._emit_response(res, "attack", r, res.attack.id)
-            fs = detectors.detect(res, self.deployed.system_prompt)
+            fs = detectors.detect(res, self.deployed.system_prompt, self.rules)
             for f in fs:
                 self.emit("breach.detected", f.model_dump(), round=r)
             findings += fs
@@ -353,7 +367,7 @@ class KavachRun:
                 round=r,
             )
 
-            outcome, replays = await audit(self.target, candidate, breaching, attempt, self.s)
+            outcome, replays = await audit(self.target, candidate, breaching, attempt, self.s, self.options)
             for rr in replays:
                 self._emit_response(rr, "replay", r, rr.attack.id)
             self.emit(

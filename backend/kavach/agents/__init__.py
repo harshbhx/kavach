@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from kavach.brains import Brain
 from kavach.config import Settings
+from kavach.models import RunOptions
 
 TEMPERATURE = {
     "recon": 0.4,
@@ -23,6 +24,7 @@ class AgentCtx:
     brain: Brain
     settings: Settings
     run_id: str
+    options: RunOptions | None = None  # set only on a bring-your-own-prompt run
 
     def session(self, agent: str) -> str:
         return f"{self.run_id}-{agent}"

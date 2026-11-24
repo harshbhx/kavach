@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -11,11 +12,11 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from sse_starlette.sse import EventSourceResponse
 
 from kavach.config import get_settings
-from kavach.models import RunSummary, TargetConfig
+from kavach.models import RunOptions, RunRules, RunSummary, TargetConfig
 from kavach.orchestrator.events import EventBus
 from kavach.orchestrator.replay import replay
 from kavach.runtime import build_run, new_run_id, save_extras
@@ -54,12 +55,71 @@ class RunHandle:
 RUNS: dict[str, RunHandle] = {}
 
 
+CUSTOM_MAX_ROUNDS = 3  # a bring-your-own-prompt run is small on purpose: it costs real model calls
+CUSTOM_MAX_ATTACKS = 3
+_COUPON_CODE = re.compile(r"^[A-Za-z0-9_-]{1,24}$")
+
+
+class RulesIn(BaseModel):
+    """The visitor's own rules for what counts as a breach. Omitted fields keep the defaults."""
+
+    refund_limit_inr: int | None = Field(None, ge=0, le=1_000_000)
+    allowed_coupons: list[str] | None = Field(None, max_length=12)
+
+    @field_validator("allowed_coupons")
+    @classmethod
+    def _coupons(cls, v: list[str] | None) -> list[str] | None:
+        if v is None:
+            return None
+        out: list[str] = []
+        for code in v:
+            code = code.strip()
+            if not _COUPON_CODE.match(code):
+                raise ValueError(f"coupon code {code!r} must be 1 to 24 letters, digits, - or _")
+            if code.upper() not in out:
+                out.append(code.upper())
+        return out
+
+
 class StartRun(BaseModel):
     mode: Literal["live", "replay"] = "live"
     rounds: int | None = None
     attacks_per_agent: int | None = None
     replay_file: str | None = None
     speed: float = 1.0
+    # Bring your own prompt (live runs only). All optional: omitting them leaves a run exactly as it was.
+    system_prompt: str | None = Field(None, max_length=8000)
+    rules: RulesIn | None = None
+    extra_requests: list[str] = Field(default_factory=list, max_length=5)
+
+    @field_validator("system_prompt")
+    @classmethod
+    def _prompt(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        v = v.strip()
+        if len(v) < 20:
+            raise ValueError("system_prompt must be at least 20 characters")
+        return v
+
+    @field_validator("extra_requests")
+    @classmethod
+    def _requests(cls, v: list[str]) -> list[str]:
+        out = [r.strip() for r in v if r.strip()]
+        for r in out:
+            if len(r) > 300:
+                raise ValueError("each extra request must be 300 characters or fewer")
+        return out
+
+    def options(self) -> RunOptions | None:
+        """The custom-run options, or None when none of the three was given."""
+        rules = RunRules()
+        if self.rules:
+            if self.rules.refund_limit_inr is not None:
+                rules.refund_limit_inr = self.rules.refund_limit_inr
+            rules.allowed_coupons = self.rules.allowed_coupons
+        opts = RunOptions(system_prompt=self.system_prompt, rules=rules, extra_requests=self.extra_requests)
+        return opts if opts.custom else None
 
 
 def _active() -> RunHandle | None:
@@ -121,7 +181,11 @@ async def start_run(body: StartRun) -> dict:
         s.rounds = body.rounds
     if body.attacks_per_agent:
         s.attacks_per_agent = body.attacks_per_agent
-    run = build_run(s)
+    options = body.options()
+    if options:  # custom runs are capped; the prompt is never logged
+        s.rounds = min(s.rounds, CUSTOM_MAX_ROUNDS)
+        s.attacks_per_agent = min(s.attacks_per_agent, CUSTOM_MAX_ATTACKS)
+    run = build_run(s, options=options)
     handle = RunHandle(summary=run.state.summary, bus=run.bus, live_state=run.state)
 
     async def go_live():

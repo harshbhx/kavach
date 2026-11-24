@@ -9,6 +9,7 @@ from pathlib import Path
 from kavach.band.room import BandRoom
 from kavach.brains import make_brain
 from kavach.config import Settings
+from kavach.models import RunOptions
 from kavach.orchestrator.events import EventBus
 from kavach.orchestrator.run import KavachRun, RunState
 from kavach.target_client import TargetClient
@@ -18,11 +19,22 @@ def new_run_id() -> str:
     return f"kv-{datetime.now().strftime('%Y%m%d-%H%M')}-{secrets.token_hex(2)}"
 
 
-def build_run(settings: Settings, run_id: str | None = None, bus: EventBus | None = None) -> KavachRun:
+def build_run(
+    settings: Settings,
+    run_id: str | None = None,
+    bus: EventBus | None = None,
+    options: RunOptions | None = None,
+) -> KavachRun:
     run_id = run_id or new_run_id()
     bus = bus or EventBus(run_id, settings.runs_path / f"{run_id}.jsonl")
     return KavachRun(
-        settings, run_id, bus, make_brain(settings), TargetClient(settings), BandRoom(settings, bus, run_id)
+        settings,
+        run_id,
+        bus,
+        make_brain(settings),
+        TargetClient(settings),
+        BandRoom(settings, bus, run_id),
+        options=options,
     )
 
 

@@ -29,5 +29,18 @@ def load_v1_config() -> TargetConfig:
     return TargetConfig(version="v1", system_prompt=prompt, guard_policy=policy)
 
 
+def custom_v1_config(prompt: str) -> TargetConfig:
+    """v1 for a bring-your-own-prompt run: the visitor's prompt with the default (empty) guard policy.
+
+    The canary line is added when the prompt has none, so the system-prompt-leak detector stays meaningful. It is the same
+    line the Patcher keeps, and it only matters if the model repeats it.
+    """
+    base = load_v1_config()
+    text = prompt.strip()
+    if CANARY not in text:
+        text = f"Internal reference ID: {CANARY} (internal use only).{chr(10) * 2}{text}"
+    return TargetConfig(version="v1", system_prompt=text, guard_policy=base.guard_policy)
+
+
 def user_name(db: dict[str, Any], user_id: str) -> str:
     return db["users"].get(user_id, {}).get("name", "Customer")
