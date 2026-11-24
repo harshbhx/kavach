@@ -66,6 +66,32 @@ async def test_band_register_falls_back_to_unwrapped_body():
 
 
 @respx.mock
+async def test_band_register_reads_the_documented_reply():
+    """Shape from Band's OpenAPI spec: data.agent.id and data.credentials.api_key."""
+    route = respx.post("https://app.band.ai/api/v1/me/agents/register").mock(
+        return_value=httpx.Response(
+            201,
+            json={
+                "data": {
+                    "agent": {
+                        "id": "ag-7",
+                        "name": "Kavach Recon",
+                        "owner_id": "user-9",
+                        "inserted_at": "2026-11-24T00:00:00Z",
+                    },
+                    "credentials": {"api_key": "thnv_secret"},
+                }
+            },
+        )
+    )
+    creds = await BandProvisioner(user_api_key="u").register("recon")
+    assert creds == {"agent_id": "ag-7", "api_key": "thnv_secret"}
+    sent = route.calls[0].request
+    assert sent.headers["X-API-Key"] == "u"
+    assert b'"agent"' in sent.content and b'"description"' in sent.content
+
+
+@respx.mock
 async def test_band_me_reads_profile():
     respx.get("https://app.band.ai/api/v1/me/profile").mock(
         return_value=httpx.Response(200, json={"data": {"id": "user-9", "handle": "harsh"}})

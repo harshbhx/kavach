@@ -56,6 +56,9 @@ def agent_payload(agent: str, provider: str, model: str, credential: str) -> dic
         "agent_role": _section(md, "Role") or f"You are {DISPLAY[agent]} in Kavach.",
         "agent_goal": _section(md, "Goal"),
         "agent_instructions": md,
+        # Some Lyzr docs list system_prompt as required; sending both keeps either reading happy.
+        "system_prompt": md,
+        "version": "3",
         "provider_id": provider,
         "model": model,
         "llm_credential_id": credential,
@@ -74,7 +77,7 @@ def _find(data: Any, *keys: str) -> str | None:
             v = data.get(k)
             if isinstance(v, (str, int)) and str(v):
                 return str(v)
-        for wrapper in ("data", "agent", "result"):
+        for wrapper in ("data", "agent", "credentials", "result"):
             if isinstance(data.get(wrapper), dict):
                 found = _find(data[wrapper], *keys)
                 if found:
