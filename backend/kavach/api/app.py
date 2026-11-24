@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
@@ -153,8 +153,11 @@ async def get_run(run_id: str) -> RunSummary:
 
 
 @app.get("/api/runs/{run_id}/events")
-async def run_events(run_id: str, from_seq: int = 0):
+async def run_events(run_id: str, request: Request, from_seq: int = 0):
     h = _get(run_id)
+    last = request.headers.get("last-event-id")
+    if last and last.isdigit():  # EventSource reconnect: resume after the last event it saw
+        from_seq = max(from_seq, int(last) + 1)
 
     async def gen():
         async for ev in h.bus.subscribe(from_seq):

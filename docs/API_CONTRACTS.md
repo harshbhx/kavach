@@ -11,7 +11,7 @@ Three surfaces: (1) the Kavach API used by the dashboard, (2) the event envelope
 | GET | `/api/health` | – | `{ ok, brain_provider, band_enabled, target_url, target_ok }` |
 | POST | `/api/runs` | `{ "mode": "live" \| "replay", "rounds"?: 3, "attacks_per_agent"?: 3, "replay_file"?: "demo_run.jsonl", "speed"?: 1.0, "seed"?: 42 }` | `201 { run_id }` · `409` if a run is active |
 | GET | `/api/runs/{run_id}` | – | `RunSummary` (below) |
-| GET | `/api/runs/{run_id}/events` | `?from_seq=0` | **SSE** stream of `Event` (resends from `from_seq`, then live) |
+| GET | `/api/runs/{run_id}/events` | `?from_seq=0` | **SSE** stream of `Event` (resends from `from_seq`, then live; an EventSource reconnect resumes after its `Last-Event-ID`) |
 | GET | `/api/runs/{run_id}/configs/{version}` | – | `TargetConfig` |
 | GET | `/api/runs/{run_id}/report.md` | – | `text/markdown` attachment `kavach-report-{run_id}.md` |
 | POST | `/api/runs/{run_id}/stop` | – | `{ stopped: true }` |
