@@ -2,18 +2,18 @@
 
 ## 1. The two-minute video
 
-**Made for you:** `pnpm --filter @kavach/web video` films the site and a run on the dashboard with captions and writes `runs/video/kavach-demo.mp4` (1080p, 30 fps). It plays `runs/demo_run.jsonl` when you have recorded one with `pnpm demo`, otherwise the offline sample (and says so on screen). Upload it to YouTube as unlisted.
+**Made for you:** `pnpm --filter @kavach/web video` films the site and a run on the dashboard with captions and writes `runs/video/kavach-demo.mp4` (1080p, 30 fps, about a minute; start the site first with `pnpm --filter @kavach/web build && pnpm --filter @kavach/web start`). It plays `runs/demo_run.jsonl` when you have recorded one with `pnpm demo`, otherwise the offline sample (and says so on screen). Upload it to YouTube as unlisted.
 
 What it shows, in order:
 
 | Time | Screen | Caption |
 |---|---|---|
-| 0:00–0:06 | Title card: the Kavach mark and the sponsors | Seven AI agents attack and harden a support bot |
-| 0:06–0:16 | The landing page: the refund slip gets stamped PAID, then HELD on guardrail v2 | One message made the bot refund ₹54,999 on someone else's order |
-| 0:16–1:45 | The dashboard runs three rounds: Recon's dossier, the attacks, breaches caught by code, the vetoed patch, the approved patch, rounds 2 and 3 holding | One plain sentence per moment, from the dashboard's presenter captions |
-| 1:45–2:00 | End card: repo URL and sponsors | Kavach. Built with Lyzr, Band, Agent37 and AdaL |
+| 0:00–0:04 | Title card: the Kavach mark | Seven AI agents attack and harden a support bot that can move money |
+| 0:04–0:14 | The landing page: the refund slip gets stamped PAID, then HELD on guardrail v2 | One message made the bot refund ₹54,999 on someone else's order |
+| 0:14–0:53 | The dashboard runs three rounds: Recon's dossier, the attacks, breaches caught by code, the vetoed patch, the approved patch, rounds 2 and 3 holding | One plain sentence per moment, from the dashboard's presenter captions |
+| 0:53–0:58 | End card: repo URL and sponsors | Breaches caught by code. Patches that keep customers served. |
 
-**If you want a voice-over**, read the captions; they are timed for about 150 words a minute. For the live Lyzr and Band story, add 5–10 s of the Band room with the agents' @mention messages (screen-record it during `pnpm demo`) after the dashboard part.
+**If you want a voice-over**, read the captions, or slow the run with `--speed 1` for a longer cut (still well under 2:00). For the live Lyzr and Band story, add 5–10 s of the Band room with the agents' @mention messages (screen-record it during `pnpm demo`) after the dashboard part.
 
 **Shots worth capturing for the README and Devpost gallery:** the 7 agents in Lyzr Studio, the Kavach room in Band, the target in Agent37 if you deploy it there.
 
