@@ -167,7 +167,7 @@ export function ArenaPanel({ run }: { run: RunView }) {
           ) : (
             <ul>
               {shown.map((c, i) => (
-                <Slip key={c.seq} card={c} attack={run.attacks[c.ref]} newest={i === shown.length - 1} onOpen={() => setOpen(i)} />
+                <Slip key={c.seq} card={c} attack={run.attacks[c.ref]} newest={run.status === 'running' && i === shown.length - 1} onOpen={() => setOpen(i)} />
               ))}
             </ul>
           )}
