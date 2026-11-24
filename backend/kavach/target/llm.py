@@ -59,6 +59,12 @@ async def run_chat(req: ChatRequest, config: TargetConfig, settings: Settings) -
 _LLM_SLOTS = asyncio.Semaphore(2)
 
 
+def _extra_params(model: str) -> dict:
+    # gpt-oss is a reasoning model: hidden reasoning tokens dominate the cost of a short support reply and eat a
+    # free-tier tokens-per-minute budget. "low" keeps replies fast and cheap, which a support bot would do anyway.
+    return {"reasoning_effort": "low"} if "gpt-oss" in model else {}
+
+
 async def _complete(litellm, settings: Settings, messages: list[dict]):
     """One model call. Free-tier providers (Groq) cap tokens per minute and answer bursts with 429, so a rate
     limit waits and retries instead of failing the whole customer turn; only two calls run at once."""
@@ -71,6 +77,7 @@ async def _complete(litellm, settings: Settings, messages: list[dict]):
                     tools=TOOL_SCHEMAS,
                     temperature=settings.target_temperature,
                     timeout=settings.llm_timeout_s,
+                    **_extra_params(settings.target_model),
                 )
         except litellm.RateLimitError:
             if attempt == 9:
