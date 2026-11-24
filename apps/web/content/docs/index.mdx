@@ -58,7 +58,7 @@ Press **Start live run** on the dashboard. Every run is saved to `runs/<run_id>.
 ### Record the demo
 
 ```bash
-pnpm demo                          # retries until round 1 is breached, a patch is vetoed and utility holds
+pnpm demo                          # keeps recording until a run passes the story check (breached, a patch vetoed, utility held)
 pnpm --filter @kavach/web video    # films the site and the run: runs/video/kavach-demo.mp4
 ```
 

@@ -8,14 +8,18 @@ Three surfaces: (1) the Kavach API used by the dashboard, (2) the event envelope
 
 | Method | Path | Body / Query | Response |
 |---|---|---|---|
-| GET | `/api/health` | – | `{ ok, brain_provider, band_enabled, target_url, target_ok }` |
-| POST | `/api/runs` | `{ "mode": "live" \| "replay", "rounds"?: 3, "attacks_per_agent"?: 3, "replay_file"?: "demo_run.jsonl", "speed"?: 1.0, "seed"?: 42 }` | `201 { run_id }` · `409` if a run is active |
+| GET | `/api/health` | – | `{ ok, brain_provider, band_enabled, target_url, target_model, target_ok }` |
+| POST | `/api/runs` | `{ "mode": "live" \| "replay", "rounds"?: 3, "attacks_per_agent"?: 3, "replay_file"?: "demo_run.jsonl", "speed"?: 1.0, "system_prompt"?: "...", "rules"?: { "refund_limit_inr"?: 500, "allowed_coupons"?: ["DIWALI10"] }, "extra_requests"?: ["..."] }` | `201 { run_id }` · `409` if a run is active · `422` for invalid input |
 | GET | `/api/runs/{run_id}` | – | `RunSummary` (below) |
 | GET | `/api/runs/{run_id}/events` | `?from_seq=0` | **SSE** stream of `Event` (resends from `from_seq`, then live; an EventSource reconnect resumes after its `Last-Event-ID`) |
 | GET | `/api/runs/{run_id}/configs/{version}` | – | `TargetConfig` |
+| GET | `/api/runs/{run_id}/configs` | – | `{ version: TargetConfig }` for every version so far |
+| GET | `/api/replays` | – | `[{ file, size }]`: the recordings in `runs/*.jsonl` |
 | GET | `/api/runs/{run_id}/report.md` | – | `text/markdown` attachment `kavach-report-{run_id}.md` |
 | POST | `/api/runs/{run_id}/stop` | – | `{ stopped: true }` |
 | GET | `/api/runs` | – | `[{ run_id, mode, started_at, status }]` |
+
+`rounds` and `attacks_per_agent` accept 1 to 10. `system_prompt` (20 to 8000 characters), `rules` and `extra_requests` (up to 5) start a bring-your-own-prompt run, which is capped at 3 rounds and 3 attacks per agent; see [Bring your own prompt](bring-your-prompt.md).
 
 ```jsonc
 // RunSummary
@@ -78,7 +82,7 @@ Chart data comes from `round.breach_scored` (Breach line) and `audit.result` (Ut
 
 ## 3. Band outbound messages
 
-Base URL: `BAND_API_BASE` (default `https://api.band.ai/api/v1`; the docs also show `https://app.band.ai/api/v1`, so confirm one with `GET /agent/me` in `scripts/band_setup.py`). Auth: header `X-API-Key: <that agent's api_key>`.
+Base URL: `BAND_API_BASE` (default `https://app.band.ai/api/v1`; confirm it with `GET /agent/me` in `scripts/band_setup.py`). Auth: header `X-API-Key: <that agent's api_key>`.
 
 | Action | Request |
 |---|---|
@@ -94,7 +98,7 @@ Rules (from the Band docs):
 - `403 limit_reached` = plan quota. Stop posting for the run, emit `band.error`, and continue.
 - `503` = backpressure. Retry once after 1 s.
 
-### Message templates (`band/bus.py`)
+### Message templates (`band/room.py`)
 
 | Trigger event | From | Mentions | Content |
 |---|---|---|---|

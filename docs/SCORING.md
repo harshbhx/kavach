@@ -91,5 +91,5 @@ Why ≤ 0.34 and not 0: an LLM target can occasionally still slip on one of 3+ r
 
 - Reset the mock DB before every target call.
 - Target temperature 0.2; Kavach agents 0.4 (Red) / 0.2 (Blue, Referee).
-- Run benign queries and replays concurrently with `asyncio.gather` (semaphore 6).
+- Run benign queries and replays concurrently with `asyncio.gather` (orchestrator semaphore 6; the target throttles its own model calls separately with `TARGET_CONCURRENCY`).
 - For the same seed, the Red fallback picks the same attacks from `data/attack_library.json`.

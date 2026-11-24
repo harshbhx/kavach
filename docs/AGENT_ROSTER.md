@@ -170,13 +170,16 @@ Three calls:
 ## Brain interface (`backend/kavach/brains/base.py`)
 
 ```python
-class Brain(Protocol):
-    async def run(self, agent: AgentName, task: str, payload: dict, *, session_id: str,
-                  temperature: float, schema: type[BaseModel]) -> BaseModel: ...
+class Brain(ABC):
+    async def complete(self, agent: str, message: str, *, session_id: str, temperature: float) -> str: ...
+
+async def run_agent(brain, agent, task, payload, schema, *, session_id, temperature) -> BaseModel: ...
 ```
+
+`complete()` sends one message and returns the raw reply text. `run_agent()` formats `TASK: <task>` plus the JSON payload, extracts the JSON from the reply, validates it against `schema`, retries once with the error, and raises `BrainError` if it still fails.
 
 - `LyzrBrain`: `POST {LYZR_BASE_URL}/inference/chat/` with header `x-api-key`, body `{user_id, agent_id, session_id, message}`. `message` = `TASK: <task>\n\n<json payload>`. The reply text is in the response JSON (verify the field name on the first call; expected `response`). Parse JSON from it.
 - `DirectBrain`: LiteLLM `acompletion` with the system prompt from `prompts/agents/<name>.md` and `DIRECT_MODEL`.
-- `FakeBrain`: deterministic canned outputs from `backend/tests/fixtures/fake_brain/*.json`, so the full pipeline runs offline in tests and CI.
+- `FakeBrain`: scripted in `backend/kavach/brains/fake.py` (it draws on the seeded attack libraries), so the full pipeline runs offline in tests and CI.
 
 `session_id` = `{run_id}-{agent}` so each agent keeps context across rounds in Lyzr.

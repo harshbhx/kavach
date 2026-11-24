@@ -19,7 +19,7 @@ flowchart LR
     BANDC[Band client<br/>7 agent identities]
   end
 
-  subgraph SANDBOX["Agent37 sandbox (or local :8001)"]
+  subgraph SANDBOX["Target (local :8001, or an Agent37 sandbox)"]
     TARGET[DiwaliMart Support agent<br/>LiteLLM tool loop]
     GUARDS[Guard policy engine]
     MOCK[(Mock DB + 4 tools<br/>fake data)]
@@ -43,14 +43,14 @@ Plain-text version (for the README image if Mermaid doesn't render):
 [Dashboard] ⇄ SSE ⇄ [Kavach API: Orchestrator + Scoring + Event bus]
                          │            │                 │
                    Lyzr agents   DiwaliMart target   Band room
-                   (7 brains)    (Agent37 sandbox)   (7 agent identities + you)
+                   (7 brains)    (local or Agent37)   (7 agent identities + you)
 ```
 
 ## 2. Components
 
 | Component | Path | Responsibility |
 |---|---|---|
-| Target service | `backend/kavach/target/` | DiwaliMart agent, 4 mock tools, guard engine, tool log. Stateless per request (DB reset each call). Deployable alone (Agent37). |
+| Target service | `backend/kavach/target/` | DiwaliMart agent, 4 mock tools, guard engine, tool log. Stateless per request (DB reset each call). Deployable alone (Agent37 script included, not deployed). |
 | Models | `backend/kavach/models.py` | All pydantic models: `TargetConfig`, `GuardPolicy`, `ToolCallRecord`, `Attack`, `AttackResult`, `Finding`, agent I/O models, `Event`. |
 | Brains | `backend/kavach/brains/` | `Brain` protocol + `LyzrBrain`, `DirectBrain`, `FakeBrain`. JSON extraction + validation + 1 repair retry. |
 | Agents | `backend/kavach/agents/` | Thin functions per agent, grouped by squad (`red.py`, `blue.py`, `referee.py`): build the payload, call the brain, validate, apply fallbacks. |
@@ -69,7 +69,7 @@ Plain-text version (for the README image if Mermaid doesn't render):
 sequenceDiagram
   participant O as Orchestrator
   participant R as Red agents (Lyzr)
-  participant T as Target (Agent37)
+  participant T as Target
   participant S as Scoring (code)
   participant B as Blue agents (Lyzr)
   participant BD as Band room
@@ -123,8 +123,8 @@ After the last round: `Referee.final_report` → `report.md` → `run.completed`
 | Band | REST (`httpx`) using the documented Agent API. Optional `band-sdk` for stretch C1. | Simple, no extra processes. |
 | Tests | `pytest`, `pytest-asyncio`, `respx` (HTTP mocking) | Offline CI with `FakeBrain`. |
 | Lint | `ruff` (lint + format) | Fast. |
-| Frontend | Vite + React 18 + TypeScript (strict) + Tailwind + Recharts + `diff` (jsdiff) | Quick to build, looks good dark. |
-| Deploy target | Agent37 instance (`agent37-base`), uvicorn on port 8000 inside the sandbox | Sponsor use + isolation story. |
+| Frontend | Vite + React 19 + TypeScript (strict) + Tailwind + Recharts + `diff` (jsdiff) | Quick to build, looks good dark. |
+| Deploy target | Optional: an Agent37 instance (`agent37-base`), uvicorn on port 8000 inside the sandbox. The script is included, but the target has not been deployed there; recorded runs used a local target. | Sponsor use + isolation story. |
 
 ## 6. Configuration (env)
 
@@ -140,7 +140,9 @@ See `.env.example` for the full list. Key flags:
 | `ATTACKS_PER_AGENT` | `3` | Attacks per Red attacker per round (6 per round) |
 | `MAX_PATCH_ATTEMPTS` | `3` | Auditor loop cap |
 | `UTILITY_THRESHOLD` | `0.9` | Patch acceptance |
-| `MAX_CONCURRENCY` | `6` | Parallel target calls |
+| `MAX_CONCURRENCY` | `6` | Orchestrator calls to the target in flight at once |
+| `TARGET_CONCURRENCY` | `2` | Model calls in flight inside the target (raise it on a paid model tier) |
+| `ATTACK_LIBRARY` | `standard` | `standard` (4 + 4 attacks per round) or `hard` (5 + 5, escalating levels) |
 
 ## 7. Failure handling
 
