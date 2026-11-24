@@ -9,7 +9,7 @@
     "prebuild": "node scripts/sync-docs.mjs && pnpm --filter @kavach/dashboard build:site",
     "build": "next build",
     "start": "next start",
-    "lint": "oxlint && tsc --noEmit",
+    "lint": "next typegen && oxlint && tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "video": "node scripts/record-video.mjs"
   },
