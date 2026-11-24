@@ -28,7 +28,8 @@ export function Wordmark({ size = 26 }: { size?: number }) {
 }
 
 const NAV = [
-  ['passbook', 'How a round runs'],
+  ['try', 'Try it'],
+  ['round', 'A round'],
   ['features', 'Breach rules'],
   ['signatories', 'The agents'],
   ['quickstart', 'Run it'],

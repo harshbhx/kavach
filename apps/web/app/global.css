@@ -206,3 +206,22 @@ body {
     animation: none;
   }
 }
+
+/* The security thread on the landing page: one slow pass, paused under reduced motion and on hover. */
+.kv-thread {
+  animation: kv-thread 70s linear infinite;
+}
+.kv-thread:hover {
+  animation-play-state: paused;
+}
+@keyframes kv-thread {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kv-thread {
+    animation: none;
+  }
+}
+

@@ -1,10 +1,15 @@
 import Link from 'next/link';
+import { AttackConsole } from '@/components/landing/attack-console';
+import { AttackThread } from '@/components/landing/attack-thread';
 import { AuditForms } from '@/components/landing/audit-forms';
 import { Passbook } from '@/components/landing/passbook';
 import { RefundSlip } from '@/components/landing/refund-slip';
+import { RoundTimeline } from '@/components/landing/round-timeline';
+import { RunMap } from '@/components/landing/run-map';
 import { SecurityFeatures } from '@/components/landing/security-features';
 import { RoomCast } from '@/components/landing/room-cast';
 import { Signatories } from '@/components/landing/signatories';
+import { WhatsReal } from '@/components/landing/whats-real';
 import { AGENTS } from '@/components/landing/agents-data';
 import { AgentAvatar } from '@kavach/brand/avatar';
 import { GitHubIcon } from '@/components/landing/site-chrome';
@@ -89,6 +94,35 @@ export default function HomePage() {
         </div>
       </section>
 
+      <AttackThread />
+
+      {/* Try the attacks yourself */}
+      <section>
+        <div className="mx-auto max-w-[1200px] px-5 py-24">
+          <Heading id="try" title="Send Diya an attack.">
+            <p>
+              Six messages Kavach’s attackers sent in round 1, and one from an ordinary customer. Pick one, then switch between
+              the bot as Kavach found it, the first patch, which the Auditor threw out, and the patch that shipped.
+            </p>
+          </Heading>
+          <div className="mt-12">
+            <AttackConsole />
+          </div>
+        </div>
+      </section>
+
+      {/* One run, second by second */}
+      <section className="border-t border-ink/15 bg-paper-2/60">
+        <div className="mx-auto max-w-[1200px] px-5 py-24">
+          <Heading id="round" title="Thirty-five seconds, from first probe to report.">
+            <p>The sample run, step by step. Times are seconds after the Referee opened the room.</p>
+          </Heading>
+          <div className="mt-14">
+            <RoundTimeline />
+          </div>
+        </div>
+      </section>
+
       {/* The round, as a passbook */}
       <section className="border-t border-ink/15">
         <div className="mx-auto max-w-[1200px] px-5 py-24">
@@ -148,6 +182,18 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* What is real */}
+      <section className="border-t border-ink/15">
+        <div className="mx-auto max-w-[1200px] px-5 py-24">
+          <Heading id="real" title="What is real here, and what is not.">
+            <p>A security tool that hides its own seams is not one to trust, so here they are.</p>
+          </Heading>
+          <div className="mt-12">
+            <WhatsReal />
+          </div>
+        </div>
+      </section>
+
       {/* Sponsors, as the printer's colophon */}
       <section className="relative bg-ink text-paper">
         <div className="kv-band h-5 opacity-60" aria-hidden />
@@ -155,7 +201,10 @@ export default function HomePage() {
           <h2 className="max-w-[50rem] font-display text-[2.4rem] leading-[1.05] text-paper-2 text-balance md:text-[3rem]">
             Printed with four sponsor platforms, each doing a real job.
           </h2>
-          <dl className="mt-12 grid gap-px overflow-hidden rounded-xl border border-paper/15 bg-paper/15 md:grid-cols-4">
+          <div className="mt-12">
+            <RunMap />
+          </div>
+          <dl className="mt-10 grid gap-px overflow-hidden rounded-xl border border-paper/15 bg-paper/15 md:grid-cols-4">
             {SPONSORS.map(([name, text]) => (
               <div key={name} className="bg-ink p-6">
                 <dt className="font-display text-[2rem] leading-none text-paper-2">{name}</dt>
