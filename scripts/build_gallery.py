@@ -67,7 +67,7 @@ def fill_readme(gallery: list[dict]) -> None:
         trend = " → ".join(f"{round(t * 100)}%" for t in g["trend"])
         util = "–" if g["utility"] is None else f"{round(g['utility'] * 100)}%"
         tth = "–" if g["tthSeconds"] is None else f"{round(g['tthSeconds'])}s"
-        link = f"[{g['title']}](https://kavach.creharsh.workers.dev/dashboard/?demo={g['id']})"
+        link = f"[{g['title']}](https://kavach.dualmindlab.tech/dashboard/?demo={g['id']})"
         rows.append(f"| {i} · {link} | `{g['model']}` | {trend} | {util} | {tth} |")
     text = readme.read_text(encoding="utf-8")
     pattern = re.compile(r"(<!-- gallery:start -->)(.*?)(<!-- gallery:end -->)", re.S)

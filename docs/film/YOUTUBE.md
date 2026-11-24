@@ -19,8 +19,8 @@ Two things make it different:
 Built for Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition), Security track, with Lyzr (the agents), Band (the room they talk in), Agent37 (the sandbox) and Cloudflare (the site).
 
 Code: https://github.com/harshbhx/kavach
-Live site and recorded run: <your Cloudflare link>/dashboard/?demo=sample
-Docs: <your Cloudflare link>/docs
+Live site and recorded run: https://kavach.dualmindlab.tech/dashboard/?demo=live
+Docs: https://kavach.dualmindlab.tech/docs
 
 0:00 The problem
 0:24 Kavach

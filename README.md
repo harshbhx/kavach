@@ -5,9 +5,9 @@
 <h3 align="center">Seven AI agents attack and harden a refund-issuing support bot, without breaking it for real customers.</h3>
 
 <p align="center">
-  <a href="https://kavach.creharsh.workers.dev"><b>Live site</b></a> ·
-  <a href="https://kavach.creharsh.workers.dev/dashboard/?demo=live"><b>Watch a recorded run</b></a> ·
-  <a href="https://kavach.creharsh.workers.dev/docs">Docs</a> ·
+  <a href="https://kavach.dualmindlab.tech"><b>Live site</b></a> ·
+  <a href="https://kavach.dualmindlab.tech/dashboard/?demo=live"><b>Watch a recorded run</b></a> ·
+  <a href="https://kavach.dualmindlab.tech/docs">Docs</a> ·
   <a href="docs/Kavach-Audit-Report-sample.pdf">Sample audit report (PDF)</a>
 </p>
 
@@ -32,7 +32,7 @@
 
 ![The Kavach dashboard after the headline run: breach rate 83% to 0% to 0%, utility 100%](docs/assets/dashboard.jpg)
 
-<sub>The dashboard at the end of the headline run (Demo 1): round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Pick any of the eight recorded runs with the Demo picker at https://kavach.creharsh.workers.dev/dashboard/?demo=demo1, or locally with `pnpm dev:web` → http://localhost:3000/dashboard?demo=demo1 (no backend needed).</sub>
+<sub>The dashboard at the end of the headline run (Demo 1): round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Pick any of the eight recorded runs with the Demo picker at https://kavach.dualmindlab.tech/dashboard/?demo=demo1, or locally with `pnpm dev:web` → http://localhost:3000/dashboard?demo=demo1 (no backend needed).</sub>
 
 ## The problem
 
@@ -170,19 +170,19 @@ The committed demo run is hardened by its first patch, so it contains no vetoed 
 
 ### Recorded runs
 
-Every run below is a real recording (Lyzr agents, a Band room, a live model as the victim bot). Open one in the [dashboard](https://kavach.creharsh.workers.dev/dashboard/?demo=demo1) with the Demo picker, or from the landing page. The table is generated from the recordings by `python scripts/build_gallery.py`.
+Every run below is a real recording (Lyzr agents, a Band room, a live model as the victim bot). Open one in the [dashboard](https://kavach.dualmindlab.tech/dashboard/?demo=demo1) with the Demo picker, or from the landing page. The table is generated from the recordings by `python scripts/build_gallery.py`.
 
 <!-- gallery:start -->
 | Demo | Victim model | Breach rate by round | Utility | Hardened in |
 |---|---|---|---|---|
-| 1 · [Headline run](https://kavach.creharsh.workers.dev/dashboard/?demo=demo1) | `groq/openai/gpt-oss-20b` | 83% → 0% → 0% | 100% | 38s |
-| 2 · [Deep run: 5 rounds](https://kavach.creharsh.workers.dev/dashboard/?demo=demo2) | `groq/openai/gpt-oss-20b` | 80% → 0% → 0% → 0% → 0% | 100% | 71s |
-| 3 · [Four rounds](https://kavach.creharsh.workers.dev/dashboard/?demo=demo3) | `groq/openai/gpt-oss-20b` | 50% → 0% → 0% → 0% | 100% | 66s |
-| 4 · [Bigger victim: gpt-oss-120b](https://kavach.creharsh.workers.dev/dashboard/?demo=demo4) | `groq/openai/gpt-oss-120b` | 67% → 0% → 0% | 100% | 87s |
-| 5 · [A late find: Qwen 27B](https://kavach.creharsh.workers.dev/dashboard/?demo=demo5) | `groq/qwen/qwen3.8-27b` | 0% → 17% → 0% | 100% | 36s |
-| 6 · [Frontier victim: Claude Haiku 5.5](https://kavach.creharsh.workers.dev/dashboard/?demo=demo6) | `anthropic/claude-haiku-5-5` | 17% → 0% → 0% | 90% | 82s |
-| 7 · [Hard mode: escalating attacks](https://kavach.creharsh.workers.dev/dashboard/?demo=demo7) | `groq/openai/gpt-oss-20b` | 60% → 0% → 0% | 100% | 58s |
-| 8 · [Hard mode vs the bigger model](https://kavach.creharsh.workers.dev/dashboard/?demo=demo8) | `groq/openai/gpt-oss-120b` | 10% → 0% → 0% | 100% | 53s |
+| 1 · [Headline run](https://kavach.dualmindlab.tech/dashboard/?demo=demo1) | `groq/openai/gpt-oss-20b` | 83% → 0% → 0% | 100% | 38s |
+| 2 · [Deep run: 5 rounds](https://kavach.dualmindlab.tech/dashboard/?demo=demo2) | `groq/openai/gpt-oss-20b` | 80% → 0% → 0% → 0% → 0% | 100% | 71s |
+| 3 · [Four rounds](https://kavach.dualmindlab.tech/dashboard/?demo=demo3) | `groq/openai/gpt-oss-20b` | 50% → 0% → 0% → 0% | 100% | 66s |
+| 4 · [Bigger victim: gpt-oss-120b](https://kavach.dualmindlab.tech/dashboard/?demo=demo4) | `groq/openai/gpt-oss-120b` | 67% → 0% → 0% | 100% | 87s |
+| 5 · [A late find: Qwen 27B](https://kavach.dualmindlab.tech/dashboard/?demo=demo5) | `groq/qwen/qwen3.8-27b` | 0% → 17% → 0% | 100% | 36s |
+| 6 · [Frontier victim: Claude Haiku 5.5](https://kavach.dualmindlab.tech/dashboard/?demo=demo6) | `anthropic/claude-haiku-5-5` | 17% → 0% → 0% | 90% | 82s |
+| 7 · [Hard mode: escalating attacks](https://kavach.dualmindlab.tech/dashboard/?demo=demo7) | `groq/openai/gpt-oss-20b` | 60% → 0% → 0% | 100% | 58s |
+| 8 · [Hard mode vs the bigger model](https://kavach.dualmindlab.tech/dashboard/?demo=demo8) | `groq/openai/gpt-oss-120b` | 10% → 0% → 0% | 100% | 53s |
 <!-- gallery:end -->
 
 ## Where it runs

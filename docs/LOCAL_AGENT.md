@@ -93,9 +93,9 @@ git push
 cd apps/web && npx wrangler login && cd ../..
 pnpm deploy:site
 ```
-`wrangler login` opens a Cloudflare page: Harsh approves it. The deploy prints the address, `https://kavach.<subdomain>.workers.dev`. Deploy once more with that address so social cards point at it:
+`wrangler login` opens a Cloudflare page: Harsh approves it. The site's main address is https://kavach.dualmindlab.tech, and production builds already point social cards at it. To be explicit:
 ```bash
-NEXT_PUBLIC_SITE_URL=https://kavach.<subdomain>.workers.dev pnpm deploy:site
+NEXT_PUBLIC_SITE_URL=https://kavach.dualmindlab.tech pnpm deploy:site
 ```
 Check these all load: `/`, `/docs`, `/docs/scoring`, `/dashboard/?demo=live` (your recorded run) and `/dashboard/?demo=sample`.
 
@@ -103,7 +103,7 @@ Check these all load: `/`, `/docs`, `/docs/scoring`, `/dashboard/?demo=live` (yo
 ```bash
 gh repo edit harshbhx/kavach \
   --description "Seven AI agents attack and harden a refund-issuing support bot. Breaches are caught by code; a patch ships only if real customers still get help." \
-  --homepage "https://kavach.<subdomain>.workers.dev" \
+  --homepage "https://kavach.dualmindlab.tech" \
   --add-topic ai-agents,agent-to-agent,llm-security,red-teaming,prompt-injection,guardrails,multi-agent,lyzr,band,agent37,fastapi,nextjs,cloudflare-workers,hackathon
 ```
 
@@ -124,7 +124,7 @@ Give Harsh this, filled in, to paste to his cloud Claude session, then tell him 
 Local run done.
 - Target model: …   Probe breach rate (v1): …%
 - Demo run: breach … → … → …, vetoes …, utility …%, time to harden … s   (pushed: yes/no)
-- Site: https://kavach.<subdomain>.workers.dev
+- Site: https://kavach.dualmindlab.tech
 - Sponsor screenshots: Lyzr yes/no, Band yes/no, Agent37 yes/no
 - Target ran on Agent37: yes/no.   AdaL used on the project: yes/no (ask Harsh)
 - Code changes I made: … (or none)

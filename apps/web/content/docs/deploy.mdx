@@ -33,7 +33,7 @@ pnpm --filter @kavach/web exec wrangler login
 pnpm deploy:site
 ```
 
-This syncs the docs from `docs/`, builds the dashboard into the site under `/dashboard/`, exports everything as static HTML (`STATIC_EXPORT=1`) to `apps/web/out` and uploads it with `wrangler deploy`. Set `NEXT_PUBLIC_SITE_URL` to the final address first, so social cards use absolute links.
+This syncs the docs from `docs/`, builds the dashboard into the site under `/dashboard/`, exports everything as static HTML (`STATIC_EXPORT=1`) to `apps/web/out` and uploads it with `wrangler deploy`. Social cards use absolute links to https://kavach.dualmindlab.tech; set `NEXT_PUBLIC_SITE_URL` first if you deploy somewhere else.
 
 </Step>
 <Step>
@@ -57,7 +57,7 @@ The Worker is configured in `apps/web/wrangler.jsonc`: it serves `./out`, adds t
 - `CLOUDFLARE_API_TOKEN`, a token with *Workers Scripts: Edit*
 - `CLOUDFLARE_ACCOUNT_ID`
 
-Without them, the workflow still builds, so a broken export fails the check, and skips the upload. It works out the site address from your `workers.dev` subdomain, or from a `SITE_URL` repository variable if you set one.
+Without them, the workflow still builds, so a broken export fails the check, and skips the upload. Social cards point at the live site, https://kavach.dualmindlab.tech, unless you set a `SITE_URL` repository variable (useful for a fork).
 
 ### Ship a new recording
 
