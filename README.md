@@ -1,17 +1,40 @@
 <p align="center">
-  <img src="docs/assets/brand/kavach-logo-light.svg" alt="Kavach" width="400">
+  <a href="https://kavach.dualmindlab.tech"><img src="docs/assets/devpost/1-kavach-intro.gif" width="100%" alt="The Kavach mark strikes into place over a guilloche rosette: Kavach, कवच, armour for agents that can act"></a>
 </p>
 
-<h3 align="center">Seven AI agents attack and harden a refund-issuing support bot, without breaking it for real customers.</h3>
+<h3 align="center">Seven AI agents attack your tool-using support bot, harden it,<br>and prove real customers still get help.</h3>
+
+<p align="center"><i>Breaches are scored by code, not by a model.</i></p>
 
 <p align="center">
   <a href="https://kavach.dualmindlab.tech"><b>Live site</b></a> ·
-  <a href="https://kavach.dualmindlab.tech/dashboard/?demo=live"><b>Watch a recorded run</b></a> ·
+  <a href="https://kavach.dualmindlab.tech/dashboard/?demo=demo1"><b>Watch a recorded live run</b></a> ·
   <a href="https://kavach.dualmindlab.tech/docs">Docs</a> ·
-  <a href="docs/Kavach-Audit-Report-sample.pdf">Sample audit report (PDF)</a>
+  <a href="docs/Kavach-Audit-Report.pdf">Audit report (PDF)</a>
 </p>
 
+<p align="center">
+  <a href="https://github.com/harshbhx/kavach/actions/workflows/ci.yml"><img src="https://github.com/harshbhx/kavach/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/track-Security%20(Attack%20%26%20Defend)-0b6e7f" alt="Security track">
+  <img src="https://img.shields.io/badge/agents-Lyzr-1f7a4d" alt="Agents on Lyzr">
+  <img src="https://img.shields.io/badge/room-Band-1f7a4d" alt="Room on Band">
+  <img src="https://img.shields.io/badge/site-Cloudflare%20Workers-3a574c" alt="Site on Cloudflare Workers">
+  <img src="https://img.shields.io/badge/license-MIT-3a574c" alt="MIT">
+</p>
+
+<table align="center">
+  <tr>
+    <td align="center"><b>83% → 0%</b><br><sub>breach rate, round 1 to 3</sub></td>
+    <td align="center"><b>100%</b><br><sub>everyday requests still served</sub></td>
+    <td align="center"><b>38 s</b><br><sub>time to harden, round start to shipped patch</sub></td>
+    <td align="center"><b>8 of 8</b><br><sub>recorded live runs hardened, 4 victim models</sub></td>
+  </tr>
+</table>
+
+<p align="center"><sub>Numbers from the headline run (a recorded live run, victim model <code>gpt-oss-20b</code>) and the eight recordings under <a href="#recorded-runs">Recorded runs</a>.</sub></p>
+
 <p align="center"><sub>
+  <a href="#the-problem">The problem</a> ·
   <a href="#what-kavach-does">What it does</a> ·
   <a href="#what-we-learned">What we learned</a> ·
   <a href="#how-the-sponsors-power-it">Sponsors</a> ·
@@ -20,31 +43,35 @@
   <a href="#roadmap">Roadmap</a>
 </sub></p>
 
-<p align="center">
-  <a href="https://github.com/harshbhx/kavach/actions/workflows/ci.yml"><img src="https://github.com/harshbhx/kavach/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/track-Security%20(Attack%20%26%20Defend)-0b6e7f" alt="Security track">
-  <img src="https://img.shields.io/badge/powered%20by-Lyzr%20%C2%B7%20Band-1f7a4d" alt="Powered by Lyzr and Band">
-  <img src="https://img.shields.io/badge/breaches%20scored%20by-code%2C%20not%20a%20model-c8203f" alt="Breaches scored by code">
-  <img src="https://img.shields.io/badge/license-MIT-3a574c" alt="MIT">
-</p>
-
 *Kavach (कवच) means armour in Hindi.* Built for **Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition)**, Security track.
+
+## See it work
 
 <p align="center">
   <a href="https://kavach.dualmindlab.tech/dashboard/?demo=demo1"><img src="docs/assets/gifs/dashboard-headline-run.gif" width="100%" alt="The Kavach dashboard replaying the headline run: the seven agents hand off in the room, round 1 breach slips land at 83%, the Patcher's guardrail v2 is deployed, rounds 2 and 3 hold at 0%, and the header turns to COMPLETE with a HARDENED verdict and 100% utility"></a>
 </p>
 
-<sub>The headline run (Demo 1) replaying in the dashboard: a recorded live run with `gpt-oss-20b` as the victim bot. Round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Sped up from the site's 4× replay. Pick any of the eight recorded runs with the Demo picker at https://kavach.dualmindlab.tech/dashboard/?demo=demo1, or locally with `pnpm dev:web` → http://localhost:3000/dashboard?demo=demo1 (no backend needed).</sub>
+<sub>The headline run replaying in the dashboard: a recorded live run with `gpt-oss-20b` as the victim bot. Round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Open it yourself at https://kavach.dualmindlab.tech/dashboard/?demo=demo1 (no install), or pick any of the eight recordings with the Demo picker.</sub>
 
 <table>
   <tr>
     <td width="50%" valign="top">
-      <a href="https://kavach.dualmindlab.tech/#try"><img src="docs/assets/gifs/attack-console-sample.gif" alt="The landing page's attack console: picking attack messages and switching between v1 as found, the first patch and v2 as shipped, so the stamp changes from BREACH to HELD"></a>
-      <br><b>Send Diya an attack.</b> <sub>Pick a message, then switch builds: v1 as found (BREACH), the first patch (held, but it also refused real customers) and v2 as shipped (HELD). From the offline sample run, on the <a href="https://kavach.dualmindlab.tech/#try">landing page</a>.</sub>
+      <img src="docs/assets/devpost/2-kavach-breach.gif" alt="A recorded live run: a fake SYSTEM OVERRIDE message makes the bot refund 1,000 rupees on another customer's order; the executed issue_refund call slides out and a BREACH stamp lands">
+      <br><b>One message, ₹1,000 gone.</b> <sub>From a recorded live run: a forged override, the executed <code>issue_refund</code> call and the rule it broke, read from the tool-call log.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <img src="docs/assets/devpost/3-kavach-agents.gif" alt="The seven agents in one room: Recon, Injector and Social Engineer on the red squad, the Referee, and Monitor, Patcher and Auditor on the blue squad, handing off with speech bubbles and arcs">
+      <br><b>Seven agents, one room.</b> <sub>Every agent runs on Lyzr, and every handoff is an @mention message in a Band room.</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="docs/assets/devpost/4-kavach-gate.gif" alt="Two audit forms: a patch that refuses refunds stops every exploit but helps only 7 of 10 real customers and is stamped VETOED; the second patch keeps 10 of 10 and is stamped APPROVED">
+      <br><b>A fix that blocks customers is not a fix.</b> <sub>The utility gate, shown with the labelled offline sample (scripted agents). In the recorded live runs, the first patch passed every time.</sub>
     </td>
     <td width="50%" valign="top">
       <a href="https://kavach.dualmindlab.tech/dashboard/?demo=demo1"><img src="docs/assets/gifs/dashboard-breach-slip.gif" alt="Filtering the dashboard's intercepted tool calls to breaches and opening a slip: the sheet shows the issue_refund call, what the tool returned, the Injector's message behind it, and steps through slips 1 to 3 of 6"></a>
-      <br><b>Open any breach.</b> <sub>Every slip carries the exact tool call, what the tool returned and the attack behind it, so you can check the code's verdict yourself. From the recorded headline run.</sub>
+      <br><b>Check every verdict yourself.</b> <sub>Each breach slip carries the exact tool call, what the tool returned and the attack behind it. From the recorded headline run.</sub>
     </td>
   </tr>
 </table>
@@ -83,6 +110,8 @@ flowchart LR
 **Code keeps score, not a model.** Breaches are read from the target's real tool-call log: a refund over ₹500, an action on another customer's account, a PII leak, the system-prompt canary, staff-coupon abuse. Models attack, patch and explain. They never grade themselves.
 
 **The utility trap.** A patch ships only if the exploits stop working **and** at least 90% of normal requests still succeed. A "refuse everything" patch is vetoed in the room and the Patcher has to try again.
+
+**Test your own prompt.** In the dashboard's live mode, paste your bot's system prompt and your own rules (refund limit, allowed coupons, everyday requests). Kavach attacks and hardens it inside the same sandbox, with the same tools and fake customers. See [Bring your own prompt](https://kavach.dualmindlab.tech/docs/bring-your-prompt).
 
 **A report you can hand to someone.** Every run turns into a four-page branded audit report with the verdict, the evidence, the patch, the hardened prompt and the SHA-256 of the recording it came from: `python scripts/build_report_pdf.py runs/<run>.jsonl out.pdf` (standard library plus Chrome). See [the report for the headline run](docs/Kavach-Audit-Report.pdf) and the [offline sample](docs/Kavach-Audit-Report-sample.pdf).
 
@@ -225,10 +254,10 @@ Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Roadmap
 
-1. **Bring your own prompt:** paste a system prompt, set your own rules (refund limit, allowed coupons, your everyday requests), and get it broken, hardened and reported.
-2. **Bring your own agent:** declare your tools and policies, so the detectors and attacks are generated for your bot and tested against a sandbox copy.
-3. **CI mode:** fail the build if the breach rate goes up after a prompt change.
-4. **Publish the skill packs** to Finch.
+- [x] **Bring your own prompt:** shipped as *Test your own prompt* in the dashboard.
+- [ ] **Bring your own agent:** declare your tools and policies, so the detectors and attacks are generated for your bot and tested against a sandbox copy.
+- [ ] **CI mode:** fail the build if the breach rate goes up after a prompt change.
+- [ ] **Publish the skill packs** to Finch.
 
 ## Safety
 
@@ -236,9 +265,13 @@ All customer data is fake. The target's tools are pure functions over a local mo
 
 ## Docs
 
-[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Film kit](docs/film/README.md) · [Contributing](CONTRIBUTING.md)
+[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Devpost story](docs/DEVPOST.md) · [Film kit](docs/film/README.md) · [Contributing](CONTRIBUTING.md)
 
 ---
+
+<p align="center">
+  <a href="https://kavach.dualmindlab.tech"><img src="docs/assets/devpost/6-kavach-outro.gif" width="100%" alt="Kavach end card: the mark, github.com/harshbhx/kavach, kavach.dualmindlab.tech, the seven agents and a HARDENED stamp"></a>
+</p>
 
 Built by **Harsh Bhanushali** ([DualMind Labs](https://dualmindlab.tech)). MIT licensed.
 HiDevs account: harshbhx@gmail.com (same person as Devpost bhanushaliharsh434@gmail.com).
