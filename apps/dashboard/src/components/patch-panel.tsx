@@ -79,7 +79,7 @@ export function PatchPanel({ run, demoData }: { run: RunView; demoData?: () => D
 
   return (
     <Panel
-      title="Patches"
+      title="Patch amendments"
       hint="Each candidate, diffed against v1"
       className="h-full"
       bodyClassName="flex flex-col"
@@ -167,12 +167,12 @@ export function PatchPanel({ run, demoData }: { run: RunView; demoData?: () => D
           aria-disabled={!reportHref}
           className={cn(
             'relative flex items-center justify-center gap-2 overflow-hidden rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors',
-            reportHref ? 'bg-kv-brand text-kv-bg hover:bg-kv-brand-hover' : 'pointer-events-none bg-kv-surface-2 text-kv-faint',
+            reportHref ? 'bg-kv-brand text-kv-surface hover:bg-kv-brand-hover' : 'pointer-events-none bg-kv-surface-2 text-kv-faint',
           )}
         >
           <Download className="size-4" />
           {reportHref ? 'Download the audit report' : 'Audit report is ready when the run ends'}
-          {reportHref && <BorderBeam size={70} duration={5} colorFrom="#0b1311" colorTo="#2fd3e6" />}
+          {reportHref && <BorderBeam size={70} duration={5} colorFrom="#e6efe9" colorTo="#5fb8c6" />}
         </a>
       </div>
     </Panel>

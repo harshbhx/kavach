@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
+import { TextGenerateEffect } from '@/components/ui/text-generate-effect'
 import type { KavachEvent } from '@/lib/types'
 
 /**
@@ -38,19 +39,19 @@ export function Narration({ latest }: { latest: { text: string; key: number } | 
     if (latest) setShown(latest)
   }, [latest])
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-8 z-50 flex justify-center px-6">
+    <div className="pointer-events-none fixed inset-x-0 bottom-7 z-50 flex justify-center px-6">
       <AnimatePresence mode="wait">
         {shown && (
-          <motion.p
+          <motion.div
             key={shown.key}
-            initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-4xl rounded-2xl border border-kv-border-strong bg-kv-bg/90 px-6 py-3.5 text-center text-[22px] leading-snug font-medium text-kv-text shadow-[0_20px_60px_rgb(0_0_0/0.55)] backdrop-blur"
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="max-w-4xl rounded-2xl bg-kv-text/95 px-7 py-4 text-center shadow-[0_24px_60px_-20px_rgb(14_35_28/0.6)]"
           >
-            {shown.text}
-          </motion.p>
+            <TextGenerateEffect words={shown.text} duration={0.35} className="text-[23px] leading-snug font-medium text-kv-surface" />
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
