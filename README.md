@@ -11,6 +11,15 @@
   <a href="docs/Kavach-Audit-Report-sample.pdf">Sample audit report (PDF)</a>
 </p>
 
+<p align="center"><sub>
+  <a href="#what-kavach-does">What it does</a> ·
+  <a href="#what-we-learned">What we learned</a> ·
+  <a href="#how-the-sponsors-power-it">Sponsors</a> ·
+  <a href="#quickstart">Quickstart</a> ·
+  <a href="#results">Results</a> ·
+  <a href="#roadmap">Roadmap</a>
+</sub></p>
+
 <p align="center">
   <a href="https://github.com/harshbhx/kavach/actions/workflows/ci.yml"><img src="https://github.com/harshbhx/kavach/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/track-Security%20(Attack%20%26%20Defend)-0b6e7f" alt="Security track">
@@ -21,9 +30,9 @@
 
 *Kavach (कवच) means armour in Hindi.* Built for **Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition)**, Security track.
 
-![The Kavach dashboard after a three-round run](docs/assets/dashboard.png)
+![The Kavach dashboard after the headline run: breach rate 83% to 0% to 0%, utility 100%](docs/assets/dashboard.jpg)
 
-<sub>The dashboard after a recorded run: round 1 is breached, the first patch is vetoed for blocking real customers, the second is approved, and rounds 2 and 3 hold. Open it in your browser with `pnpm dev:web` → http://localhost:3000/dashboard?demo=live (no backend needed; it plays the recorded live run, or the labelled sample until one exists).</sub>
+<sub>The dashboard at the end of the headline run (Demo 1): round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Pick any of the eight recorded runs with the Demo picker at https://kavach.creharsh.workers.dev/dashboard/?demo=demo1, or locally with `pnpm dev:web` → http://localhost:3000/dashboard?demo=demo1 (no backend needed).</sub>
 
 ## The problem
 
