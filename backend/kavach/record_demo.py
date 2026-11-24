@@ -12,8 +12,10 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
+import re
 import shutil
 import sys
+from pathlib import Path
 
 from kavach.config import Settings
 from kavach.models import RunSummary
@@ -43,6 +45,46 @@ def story_problems(summary: RunSummary) -> list[str]:
     return problems
 
 
+def _pct(x: float | None) -> str:
+    return "–" if x is None else f"{x:.0%}"
+
+
+def results_table(summary: RunSummary, model: str) -> str:
+    """The README results table for a recorded run."""
+    rows = [
+        "| Round | Config attacked | Attacks | Breach rate | Patch applied | Utility | Vetoes |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for r in sorted(summary.rounds, key=lambda r: r.round):
+        rows.append(
+            f"| {r.round} | {r.config_attacked} | {r.total_attacks} | {_pct(r.breach_rate)} | "
+            f"{r.applied_version or '–'} | {_pct(r.utility_applied)} | {r.vetoes} |"
+        )
+    rows.append("")
+    rows.append(
+        f"<sub>Run `{summary.run_id}`, target model `{model}`. Replay it: `runs/demo_run.jsonl`.</sub>"
+    )
+    return "\n".join(rows)
+
+
+def breach_story(summary: RunSummary) -> str:
+    """ "100% → 0% → 0%" for the Devpost text."""
+    return " → ".join(_pct(r.breach_rate) for r in sorted(summary.rounds, key=lambda r: r.round))
+
+
+def fill_markers(path: Path, name: str, content: str) -> bool:
+    """Replace the text between <!-- name:start --> and <!-- name:end --> in a docs file."""
+    if not path.exists():
+        return False
+    text = path.read_text()
+    pattern = re.compile(rf"(<!-- {name}:start -->)(.*?)(<!-- {name}:end -->)", re.S)
+    if not pattern.search(text):
+        return False
+    sep = "\n" if "\n" in content else ""
+    path.write_text(pattern.sub(lambda m: f"{m.group(1)}{sep}{content}{sep}{m.group(3)}", text, count=1))
+    return True
+
+
 async def record(attempts: int, rounds: int | None) -> int:
     settings = Settings()
     if rounds:
@@ -68,8 +110,31 @@ async def record(attempts: int, rounds: int | None) -> int:
             if state.report_md:
                 (settings.runs_path / "demo_run.report.md").write_text(state.report_md)
             print(f"\nsaved {target.relative_to(settings.runs_path.parent)} from {state.summary.run_id}.")
+            root = settings.runs_path.parent
+            filled = [
+                f
+                for f, ok in (
+                    (
+                        "README.md",
+                        fill_markers(
+                            root / "README.md", "results", results_table(state.summary, settings.target_model)
+                        ),
+                    ),
+                    (
+                        "docs/DEMO_AND_SUBMISSION.md",
+                        fill_markers(
+                            root / "docs" / "DEMO_AND_SUBMISSION.md",
+                            "breach-story",
+                            breach_story(state.summary),
+                        ),
+                    ),
+                )
+                if ok
+            ]
+            if filled:
+                print("filled the results into " + ", ".join(filled))
             print(
-                "Commit it: git add runs/demo_run.jsonl && git commit -m 'chore(runs): record the demo run'"
+                "Commit it: git add runs/demo_run.jsonl README.md docs && git commit -m 'chore(runs): record the demo run'"
             )
             return 0
         print("  not demo-worthy: " + "; ".join(problems))
