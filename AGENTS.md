@@ -39,11 +39,14 @@ kavach/               # pnpm + Turborepo workspace (apps/*, packages/*) plus the
   skills/             # Finch-ready skill packs (stretch)
   docs/assets/brand/  # logo, favicon, thumbnails, agent avatars (see BRAND.md); use these in the dashboard
   scripts/            # probe_v1.py, band_setup.py, deploy_target_agent37.sh, build_brand.py
+  docs/assets/gallery # Devpost gallery screenshots (3:2)
   runs/               # JSONL run logs (demo_run.jsonl = real live run; sample_simulated_run.jsonl = offline fake run)
   backend/
     pyproject.toml  Makefile
     kavach/
       config.py models.py runtime.py cli.py target_client.py
+      devserver.py  record_demo.py   # `pnpm dev` backend (API + local target); `pnpm demo` recorder
+      setup/       __main__.py provision.py envfile.py   # `pnpm bootstrap` wizard (creates Lyzr + Band agents)
       target/      service.py llm.py runner.py tools.py guards.py db.py fake_model.py
       brains/      base.py lyzr.py direct.py fake.py
       agents/      red.py (recon, injector, social) blue.py (monitor, patcher, auditor) referee.py
@@ -54,12 +57,17 @@ kavach/               # pnpm + Turborepo workspace (apps/*, packages/*) plus the
       report/      markdown.py
     tests/         (pytest, all offline: conftest.py test_target.py test_scoring.py test_run.py)
   apps/dashboard/   (Vite + React 19 + TS + Tailwind v4 + shadcn/ui + Magic UI + React Bits + Recharts)
-    src/lib/        api.ts types.ts useRun.ts (SSE → view state, round phases) format.ts useStickyScroll.ts
-    src/components/ top-bar round-rail kpi-strip room-panel arena-panel trend-panel patch-panel panel; ui/ (shadcn + Magic UI)
-  apps/web/         (Next.js 16 + Fumadocs: landing page at /, docs at /docs built from ../../docs/*.md)
-    app/(home)/     landing page; components/landing/ hero exploit replay, round diagram, squad, chart
-    scripts/sync-docs.mjs   copies docs/*.md into content/docs before dev/build (edit docs/, not content/)
+    src/lib/        api.ts types.ts useRun.ts (SSE → view state) demo.ts (in-browser replay) slips.ts format.ts useStickyScroll.ts
+    src/components/ top-bar round-rail kpi-strip room-panel arena-panel slip-sheet trend-panel patch-panel narration
+                    panel (Panel/Empty/Stamp) jump-pill error-boundary; ui/ (shadcn, Magic UI, React Bits, Aceternity)
+  apps/web/         (Next.js 16 + Fumadocs: landing page at /, docs at /docs, dashboard demo at /dashboard)
+    app/(home)/     landing page; components/landing/ refund slip, passbook, breach rules, audit forms, signatories
+    scripts/sync-docs.mjs        copies docs/*.md into content/docs before dev/build (edit docs/, not content/)
+    scripts/record-video.mjs     films the site + a run into runs/video/kavach-demo.mp4
+    scripts/make-brand-cards.mjs renders the social card and Devpost thumbnail
+    wrangler.jsonc               Cloudflare Workers static assets (STATIC_EXPORT=1 build → out/)
   packages/brand/   (@kavach/brand: KavachLogo + tokens.css + theme.css + fonts.css, shared by both apps)
+  .github/workflows ci.yml (lint, tests, offline run, builds) · deploy-site.yml (Cloudflare)
 ```
 
 ## Commands
@@ -75,12 +83,18 @@ make smoke         # offline 3-round run: BRAIN_PROVIDER=fake BAND_ENABLED=false
 uv run python ../scripts/probe_v1.py     # Phase 1 exit check (v1 breach rate >= 50%)
 uv run python ../scripts/band_setup.py   # verify the 7 Band identities + test room
 
-# web apps (Node 20+, pnpm), from the repo root
+# whole repo (Node 22+, pnpm 10), from the root
 pnpm install
-pnpm dev:dashboard   # http://localhost:5173, proxies /api to :8000 (KAVACH_API to change)
-pnpm dev:web         # http://localhost:3000, landing page + /docs
+pnpm bootstrap       # setup wizard: keys → 7 Lyzr agents + 7 Band agents → .env + agent_config.yaml
+pnpm dev             # backend (API + local target) + dashboard :5173 + site :3000
+pnpm dev:offline     # the same with scripted agents, no keys
+pnpm dev:dashboard   # dashboard only, proxies /api to :8000 (KAVACH_API to change)
+pnpm dev:web         # site only: landing page, /docs, /dashboard?demo=sample
+pnpm demo            # record a demo-worthy live run, fill the README results
 pnpm build           # turbo builds every app
-pnpm lint            # oxlint + tsc in each app
+pnpm lint            # ruff + oxlint + tsc in each package
+pnpm deploy:site     # static export + wrangler deploy (needs `npx wrangler login` or CLOUDFLARE_API_TOKEN)
+pnpm --filter @kavach/web video   # demo video from a running site (Chrome + ffmpeg)
 # add UI components with the shadcn CLI from an app folder, e.g.
 #   pnpm dlx shadcn@latest add @magicui/number-ticker @react-bits/ShinyText-TS-TW @aceternity/spotlight-new
 ```
