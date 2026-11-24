@@ -5,12 +5,12 @@
 #   ./scripts/deploy_target_agent37.sh delete <instance_id>     # stop billing after the demo
 #
 # Optional env: REPO_URL (default the public GitHub repo), TARGET_MODEL, PORT (8000), INSTANCE_ID (reuse one).
-# Needs a funded Agent37 wallet. Endpoints per https://www.agent37.com/docs — VERIFY the background-process
-# rules on the "Run commands" page if the health check never comes up.
+# New Agent37 workspaces include credit for one instance. Endpoints per https://www.agent37.com/docs (checked
+# 24 Nov 2026): the hosting API takes `Authorization: Bearer`, instance and preview URLs take `X-Agent37-Key`,
+# and one exec call may run for up to 280 s, so the server is started in the background.
 set -euo pipefail
 
 API=https://api.agent37.com/v1
-SANDBOX=https://sandbox.agent37.app/v1
 REPO_URL=${REPO_URL:-https://github.com/harshbhx/kavach.git}
 TARGET_MODEL=${TARGET_MODEL:-anthropic/claude-haiku-5-5}
 PORT=${PORT:-8000}
@@ -40,8 +40,8 @@ fi
 
 exec_cmd() { # exec_cmd "<shell command>" -> prints stdout, fails on non-zero exit
   local out
-  out=$(curl -fsS -X POST "$SANDBOX/instances/$INSTANCE_ID/exec" \
-    -H "X-Agent37-Key: $AGENT37_API_KEY" -H "Content-Type: application/json" \
+  out=$(curl -fsS -X POST "$API/instances/$INSTANCE_ID/exec" \
+    -H "Authorization: Bearer $AGENT37_API_KEY" -H "Content-Type: application/json" \
     -d "$(jq -n --arg c "$1" '{command: $c}')")
   echo "$out" | jq -r '.stdout // empty'
   local code
@@ -55,8 +55,9 @@ exec_cmd() { # exec_cmd "<shell command>" -> prints stdout, fails on non-zero ex
 
 if [[ -z "${INSTANCE_ID:-}" ]]; then
   echo "1/4 creating instance…"
+  # The default template is a Linux machine with Python, Node, git and build tools.
   INSTANCE_ID=$(curl -fsS -X POST "$API/instances" -H "Authorization: Bearer $AGENT37_API_KEY" \
-    -H "Content-Type: application/json" -d '{"template":"agent37-base"}' | jq -r '.id // .data.id // .instance.id')
+    | jq -r '.id // .data.id // .instance.id')
   [[ -n "$INSTANCE_ID" && "$INSTANCE_ID" != "null" ]] || { echo "could not read the instance id"; exit 1; }
 fi
 echo "    instance: $INSTANCE_ID"

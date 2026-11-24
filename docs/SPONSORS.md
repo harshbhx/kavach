@@ -71,17 +71,17 @@ Give it a custom tool that reads the latest `RunSummary` from our API.
 
 **Docs:** https://www.agent37.com/docs (index: https://www.agent37.com/docs/llms.txt, quickstart: `/docs/quickstart.md`)
 
-### Facts from the docs
+### Facts from the docs (checked 24 Nov 2026)
 - Create/delete: `https://api.agent37.com/v1/instances` with `Authorization: Bearer $AGENT37_API_KEY`.
-- Exec: `POST https://sandbox.agent37.app/v1/instances/{id}/exec` with `X-Agent37-Key: $AGENT37_API_KEY`, body `{"command": "..."}` → `{exit_code, stdout, stderr, truncated}`. Files persist between commands.
+- Exec: `POST https://api.agent37.com/v1/instances/{id}/exec` with `Authorization: Bearer $AGENT37_API_KEY`, body `{"command": "..."}` → `{exit_code, stdout, stderr, truncated}`. One call runs for at most 280 s, so long-running servers start with `nohup … &`. Files persist between commands.
 - HTTP services are reachable at `https://{instanceId}-{port}.agent37.app` (no port registration). Requests need `X-Agent37-Key` (or a signed URL / public port for browsers).
-- **A funded workspace wallet is required.** Deleting an instance stops billing; stopped instances still bill for disk.
-- The default template is `agent37-base`.
+- New workspaces include credit for one instance; more need a funded wallet. Deleting an instance stops billing; stopped instances still bill for disk.
+- The default template (no body on create) is a Linux machine with Python, Node, git and build tools.
 
 ### Deploy (`scripts/deploy_target_agent37.sh`)
 1. Create an instance → `INSTANCE_ID`.
 2. Exec: install uv, `git clone <public repo>`, `cd kavach/backend && uv sync`.
-3. Exec: start in the background, e.g. `nohup uv run uvicorn kavach.target.service:app --host 0.0.0.0 --port 8000 > /tmp/target.log 2>&1 &` (**VERIFY** the background-process rules on the "Run commands" page), with `TARGET_MODEL` + the provider key passed as env vars in the command.
+3. Exec: start in the background, e.g. `nohup uv run uvicorn kavach.target.service:app --host 0.0.0.0 --port 8000 > /tmp/target.log 2>&1 &`, with `TARGET_MODEL` + the provider key passed as env vars in the command.
 4. Health check: `curl -H "X-Agent37-Key: $AGENT37_API_KEY" https://$INSTANCE_ID-8000.agent37.app/health`.
 5. In `.env`: `TARGET_URL=https://$INSTANCE_ID-8000.agent37.app`, `TARGET_EXTRA_HEADERS={"X-Agent37-Key":"..."}`.
 6. After the hackathon: `DELETE` the instance.
