@@ -1,4 +1,22 @@
 {
   "title": "Kavach",
-  "pages": ["index", "---How it works---", "architecture", "target-bot", "agents", "scoring", "---Reference---", "api", "sponsors", "product"]
+  "pages": [
+    "index",
+    "walkthrough",
+    "---How it works---",
+    "architecture",
+    "target-bot",
+    "agents",
+    "scoring",
+    "guard-policy",
+    "---Using Kavach---",
+    "configuration",
+    "dashboard",
+    "deploy",
+    "troubleshooting",
+    "---Reference---",
+    "api",
+    "sponsors",
+    "product"
+  ]
 }

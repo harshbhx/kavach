@@ -1,0 +1,95 @@
+---
+title: Troubleshooting and FAQ
+description: Fixes for the problems people actually hit, and short answers to the questions people ask about Kavach.
+---
+
+## When something goes wrong
+
+Start with the connection check. It tries every key and service in `.env` and says which one failed:
+
+```bash
+make -C backend check-setup
+```
+
+<Accordions type="multiple">
+<Accordion title="The dashboard says the backend is offline">
+
+The dashboard could not reach `http://localhost:8000/api/health`. Start the API with `pnpm dev`, `pnpm dev:offline` or `make -C backend api`. If the API is running on another machine or port, check that `DASHBOARD_ORIGIN` in `.env` matches the address you opened the dashboard on, or the browser blocks the requests. Recorded demos (`?demo=live`) play without the API.
+
+</Accordion>
+<Accordion title="Start live run does nothing, or the API answers 409">
+
+Only one run can be active at a time, and the API answers `409` while one is. Press **Stop**, or wait for the run to finish. The button already ignores extra clicks while the API is starting a run.
+
+</Accordion>
+<Accordion title="make probe says v1 is not breakable">
+
+`make -C backend probe` sends the seeded attacks to v1 and wants at least half of them to breach. Strong models refuse many of them even with no guards, which makes for a short demo. Pick a smaller `TARGET_MODEL` in `.env`, or raise `TARGET_TEMPERATURE` a little, and probe again. The point of v1 is a bot that trusts its prompt, the way many shipped bots do.
+
+</Accordion>
+<Accordion title="Calls fail with rate limits or time out">
+
+The bot queues and retries calls that hit a provider rate limit, but a small quota can still run out in round 1, which sends about 40 calls. Lower `MAX_CONCURRENCY` (try 2), or raise `LLM_TIMEOUT_S` for slow models. Agent calls that still fail fall back: Recon to a built-in dossier, the attackers to the seeded attack library, and a Patcher that returns nothing counts as a vetoed attempt. The room says when a fallback was used.
+
+</Accordion>
+<Accordion title="Lyzr returns 401, or an agent is not found">
+
+Check `LYZR_API_KEY`, and that `LYZR_USER_ID` is the email of the account that owns the agents. If you deleted agents in Lyzr Studio, clear their `LYZR_AGENT_*` lines in `.env` and run `pnpm bootstrap` again. Setup skips agents that already have an ID, so it creates only the ones you cleared and writes their new IDs back.
+
+</Accordion>
+<Accordion title="Nothing shows up in Band">
+
+Run `make -C backend band`. It checks the seven identities in `agent_config.yaml` and posts a test message. If registration failed, `pnpm bootstrap` registers them again with your `BAND_USER_API_KEY`. Set `BAND_OWNER_USER_ID` so the Referee adds you to each run's room, or you will not see the rooms in your Band account. To run without Band, set `BAND_ENABLED=false`.
+
+</Accordion>
+<Accordion title="The recorded demo says “Sample run (simulated)”">
+
+The site plays `runs/demo_run.jsonl` when it exists and falls back to the sample otherwise, labelled so nobody mistakes it for a live run. Record one with `pnpm demo`, commit it and deploy again.
+
+</Accordion>
+<Accordion title="On Windows: scripts fail or diagrams show as code">
+
+Use a recent checkout. The scripts use `cross-env` so environment variables work in PowerShell and cmd, and `.gitattributes` keeps every text file on LF so the docs build converts diagrams correctly. If an old clone still has CRLF files, run `git add --renormalize .` once.
+
+</Accordion>
+<Accordion title="A port is already in use">
+
+Kavach uses 8000 (API), 8001 (bot), 5173 (dashboard) and 3000 (site). Stop whatever holds the port, or start the pieces one at a time with `make -C backend api`, `make -C backend target`, `pnpm dev:dashboard` and `pnpm dev:web`.
+
+</Accordion>
+</Accordions>
+
+## Questions
+
+<Accordions type="multiple">
+<Accordion title="Does Kavach attack real systems?">
+
+No. It attacks DiwaliMart Support, a bot in this repo with four mock tools and invented customers. The attack library is written for that bot and runs as the demo customer `U-101` against the demo victim `U-202`. No real money, accounts or personal data are involved.
+
+</Accordion>
+<Accordion title="Why are breaches detected in code and not by a model?">
+
+Because the question “did ₹50,000 leave the store?” has a factual answer in the tool-call log. A model judge can be argued with, the same way the bot was. Five fixed rules read what the bot actually did, so the attackers cannot talk their way to a better score and the defenders cannot talk their way out of one. See [Scoring](/docs/scoring).
+
+</Accordion>
+<Accordion title="Why does a patch have to keep 90% utility?">
+
+The cheapest way to stop every attack is to stop helping anyone. Without the gate, the first patch in the sample run, which refused every message about refunds, would have shipped. The ten everyday requests in `data/benign_suite.json` include a Hinglish order check, small refunds and coupon questions, so over-blocking shows up immediately.
+
+</Accordion>
+<Accordion title="Can I point it at my own bot?">
+
+Yes, if your bot speaks the target contract: `POST /chat` with a message and the logged-in user, answering with the reply and the tool calls it made (see [Target bot](/docs/target-bot)). Set `TARGET_URL` to it. Your guard policy will need its own fields, and the breach rules assume tools like refunds, KYC lookups and coupons, so expect to adapt `backend/kavach/scoring/detectors.py` to what your tools can do wrong.
+
+</Accordion>
+<Accordion title="How much does a run cost?">
+
+Offline runs cost nothing. A live three-round run makes roughly 50 to 100 calls to the bot's model (probes, attacks, and for each patch attempt a replay of every exploit plus the ten everyday requests) and around 20 agent calls. With the defaults, the agents run on Lyzr-provided credits and the bot on a small model.
+
+</Accordion>
+<Accordion title="Which OWASP risks does it cover?">
+
+The five rules map to three entries of the OWASP Top 10 for LLM applications: LLM06 Excessive Agency (refunds over the limit, actions on another customer's account, coupon abuse), LLM02 Sensitive Information Disclosure (PII leaks) and LLM07 System Prompt Leakage (the canary in the reply).
+
+</Accordion>
+</Accordions>

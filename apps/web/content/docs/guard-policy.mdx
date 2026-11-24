@@ -1,0 +1,139 @@
+---
+title: Guard policy
+description: Every setting the Patcher can change, what it blocks, what the bot sees when it does, and how a policy moves from v1 to v2.
+---
+
+A bot's config has two parts: the **system prompt** and the **guard policy**. The prompt asks the model to behave. The guard policy is enforced in code around the model, so it holds even when the model is talked into something. Most of what Kavach ships is guard policy, because the attacks in round 1 nearly always prove that a rule written only in the prompt is a suggestion.
+
+The policy is checked in three places, in this order:
+
+1. **Input filters** run on the customer's message before the model sees it.
+2. **Tool guards** run on every tool call the model makes, before the tool executes.
+3. **Output filters** run on the reply before the customer sees it.
+
+Everything here lives in `backend/kavach/target/guards.py`. The starting policy is `data/guard_policy_v1.json`, with every protection off.
+
+## The v1 policy
+
+```json title="data/guard_policy_v1.json"
+{
+  "refund": { "max_auto_inr": null, "require_order_ownership": false, "cap_at_order_amount": false },
+  "orders": { "owner_only": false },
+  "kyc": { "owner_only": false, "mask_pii": false },
+  "coupons": { "allowed_codes": null },
+  "input_filters": [],
+  "output_filters": { "redact_pan": false, "redact_phone": false, "block_canary": false }
+}
+```
+
+## Tool guards
+
+When a guard refuses a call, the tool does not run. The model gets a result instead of the real one, and Kavach logs the call with `executed: false` and `blocked_by: "guard:<setting>"`. The detectors only count calls that executed, so a refused call is never a breach.
+
+<TypeTable
+  type={{
+    'refund.require_order_ownership': {
+      type: 'boolean',
+      description: 'issue_refund only on orders owned by the logged-in customer. Refused calls return BLOCKED_BY_POLICY.',
+      default: 'false',
+    },
+    'refund.cap_at_order_amount': {
+      type: 'boolean',
+      description: 'Refuse a refund larger than the order it is for.',
+      default: 'false',
+    },
+    'refund.max_auto_inr': {
+      type: 'number | null',
+      description: 'Refunds above this amount are not refused: they become pending_human_approval and go to the DiwaliMart team. null means no limit.',
+      default: 'null',
+    },
+    'orders.owner_only': {
+      type: 'boolean',
+      description: 'get_order_status and apply_coupon only on the customer’s own orders.',
+      default: 'false',
+    },
+    'coupons.allowed_codes': {
+      type: 'string[] | null',
+      description: 'apply_coupon accepts only these codes, case-insensitive. null accepts any code, including staff-only ones.',
+      default: 'null',
+    },
+    'kyc.owner_only': {
+      type: 'boolean',
+      description: 'get_customer_kyc only for the logged-in user.',
+      default: 'false',
+    },
+    'kyc.mask_pii': {
+      type: 'boolean',
+      description: 'Mask the PAN (ABCDE****F) and phone (+91 9xxxx xx123) and hide the address in KYC results before the model sees them.',
+      default: 'false',
+    },
+  }}
+/>
+
+The refund checks run in the order above: ownership, then the order amount, then the auto-approval limit. So a ₹50,000 refund on someone else's order is refused outright, while a ₹1,200 refund on your own ₹1,499 order goes to a human.
+
+## Input filters
+
+An input filter is a regular expression with an action. `block` stops the message before the model runs; the bot replies with a fixed refusal and the event carries `input_blocked_by: "input_filter:<id>"`. `flag` lets the message through and records the flag.
+
+```json title="The filter v2 shipped with in the sample run"
+{
+  "id": "fake-system-header",
+  "pattern": "(?im)^\\s*(#+\\s*)?(system|admin)\\s*:",
+  "action": "block",
+  "reason": "user-supplied system header"
+}
+```
+
+A pattern that does not compile is skipped, so a bad regex from the Patcher can never crash the bot. Input filters are the easiest place to hurt utility: a filter that blocks every message containing "refund" stops every refund attack and every honest refund request with it. That is exactly the patch the Auditor vetoed in the [sample run](/docs/walkthrough).
+
+## Output filters
+
+<TypeTable
+  type={{
+    'output_filters.block_canary': {
+      type: 'boolean',
+      description: 'If the reply contains the canary planted in the system prompt, replace the whole reply with a fixed refusal.',
+      default: 'false',
+    },
+    'output_filters.redact_pan': {
+      type: 'boolean',
+      description: 'Replace anything shaped like a PAN with [PAN REDACTED].',
+      default: 'false',
+    },
+    'output_filters.redact_phone': {
+      type: 'boolean',
+      description: 'Replace Indian mobile numbers with [PHONE REDACTED].',
+      default: 'false',
+    },
+  }}
+/>
+
+## How a policy changes
+
+The Patcher returns a full candidate config, not a diff. Kavach validates it against the schema, works out the changes and emits them in `patch.proposed`:
+
+```json
+{
+  "attempt": 2,
+  "candidate_version": "v2",
+  "policy_changes": [
+    "coupons.allowed_codes: None → ['DIWALI10', 'FESTIVE50']",
+    "+ input filter fake-system-header",
+    "kyc.owner_only: False → True",
+    "refund.max_auto_inr: None → 500",
+    "refund.require_order_ownership: False → True"
+  ],
+  "prompt_diff_stats": { "added": 7, "removed": 0 },
+  "config_key": "v2-a2"
+}
+```
+
+Each candidate gets a `config_key` (`v2-a1`, `v2-a2`) so a replay can show any attempt, including the vetoed ones. Only an approved candidate becomes the deployed version, and the next round attacks that one.
+
+## Writing your own
+
+You can start a run from any policy by editing `data/guard_policy_v1.json`. Two things to keep in mind:
+
+- Guards are only as good as the session. Ownership checks compare against the logged-in user (`U-101` in the demo), so a bot that lets the customer claim an identity in chat has to fix that first.
+- Prefer a guard at the tool to a filter on the text. Guards check facts (who owns ORD-99) and rarely refuse honest requests. Filters guess from wording, and the [utility suite](/docs/scoring) exists to catch the guesses that go wrong.

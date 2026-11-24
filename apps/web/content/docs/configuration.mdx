@@ -1,0 +1,124 @@
+---
+title: Configuration
+description: Every setting in .env, the three ways to run Kavach, and what each run parameter changes.
+---
+
+Kavach reads its settings from `.env` at the repo root. `pnpm bootstrap` writes it for you; to do it by hand, copy `.env.example` to `.env`. Both `.env` and `agent_config.yaml` (the Band identities) are gitignored, so keys never reach the repository.
+
+## Three ways to run
+
+<Tabs items={['Offline', 'Live', 'Replay']}>
+<Tab value="Offline">
+
+```bash
+pnpm dev:offline
+```
+
+Scripted agents, a scripted bot running in the same process and no Band. It sets `BRAIN_PROVIDER=fake`, `TARGET_MODEL=fake`, `TARGET_URL=inprocess`, `BAND_ENABLED=false` and `FAKE_DELAY_S=1` so the run is slow enough to watch. The detectors, guard policy and utility suite are the real ones. No keys needed.
+
+</Tab>
+<Tab value="Live">
+
+```bash
+pnpm dev
+```
+
+Lyzr agents (or a direct model), a real model behind the bot and every handoff posted to Band. Needs the keys below. Run `make -C backend probe` first to check the bot is breakable: it wants at least a 50% breach rate on v1.
+
+</Tab>
+<Tab value="Replay">
+
+Pick any saved run on the dashboard and press **Replay**, or open `/dashboard?run=<run_id>&mode=replay`. Replays read `runs/<run_id>.jsonl` and need no keys. In the browser with no backend at all, `/dashboard?demo=live` plays the recorded run bundled with the site.
+
+</Tab>
+</Tabs>
+
+## Agent brains
+
+<TypeTable
+  type={{
+    BRAIN_PROVIDER: {
+      type: '"lyzr" | "direct" | "fake"',
+      description: 'Who thinks for the seven agents. lyzr calls your Lyzr Studio agents, direct calls DIRECT_MODEL through LiteLLM, fake uses scripted replies.',
+      default: '"lyzr"',
+    },
+    LYZR_API_KEY: { type: 'string', description: 'From Lyzr Studio. Used for every agent call and by setup to create the agents.' },
+    LYZR_USER_ID: { type: 'string', description: 'Your Lyzr account email.' },
+    LYZR_BASE_URL: { type: 'string', description: 'Lyzr agent API.', default: '"https://agent-prod.studio.lyzr.ai/v3"' },
+    'LYZR_AGENT_RECON … LYZR_AGENT_REFEREE': { type: 'string', description: 'The seven Lyzr agent IDs. Setup fills them in.' },
+    LYZR_PROVIDER: { type: 'string', description: 'Model provider the Lyzr agents are created with.', default: '"OpenAI"' },
+    LYZR_MODEL: { type: 'string', description: 'Model the Lyzr agents run on.', default: '"gpt-4o-mini"' },
+    LYZR_CREDENTIAL_ID: { type: 'string', description: 'Lyzr credential for that provider. The default uses Lyzr-provided credits.', default: '"lyzr_openai"' },
+    DIRECT_MODEL: { type: 'string', description: 'LiteLLM model string used when BRAIN_PROVIDER=direct.', default: '"anthropic/claude-haiku-5-5"' },
+  }}
+/>
+
+## The bot under test
+
+<TypeTable
+  type={{
+    TARGET_URL: {
+      type: 'string',
+      description: 'Where DiwaliMart Support answers. inprocess runs it inside the API (offline mode). Point it at an Agent37 preview URL to attack a sandboxed bot.',
+      default: '"http://localhost:8001"',
+    },
+    TARGET_EXTRA_HEADERS: { type: 'JSON object', description: 'Extra headers for every call to the bot, for example {"X-Agent37-Key": "…"} for Agent37.', default: '{}' },
+    TARGET_MODEL: { type: 'string', description: 'LiteLLM model string the bot runs on, or fake for the scripted bot.', default: '"anthropic/claude-haiku-5-5"' },
+    TARGET_TEMPERATURE: { type: 'number', description: 'Sampling temperature for the bot.', default: '0.2' },
+    'ANTHROPIC_API_KEY, OPENAI_API_KEY': { type: 'string', description: 'Provider keys. Set whichever TARGET_MODEL and DIRECT_MODEL need.' },
+  }}
+/>
+
+## Band
+
+<TypeTable
+  type={{
+    BAND_ENABLED: { type: 'boolean', description: 'Post every handoff to a Band room. Off in offline mode.', default: 'true' },
+    BAND_API_BASE: { type: 'string', description: 'Band API.', default: '"https://app.band.ai/api/v1"' },
+    BAND_AGENT_CONFIG: { type: 'path', description: 'The seven Band identities and their keys, written by setup.', default: '"agent_config.yaml"' },
+    BAND_USER_API_KEY: { type: 'string', description: 'Your Band user key. Only setup uses it, to register the seven agents.' },
+    BAND_OWNER_USER_ID: { type: 'string', description: 'Your Band user UUID. The Referee adds you to every Kavach room.' },
+    BAND_OWNER_HANDLE: { type: 'string', description: 'Optional. Your handle, so the Referee can @mention you in its final message.' },
+  }}
+/>
+
+## Run parameters
+
+<TypeTable
+  type={{
+    ROUNDS: { type: 'number', description: 'Rounds per run. Each one attacks what the previous one shipped.', default: '3' },
+    ATTACKS_PER_AGENT: { type: 'number', description: 'Attacks the Injector and the Social Engineer each send per round.', default: '3' },
+    MAX_PATCH_ATTEMPTS: { type: 'number', description: 'Candidates the Patcher may propose per round before the round ends unhardened.', default: '3' },
+    UTILITY_THRESHOLD: { type: 'number', description: 'Share of the ten everyday requests a patch must still answer.', default: '0.9' },
+    REPLAY_MAX_BREACH: { type: 'number', description: 'Highest share of replayed exploits that may still breach for a patch to pass.', default: '0.34' },
+    MAX_CONCURRENCY: { type: 'number', description: 'Calls to the bot in flight at once.', default: '6' },
+    LLM_TIMEOUT_S: { type: 'number', description: 'Timeout for one model or agent call, in seconds.', default: '45' },
+    SEED: { type: 'number', description: 'Seeds the attack-library fallback, so offline runs repeat.', default: '42' },
+    FAKE_DELAY_S: { type: 'number', description: 'Offline only: seconds each scripted agent call waits, so the dashboard has time to show it.', default: '0' },
+  }}
+/>
+
+## API and dashboard
+
+<TypeTable
+  type={{
+    DASHBOARD_ORIGIN: { type: 'string', description: 'Allowed CORS origin for the dashboard.', default: '"http://localhost:5173"' },
+    RUNS_DIR: { type: 'path', description: 'Where runs and reports are saved, relative to backend/.', default: '"../runs"' },
+    AGENT37_API_KEY: { type: 'string', description: 'Only for scripts/deploy_target_agent37.sh.' },
+  }}
+/>
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `pnpm bootstrap` | Installs everything, asks for keys, creates the Lyzr and Band agents, writes `.env` and checks every connection |
+| `pnpm dev` | API, bot, dashboard and this site, live |
+| `pnpm dev:offline` | The same with scripted agents and bot, no keys |
+| `pnpm demo` | Runs live until round 1 is breached, a patch is vetoed and utility holds, then saves `runs/demo_run.jsonl` |
+| `make -C backend check-setup` | Re-runs only the connection checks |
+| `make -C backend probe` | Is v1 breakable by your `TARGET_MODEL`? Needs at least 50% |
+| `make -C backend band` | Checks the seven Band identities and posts a test message |
+| `make -C backend smoke` | A full three-round offline run in the terminal |
+| `make -C backend test` | The backend unit tests, offline |
+| `pnpm deploy:site` | Builds this site, the docs and the dashboard demo and deploys them to Cloudflare. See [Deploy](/docs/deploy) |
