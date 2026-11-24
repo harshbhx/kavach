@@ -3,7 +3,7 @@
   "private": true,
   "description": "Python backend (uv). These scripts let `pnpm dev` and turbo start it with the web apps.",
   "scripts": {
-    "dev": "uv run uvicorn kavach.api.app:app --port 8000 --reload",
+    "dev": "uv run python -m kavach.devserver",
     "dev:offline": "BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess FAKE_DELAY_S=1 uv run uvicorn kavach.api.app:app --port 8000",
     "lint": "uv run ruff check . && uv run ruff format --check .",
     "test": "uv run pytest -q"

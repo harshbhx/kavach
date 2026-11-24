@@ -77,3 +77,13 @@ async def test_band_me_reads_profile():
 def test_all_seven_agents_have_prompts():
     for a in AGENTS:
         assert agent_payload(a, "p", "m", "c")["agent_instructions"]
+
+
+def test_devserver_serves_only_a_local_target():
+    from kavach.devserver import local_target_port
+
+    assert local_target_port("http://localhost:8001") == 8001
+    assert local_target_port("http://127.0.0.1:9001/") == 9001
+    assert local_target_port("inprocess") is None
+    assert local_target_port("https://kavach-target.agent37.app") is None
+    assert local_target_port("http://localhost:8000") is None
