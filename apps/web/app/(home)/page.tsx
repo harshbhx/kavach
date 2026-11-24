@@ -43,7 +43,7 @@ function Heading({ id, title, children }: { id: string; title: string; children?
 
 export default function HomePage() {
   return (
-    <main className="kv-paper flex-1">
+    <main id="main" className="kv-paper flex-1">
       {/* First viewport: the exploit as the refund it tried to cash */}
       <section className="relative overflow-hidden">
         <img
@@ -102,7 +102,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1200px] px-5 py-24">
           <Heading id="try" title="Send Diya an attack.">
             <p>
-              Six messages Kavach’s attackers sent in round 1, and one from an ordinary customer. Pick one, then switch between
+              Six messages Kavach’s attackers sent in round 1 of the offline sample run (scripted agents, scripted bot), and one from an ordinary customer. Pick one, then switch between
               the bot as Kavach found it, the first patch, which the Auditor threw out, and the patch that shipped.
             </p>
           </Heading>
@@ -116,7 +116,10 @@ export default function HomePage() {
       <section className="border-t border-ink/15 bg-paper-2/60">
         <div className="mx-auto max-w-[1200px] px-5 py-24">
           <Heading id="round" title="Thirty-five seconds, from first probe to report.">
-            <p>The sample run, step by step. Times are seconds after the Referee opened the room.</p>
+            <p>
+              The offline sample run (scripted agents), step by step. Times are seconds after the Referee opened the room. Real
+              runs with live models take longer: 36 to 87 seconds to harden in the recordings below.
+            </p>
           </Heading>
           <div className="mt-14">
             <RoundTimeline />
@@ -129,7 +132,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1200px] px-5 py-24">
           <Heading id="passbook" title="Every round goes into the passbook.">
             <p>
-              Three rounds per run. Each one attacks whatever the last one shipped, and every entry says what went out, what
+              Three rounds by default. Each one attacks whatever the last one shipped, and every entry says what went out, what
               was stopped and how much of the bot’s usefulness is left.
             </p>
           </Heading>
@@ -182,6 +185,10 @@ export default function HomePage() {
           </Heading>
           <div className="mt-12">
             <AuditForms />
+            <p className="mt-4 max-w-[70ch] text-[14px] text-ink-3">
+              These two forms are from the offline sample run (scripted agents), where the Auditor vetoes the first patch. In the
+              recorded live runs the first patch was approved, so no veto appears there.
+            </p>
           </div>
         </div>
       </section>
@@ -216,7 +223,7 @@ export default function HomePage() {
         <div className="kv-band h-5 opacity-60" aria-hidden />
         <div className="mx-auto max-w-[1200px] px-5 py-20">
           <h2 className="max-w-[50rem] font-display text-[2.4rem] leading-[1.05] text-paper-2 text-balance md:text-[3rem]">
-            Printed with four sponsor platforms, each doing a real job.
+            Built on Lyzr and Band, with Agent37 and AdaL support in the repo.
           </h2>
           <div className="mt-12">
             <RunMap />
@@ -242,7 +249,7 @@ export default function HomePage() {
             </p>
             <p>
               For a real run, <code className="font-mono text-[0.92em] text-ink">pnpm bootstrap</code> asks for your Lyzr, Band
-              and model keys, then creates all fourteen agents for you.{' '}
+              and model keys, then creates the seven Lyzr agents and registers seven Band identities for you.{' '}
               <Link href="/docs" className="font-semibold text-hold underline underline-offset-4 hover:text-ink">
                 The docs walk through it.
               </Link>

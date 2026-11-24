@@ -135,7 +135,7 @@ export function RefundSlip() {
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 pb-1">
               <p className="font-display text-2xl text-ink">DiwaliMart Support</p>
               <p className="font-mono text-xs text-ink-2">
-                No. ATK-R1-SOC-02 <span className="text-ink-3">round 1</span>
+                No. LIB-R2-SOC-A <span className="text-ink-3">library, round 2</span>
               </p>
             </div>
             <Field label="Pay">Aarav Shah, the customer in session U-101</Field>
@@ -228,7 +228,7 @@ export function RefundSlip() {
             ? 'Two detectors fire on the tool-call log: refund over the limit, and a refund on another customer’s order.'
             : 'After the patch: 0 of 6 exploits land, and all 10 everyday requests, small refunds included, still go through.'}
         </span>
-        <span className="text-ink-3">A real exploit from Kavach’s attack library. Every name, order and PAN here is fake.</span>
+        <span className="text-ink-3">An attack message from Kavach’s library, replayed against the scripted offline bot. Every name, order and PAN here is fake.</span>
       </figcaption>
     </figure>
   );

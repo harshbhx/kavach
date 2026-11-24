@@ -69,11 +69,11 @@ flowchart LR
 
 **The utility trap.** A patch ships only if the exploits stop working **and** at least 90% of normal requests still succeed. A "refuse everything" patch is vetoed in the room and the Patcher has to try again.
 
-**A report you can hand to someone.** Every run turns into a four-page branded audit report with the verdict, the evidence, the patch, the hardened prompt and the SHA-256 of the recording it came from: `uv run python scripts/build_report_pdf.py runs/<run>.jsonl out.pdf`. See [the report for the headline run](docs/Kavach-Audit-Report.pdf) and the [offline sample](docs/Kavach-Audit-Report-sample.pdf).
+**A report you can hand to someone.** Every run turns into a four-page branded audit report with the verdict, the evidence, the patch, the hardened prompt and the SHA-256 of the recording it came from: `python scripts/build_report_pdf.py runs/<run>.jsonl out.pdf` (standard library plus Chrome). See [the report for the headline run](docs/Kavach-Audit-Report.pdf) and the [offline sample](docs/Kavach-Audit-Report-sample.pdf).
 
 ## What we learned
 
-We probed the same v1 bot with several victim models and the same eight attacks. Only a small model was breakable enough to tell the story:
+We probed the same v1 bot with several victim models, using the same eight seeded attacks once (`scripts/probe_v1.py`). The recorded runs below use model-written attacks and different seeds, so their round 1 numbers differ. Only a small model was breakable enough to tell the story:
 
 | Victim model | v1 breach rate |
 |---|---|
@@ -115,11 +115,11 @@ pnpm bootstrap       # asks for your Lyzr, Band and model keys, creates the 7 Ly
                      # and 7 Band agents, writes .env and agent_config.yaml, checks everything
 make -C backend probe  # is guardrail v1 breakable by your TARGET_MODEL? (needs >= 50%)
 pnpm dev             # API + target bot + dashboard + site
-pnpm demo            # runs until round 1 is breached, a patch is vetoed and utility holds,
+pnpm demo            # keeps recording until round 1 is breached, utility holds and (ideally) a patch is vetoed,
                      # then saves runs/demo_run.jsonl and fills the results table below
 ```
 
-> **Windows:** `make` is not installed by default. Run the same commands from `backend/` with `uv run`, for example `cd backend && uv run python ../scripts/probe_v1.py`. Free-tier model providers cap tokens per minute; the target queues and retries, and `TARGET_CONCURRENCY` raises the parallelism on a paid tier.
+> **Windows:** `make` is not installed by default, and `pnpm bootstrap` and `pnpm demo` call it. Without it, run the same steps from `backend/`: `uv sync && uv run python -m kavach.setup` (setup), `uv run python ../scripts/probe_v1.py` (probe), `uv run python -m kavach.record_demo` (demo). Free-tier model providers cap tokens per minute; the target queues and retries, and `TARGET_CONCURRENCY` raises the parallelism on a paid tier.
 
 Record the two-minute video from the site (Chrome needed): `pnpm --filter @kavach/web video` → `runs/video/kavach-demo.mp4`.
 
@@ -155,6 +155,8 @@ runs              Recorded runs; sample_simulated_run.jsonl powers the browser d
 ```
 
 ## Results
+
+The committed demo run is hardened by its first patch, so it contains no vetoed patch; the vetoed-patch story is in the labelled offline sample (`runs/sample_simulated_run.jsonl`). `pnpm demo` keeps trying for a run with a veto.
 
 <!-- results:start -->
 | Round | Config attacked | Attacks | Breach rate | Patch applied | Utility | Vetoes |
