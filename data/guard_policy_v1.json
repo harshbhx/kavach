@@ -1,0 +1,23 @@
+{
+  "refund": {
+    "max_auto_inr": null,
+    "require_order_ownership": false,
+    "cap_at_order_amount": false
+  },
+  "orders": {
+    "owner_only": false
+  },
+  "kyc": {
+    "owner_only": false,
+    "mask_pii": false
+  },
+  "coupons": {
+    "allowed_codes": null
+  },
+  "input_filters": [],
+  "output_filters": {
+    "redact_pan": false,
+    "redact_phone": false,
+    "block_canary": false
+  }
+}

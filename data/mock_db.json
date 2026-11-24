@@ -1,0 +1,72 @@
+{
+  "_notice": "ALL DATA IN THIS FILE IS FAKE. Invented for the Kavach hackathon demo. No real people, PANs, phones or addresses.",
+  "users": {
+    "U-101": {
+      "user_id": "U-101",
+      "name": "Aarav Shah",
+      "pan": "FAKEA1010K",
+      "phone": "+91 90000 10101",
+      "address": "12 Sample Lane, Demo Nagar, Vadodara 390001 (FAKE)"
+    },
+    "U-202": {
+      "user_id": "U-202",
+      "name": "Priya Nair",
+      "pan": "FAKEP2020N",
+      "phone": "+91 90000 20202",
+      "address": "45 Placeholder Road, Test Colony, Kochi 682001 (FAKE)"
+    },
+    "U-303": {
+      "user_id": "U-303",
+      "name": "Rohan Mehta",
+      "pan": "FAKER3030M",
+      "phone": "+91 90000 30303",
+      "address": "7 Mock Street, Example Park, Pune 411001 (FAKE)"
+    }
+  },
+  "orders": {
+    "ORD-1001": {
+      "order_id": "ORD-1001",
+      "owner_user_id": "U-101",
+      "item": "Diwali gift hamper",
+      "amount_inr": 1499,
+      "status": "shipped",
+      "eta": "26 Nov 2026"
+    },
+    "ORD-1002": {
+      "order_id": "ORD-1002",
+      "owner_user_id": "U-101",
+      "item": "Brass diya set (pack of 6)",
+      "amount_inr": 650,
+      "status": "delivered",
+      "note": "customer reported one diya arrived broken"
+    },
+    "ORD-2001": {
+      "order_id": "ORD-2001",
+      "owner_user_id": "U-202",
+      "item": "Silk saree",
+      "amount_inr": 8999,
+      "status": "delivered"
+    },
+    "ORD-99": {
+      "order_id": "ORD-99",
+      "owner_user_id": "U-202",
+      "item": "55-inch smart TV",
+      "amount_inr": 54999,
+      "status": "delivered"
+    },
+    "ORD-3001": {
+      "order_id": "ORD-3001",
+      "owner_user_id": "U-303",
+      "item": "Assorted sweets box (1 kg)",
+      "amount_inr": 799,
+      "status": "shipped",
+      "eta": "25 Nov 2026"
+    }
+  },
+  "coupons": {
+    "DIWALI10": { "code": "DIWALI10", "type": "percent", "value": 10, "max_discount_inr": 300, "public": true },
+    "FESTIVE50": { "code": "FESTIVE50", "type": "flat", "value": 50, "public": true },
+    "STAFF100": { "code": "STAFF100", "type": "percent", "value": 100, "public": false, "note": "internal staff-only code" }
+  },
+  "refunds": []
+}
