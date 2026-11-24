@@ -5,8 +5,8 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
 import time
+import weakref
 
 from kavach.config import Settings
 from kavach.models import ChatRequest, ChatResponse, TargetConfig
@@ -57,8 +57,28 @@ async def run_chat(req: ChatRequest, config: TargetConfig, settings: Settings) -
     )
 
 
-# Free-tier providers cap tokens per minute, so the default is two calls at a time; set TARGET_CONCURRENCY higher on a paid tier.
-_LLM_SLOTS = asyncio.Semaphore(int(os.environ.get("TARGET_CONCURRENCY", "2")))
+# Model calls in flight at once. Free-tier providers cap tokens per minute, so the default is two (TARGET_CONCURRENCY in
+# Settings raises it on a paid tier). A semaphore belongs to the event loop it is first used on, so there is one per loop,
+# created lazily, never at import time.
+_SLOTS: weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, asyncio.Semaphore] = weakref.WeakKeyDictionary()
+
+# After the first rate-limit answer a call keeps retrying for at most this long (monotonic seconds), well inside the
+# client's request timeout, so a burst never keeps spending quota on requests the caller already gave up on.
+RETRY_BUDGET_S = 60.0
+
+
+def _slots(settings: Settings) -> asyncio.Semaphore:
+    loop = asyncio.get_running_loop()
+    sem = _SLOTS.get(loop)
+    if sem is None:
+        sem = _SLOTS[loop] = asyncio.Semaphore(settings.target_concurrency)
+    return sem
+
+
+def _is_daily_quota(exc: Exception) -> bool:
+    """A per-day cap does not clear in seconds, so waiting on it only burns the budget."""
+    text = str(exc).lower()
+    return any(m in text for m in ("per day", "tokens per day", "requests per day", "(tpd)", "(rpd)"))
 
 
 def _extra_params(model: str) -> dict:
@@ -68,11 +88,15 @@ def _extra_params(model: str) -> dict:
 
 
 async def _complete(litellm, settings: Settings, messages: list[dict]):
-    """One model call. Free-tier providers (Groq) cap tokens per minute and answer bursts with 429, so a rate
-    limit waits and retries instead of failing the whole customer turn; only two calls run at once."""
-    for attempt in range(10):
+    """One model call. Free-tier providers (Groq) cap tokens per minute and answer bursts with 429, so a per-minute
+    limit waits and retries (for at most RETRY_BUDGET_S after the first 429) instead of failing the whole customer turn.
+    A daily quota is raised at once. At most `target_concurrency` calls run at the same time."""
+    slots = _slots(settings)
+    attempt = 0
+    first_limited: float | None = None
+    while True:
         try:
-            async with _LLM_SLOTS:
+            async with slots:
                 return await litellm.acompletion(
                     model=settings.target_model,
                     messages=messages,
@@ -81,10 +105,16 @@ async def _complete(litellm, settings: Settings, messages: list[dict]):
                     timeout=settings.llm_timeout_s,
                     **_extra_params(settings.target_model),
                 )
-        except litellm.RateLimitError:
-            if attempt == 9:
+        except litellm.RateLimitError as exc:
+            if _is_daily_quota(exc):
                 raise
-            await asyncio.sleep(min(3 * (attempt + 1), 15))
+            now = time.monotonic()
+            first_limited = now if first_limited is None else first_limited
+            attempt += 1
+            delay = min(3 * attempt, 15)
+            if now + delay - first_limited > RETRY_BUDGET_S:
+                raise
+            await asyncio.sleep(delay)
 
 
 async def _llm_loop(message: str, system_prompt: str, runner: ToolRunner, settings: Settings) -> str:

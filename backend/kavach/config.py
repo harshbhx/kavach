@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     target_extra_headers: dict[str, str] = Field(default_factory=dict)
     target_model: str = "anthropic/claude-haiku-5-5"  # or "fake"
     target_temperature: float = 0.2
+    # Model calls in flight at once inside the target. Two suits a free tier that caps tokens per minute; raise it on a paid tier.
+    target_concurrency: int = Field(2, ge=1, le=64)
 
     # band
     band_enabled: bool = True
@@ -72,6 +74,15 @@ class Settings(BaseSettings):
             v = v.strip()
             return json.loads(v) if v else {}
         return v or {}
+
+    @field_validator("attack_library")
+    @classmethod
+    def _known_library(cls, v: str) -> str:
+        from kavach.attack_library import LIBRARIES  # imported here: attack_library imports this module
+
+        if v not in LIBRARIES:
+            raise ValueError(f"unknown attack library {v!r}; choose one of: {', '.join(sorted(LIBRARIES))}")
+        return v
 
     def lyzr_agent_id(self, agent: str) -> str:
         return getattr(self, f"lyzr_agent_{agent}", "")
