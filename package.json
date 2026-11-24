@@ -5,7 +5,7 @@
   "scripts": {
     "bootstrap": "pnpm install && cd backend && make setup",
     "dev": "turbo run dev --filter=@kavach/api --filter=@kavach/dashboard --filter=@kavach/web",
-    "dev:offline": "BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess FAKE_DELAY_S=1 turbo run dev --filter=@kavach/dashboard --filter=@kavach/web --filter=@kavach/api",
+    "dev:offline": "cross-env BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess FAKE_DELAY_S=1 turbo run dev --filter=@kavach/dashboard --filter=@kavach/web --filter=@kavach/api",
     "dev:web": "pnpm --filter @kavach/web dev",
     "dev:dashboard": "pnpm --filter @kavach/dashboard dev",
     "demo": "cd backend && make demo",
@@ -15,6 +15,7 @@
     "deploy:site": "pnpm --filter @kavach/web deploy:cf"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "turbo": "^2.11.13"
   }
 }
