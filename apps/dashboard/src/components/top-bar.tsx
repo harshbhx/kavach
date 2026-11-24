@@ -140,7 +140,7 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
           </p>
         </div>
         <StatusStamp run={run} apiDown={apiDown && !demo} />
-        {run.bandUrl && (
+        {run.bandUrl && run.mode !== 'demo' && (
           <a
             href={run.bandUrl}
             target="_blank"
