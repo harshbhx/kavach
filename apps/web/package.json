@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "oxlint && tsc --noEmit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "video": "node scripts/record-video.mjs"
   },
   "dependencies": {
     "@kavach/brand": "workspace:*",
@@ -37,6 +38,7 @@
     "@types/react-dom": "^19.3.0",
     "oxlint": "^1.93.0",
     "postcss": "^8.5.32",
+    "puppeteer-core": "^25.18.1",
     "tailwindcss": "^4.3.5",
     "typescript": "^7.0.2"
   }

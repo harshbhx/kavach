@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ArenaPanel } from '@/components/arena-panel'
 import { KpiStrip } from '@/components/kpi-strip'
+import { Narration, narrationFor } from '@/components/narration'
 import { PatchPanel } from '@/components/patch-panel'
 import { RoomPanel } from '@/components/room-panel'
 import { RoundRail } from '@/components/round-rail'
@@ -37,8 +38,21 @@ function useRunToasts() {
   }, [])
 }
 
+const params = new URLSearchParams(window.location.search)
+const NARRATE = params.get('narrate') === '1'
+const DEMO_SPEED = Number(params.get('speed')) || 1.5
+
 export default function App() {
-  const onEvent = useRunToasts()
+  const toasts = useRunToasts()
+  const [caption, setCaption] = useState<{ text: string; key: number } | null>(null)
+  const onEvent = useCallback(
+    (ev: KavachEvent) => {
+      if (!NARRATE) return toasts(ev)
+      const text = narrationFor(ev, Boolean(demoParam()) && demoParam() !== 'live')
+      if (text) setCaption({ text, key: ev.seq })
+    },
+    [toasts],
+  )
   const { state: run, attach, attachDemo, demoData } = useRun(onEvent)
   const demo = demoParam()
   const [logo, setLogo] = useState<KavachLogoState>('idle')
@@ -61,7 +75,7 @@ export default function App() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
     if (demo) {
-      attachDemo(demo).catch((e) => toast.error('Could not load the recorded run', { description: String(e) }))
+      attachDemo(demo, DEMO_SPEED).catch((e) => toast.error('Could not load the recorded run', { description: String(e) }))
       return
     }
     const id = q.get('run')
@@ -113,7 +127,7 @@ export default function App() {
           </div>
         </main>
       </div>
-      <Toaster position="bottom-right" richColors closeButton />
+      {NARRATE ? <Narration latest={caption} /> : <Toaster position="bottom-right" richColors closeButton />}
     </TooltipProvider>
   )
 }
