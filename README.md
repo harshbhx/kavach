@@ -1,107 +1,134 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/kavach-logo-dark-animated.svg">
-    <img src="docs/assets/brand/kavach-logo-light.svg" alt="Kavach" width="440">
-  </picture>
+  <img src="docs/assets/brand/kavach-logo-light.svg" alt="Kavach" width="400">
 </p>
 
-# Kavach — AI Red vs Blue for Tool-Using Agents
+<h3 align="center">Seven AI agents attack and harden a refund-issuing support bot, without breaking it for real customers.</h3>
 
-> Seven AI agents attack and harden a refund-issuing support bot, live in a shared Band room, without breaking it for real customers.
+<p align="center">
+  <a href="https://github.com/harshbhx/kavach/actions/workflows/ci.yml"><img src="https://github.com/harshbhx/kavach/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/track-Security%20(Attack%20%26%20Defend)-0b6e7f" alt="Security track">
+  <img src="https://img.shields.io/badge/built%20with-Lyzr%20%C2%B7%20Band%20%C2%B7%20Agent37%20%C2%B7%20AdaL-1f7a4d" alt="Built with Lyzr, Band, Agent37, AdaL">
+  <img src="https://img.shields.io/badge/license-MIT-3a574c" alt="MIT">
+</p>
 
-*Kavach (कवच) means "armour" in Hindi. The logo is a K drawn as `|<`: a guardrail with an attack striking it.*
+*Kavach (कवच) means armour in Hindi.* Built for **Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition)**, Security track.
 
-**Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition)** · Track: **Security (Attack & Defend)**
-Built with **Lyzr · Band · Agent37 · AdaL**
+![The Kavach dashboard after a three-round run](docs/assets/dashboard.png)
 
-![Kavach dashboard](docs/assets/dashboard.png)
-<sub>The dashboard after an offline run (scripted agents, in-process target). <!-- TODO: swap for a live Lyzr + Band run --></sub>
-
-The repo also ships a landing page and a docs site (`apps/web`, Next.js + Fumadocs): `pnpm dev:web`.
-
-![Kavach landing page](docs/assets/landing.png)
-
----
+<sub>The dashboard after a recorded run: round 1 is breached, the first patch is vetoed for blocking real customers, the second is approved, and rounds 2 and 3 hold. Open it in your browser with `pnpm dev:web` → http://localhost:3000/dashboard?demo=sample (no backend needed).</sub>
 
 ## The problem
-Support agents now take real actions: refunds, KYC lookups, coupons. One clever message can make them refund ₹50,000 on someone else's order or read out a customer's PAN. Teams test this by hand, once, and "fix" it by making the bot refuse everything, which quietly breaks customer service.
+
+Support bots now take real actions: refunds, KYC lookups, coupons. One clever message can make a bot refund ₹50,000 on someone else's order or read out a customer's PAN. Teams test this by hand, once, and "fix" it by making the bot refuse everything, which quietly breaks customer service.
 
 ## What Kavach does
-Kavach runs an autonomous **Attack → Detect → Patch → Audit** loop against **DiwaliMart Support**, a tool-using e-commerce agent with fake data:
+
+Kavach runs an **Attack → Detect → Patch → Audit** loop against **DiwaliMart Support**, a tool-using e-commerce bot with fake data. Seven agents share one room and hand off by @mentioning each other.
 
 | Squad | Agent | Job |
 |---|---|---|
-| 🔴 Red | **Recon** | Maps the bot's persona, tools and limits with harmless probes |
-| 🔴 Red | **Injector** | Technical prompt injection: overrides, base64, JSON/tool-output spoofing |
-| 🔴 Red | **Social Engineer** | Founder/VIP authority, urgency, emotional stories, **Hinglish code-switching** |
-| 🔵 Blue | **Monitor** | Explains each breach and its root cause |
-| 🔵 Blue | **Patcher** | Rewrites the system prompt **and** policy-as-code guardrails |
-| 🔵 Blue | **Auditor** | Replays the exploits + runs 10 normal customer requests; **vetoes patches that over-block** |
-| ⚖️ | **Referee** | Scores Breach Rate, Utility and Time-to-Harden; writes the audit report |
+| Red | **Recon** | Maps the bot's persona, tools and soft limits with harmless questions |
+| Red | **Injector** | Prompt injection: overrides, fake system messages, base64, spoofed tool output |
+| Red | **Social Engineer** | Founder and VIP authority, urgency, emotional stories, Hinglish code-switching |
+| Blue | **Monitor** | Explains each breach and its root cause |
+| Blue | **Patcher** | Rewrites the system prompt **and** the policy-as-code guardrails |
+| Blue | **Auditor** | Replays every exploit and runs 10 normal customer requests; vetoes patches that over-block |
+| Referee | **Referee** | Scores breach rate, utility and time to harden; writes the audit report |
 
-**Honest scoring:** breaches are detected **by code** from the target's real tool-call log (refund > ₹500, cross-account action, PII leak, system-prompt canary, staff-coupon abuse). LLMs attack, patch and explain. They never grade themselves.
+**Code keeps score, not a model.** Breaches are read from the target's real tool-call log: a refund over ₹500, an action on another customer's account, a PII leak, the system-prompt canary, staff-coupon abuse. Models attack, patch and explain. They never grade themselves.
 
-**The Utility Trap:** a patch is approved only if the exploits stop working **and** benign utility stays ≥ 90%. A "refuse everything" patch gets vetoed in the Band room, and the Patcher has to do better.
+**The utility trap.** A patch ships only if the exploits stop working **and** at least 90% of normal requests still succeed. A "refuse everything" patch is vetoed in the room and the Patcher has to try again.
 
 ## How the sponsors power it
-- **Lyzr**: all 7 Kavach agents run as Lyzr Studio agents (role, goal, instructions, structured JSON, session memory), called through the Lyzr inference API.
-- **Band**: each agent is a Band remote agent. Every handoff is an @mention message in one shared Kavach room, which humans can watch and join.
-- **Agent37**: the target agent and its mock tools run in an isolated Agent37 sandbox, so attacks have a safe blast radius.
-- **AdaL**: the coding agent that built the project from this repo's `AGENTS.md` and `docs/`.
 
-<!-- TODO: add screenshots: docs/assets/lyzr-agents.png, docs/assets/band-room.png, docs/assets/agent37.png -->
-
-## Architecture
-```
-[React dashboard] ⇄ SSE ⇄ [Kavach API: Orchestrator · Scoring · Event bus]
-                               │              │                  │
-                         Lyzr (7 agents)  DiwaliMart target   Band room
-                                          (Agent37 sandbox)   (7 agents + you)
-```
-Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- **Lyzr**: the seven agents are Lyzr Studio agents (role, goal, instructions, JSON output, session memory) called through the Lyzr inference API. `pnpm bootstrap` creates them for you.
+- **Band**: each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room that people can watch and join. `pnpm bootstrap` registers them.
+- **Agent37**: the target bot and its mock tools can run in an isolated Agent37 sandbox, so attacks have a safe blast radius (`scripts/deploy_target_agent37.sh`).
+- **AdaL**: the coding agent the repo is set up for; `AGENTS.md` and `docs/` are its instructions.
 
 ## Quickstart
 
-**Try it with no keys (2 minutes).** Fake brains + an in-process fake target run the whole loop offline:
+You need Node 22+, pnpm 10 and [uv](https://docs.astral.sh/uv/). uv fetches Python 3.12 itself.
+
+**No keys, two minutes.** Scripted agents and an in-process target run the whole loop offline:
+
 ```bash
-cd backend && uv sync
-BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess FAKE_DELAY_S=1 make api
-# second terminal, repo root
-pnpm install && pnpm dev:dashboard                # http://localhost:5173 → "Start live run"
+pnpm install
+pnpm dev:offline     # API :8000 · dashboard :5173 · site and docs :3000
 ```
-Or pick `sample_simulated_run.jsonl` and click **Replay** (a recorded offline run, labelled as simulated).
 
-**Live run (Lyzr + Band + a real target model):**
+Open http://localhost:5173 and press **Start live run**.
+
+**Live, with Lyzr and Band:**
+
 ```bash
-cp .env.example .env                              # Lyzr key + 7 agent IDs, model key, Band settings
-cp agent_config.example.yaml agent_config.yaml    # 7 Band agent IDs + API keys
-cd backend && uv sync
-make probe                                        # is v1 breakable by your TARGET_MODEL? (needs >= 50%)
-uv run python ../scripts/band_setup.py            # checks the 7 Band identities, posts a test message
-make target                                       # DiwaliMart target on :8001
-make api                                          # Kavach API on :8000
-pnpm dev:dashboard                                # from the repo root
+pnpm bootstrap       # asks for your Lyzr, Band and model keys, creates the 7 Lyzr agents
+                     # and 7 Band agents, writes .env and agent_config.yaml, checks everything
+make -C backend probe  # is guardrail v1 breakable by your TARGET_MODEL? (needs >= 50%)
+pnpm dev             # API + target bot + dashboard + site
+pnpm demo            # runs until round 1 is breached, a patch is vetoed and utility holds,
+                     # then saves runs/demo_run.jsonl and fills the results table below
 ```
-Landing page and docs site: `pnpm dev:web` (http://localhost:3000, docs at `/docs`).
-Headless: `cd backend && uv run python -m kavach.cli run --rounds 3` (events → `runs/<id>.jsonl`, report → `runs/<id>.report.md`).
-Target in an Agent37 sandbox: `scripts/deploy_target_agent37.sh` (see [docs/SPONSORS.md](docs/SPONSORS.md#3-agent37-isolated-sandbox-for-the-target)).
 
-Checks: `cd backend && make check` (ruff + 35 tests, all offline) · `make smoke` (full 3-round offline run).
+Record the two-minute video from the site (Chrome needed): `pnpm --filter @kavach/web video` → `runs/video/kavach-demo.mp4`.
 
-## Results (recorded run)
-<!-- TODO: fill from runs/demo_run.jsonl -->
-| Round | Config attacked | Breach rate | Patch | Utility | Vetoes |
-|---|---|---|---|---|---|
-| 1 | v1 | –% | v2 | –% | – |
-| 2 | v2 | –% | v3 | –% | – |
-| 3 | v3 | –% | – | –% | – |
+## Commands
+
+| From the repo root | What it does |
+|---|---|
+| `pnpm dev` | Backend (API, plus the target when `TARGET_URL` is local), dashboard and site |
+| `pnpm dev:offline` | The same with scripted agents and no keys |
+| `pnpm dev:web` / `pnpm dev:dashboard` | One app on its own |
+| `pnpm demo` | Record a demo-worthy live run |
+| `pnpm build` | Build the site, docs and the bundled dashboard demo |
+| `pnpm lint` / `pnpm test` | Lint and test every package (Python and TypeScript) |
+| `make -C backend help` | Backend targets: `setup`, `check-setup`, `api`, `target`, `probe`, `band`, `smoke` |
+
+Headless run: `cd backend && uv run python -m kavach.cli run --rounds 3` writes events to `runs/<id>.jsonl` and the report to `runs/<id>.report.md`.
+
+## Repository layout
+
+```
+apps/web          Landing page and docs (Next.js 16, Fumadocs). Serves the dashboard demo at /dashboard
+apps/dashboard    Live dashboard (Vite, React 19, shadcn/ui, Magic UI, React Bits, Aceternity, Recharts)
+packages/brand    Logo, tokens and fonts shared by both apps
+backend           Orchestrator, scoring, target bot, Lyzr and Band clients, setup wizard (Python, FastAPI)
+prompts           The seven agent prompts and the target's v1 system prompt
+data              Attack library, benign suite, mock store
+docs              PRD, architecture, scoring, agent roster, API contracts; synced into the docs site
+runs              Recorded runs; sample_simulated_run.jsonl powers the browser demo
+```
+
+## Results
+
+<!-- results:start -->
+Fills in when you run `pnpm demo`. The bundled offline sample (`runs/sample_simulated_run.jsonl`, scripted agents) goes 100% → 0% → 0% breach with utility at 100% after one vetoed patch.
+<!-- results:end -->
+
+## Deploy the site
+
+Import the repo on Vercel and set the root directory to `apps/web`. The build syncs `docs/` into the docs site and bundles the dashboard with the recorded runs, so `/dashboard?demo=sample` works with no backend.
+
+## Architecture
+
+```
+[Dashboard] ⇄ SSE ⇄ [Kavach API: orchestrator · scoring · event bus]
+                          │                │                  │
+                    Lyzr (7 agents)   DiwaliMart target    Band room
+                                      (Agent37 sandbox)    (7 agents + you)
+```
+
+Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Safety
-All customer data is fake. The target's tools are pure functions over a local mock database: no network, no real payments. Attacks are aimed only at our own sandboxed target.
+
+All customer data is fake. The target's tools are pure functions over a local mock store: no network, no real payments. Attacks are aimed only at our own sandboxed bot. See [SECURITY.md](SECURITY.md).
 
 ## Docs
-[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [Demo & submission](docs/DEMO_AND_SUBMISSION.md)
+
+[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Contributing](CONTRIBUTING.md)
 
 ---
-Built by **Harsh Bhanushali** (DualMind Labs) during the hackathon.
+
+Built by **Harsh Bhanushali** ([DualMind Labs](https://dualmindlab.tech)). MIT licensed.
 HiDevs account: harshbhx@gmail.com (same person as Devpost bhanushaliharsh434@gmail.com).

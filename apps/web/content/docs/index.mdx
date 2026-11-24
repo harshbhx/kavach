@@ -7,34 +7,28 @@ Kavach attacks and hardens **DiwaliMart Support**, a tool-using support bot with
 
 ## Run it offline
 
-No keys needed. Scripted agents and a scripted target run the whole loop.
+No keys needed. Scripted agents and a scripted target run the whole loop. You need Node 22+, pnpm 10 and [uv](https://docs.astral.sh/uv/).
 
 ```bash
 git clone https://github.com/harshbhx/kavach.git && cd kavach
-
-# API with fake brains and an in-process fake target
-cd backend && uv sync
-BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess FAKE_DELAY_S=1 make api
-
-# second terminal, repo root: the dashboard on http://localhost:5173
-pnpm install && pnpm dev:dashboard
+pnpm install
+pnpm dev:offline     # API :8000, dashboard :5173, this site :3000
 ```
 
-Press **Start live run**, or pick `sample_simulated_run.jsonl` and press **Replay**. The sample is an offline run and is labelled as simulated.
+Open the dashboard at http://localhost:5173 and press **Start live run**, or pick `sample_simulated_run.jsonl` and press **Replay**. The sample is an offline run and is labelled as simulated. You can also watch it in the browser with no backend at [/dashboard?demo=sample](/dashboard/?demo=sample).
 
 ## Run it for real
 
 <Steps>
 <Step>
 
-### Add your keys
+### Connect Lyzr and Band
 
 ```bash
-cp .env.example .env                              # Lyzr key + 7 agent IDs, model key, Band settings
-cp agent_config.example.yaml agent_config.yaml    # 7 Band agent IDs + API keys
+pnpm bootstrap
 ```
 
-The seven agent prompts live in `prompts/agents/`. Paste each into a Lyzr Studio agent. Setup for every sponsor is in [Sponsor integrations](/docs/sponsors).
+The setup wizard asks for your Lyzr API key and user ID, your Band user API key and a model key. It creates the seven Lyzr agents from `prompts/agents/`, registers the seven Band agents, writes `.env` and `agent_config.yaml` (both gitignored) and checks every connection. Run it again with `make -C backend check-setup` to re-check. Details for each sponsor are in [Sponsor integrations](/docs/sponsors).
 
 </Step>
 <Step>
@@ -42,10 +36,10 @@ The seven agent prompts live in `prompts/agents/`. Paste each into a Lyzr Studio
 ### Check the target is breakable
 
 ```bash
-cd backend
-make probe                                  # needs >= 50% breach rate on v1
-uv run python ../scripts/band_setup.py      # checks the 7 Band identities, posts a test message
+make -C backend probe     # needs >= 50% breach rate on guardrail v1
 ```
+
+If the target model refuses too much, pick a weaker `TARGET_MODEL` in `.env`.
 
 </Step>
 <Step>
@@ -53,12 +47,22 @@ uv run python ../scripts/band_setup.py      # checks the 7 Band identities, post
 ### Start a run
 
 ```bash
-make target     # DiwaliMart target on :8001
-make api        # Kavach API on :8000
-pnpm dev:dashboard
+pnpm dev     # API + target bot + dashboard + site
 ```
 
-Every run is saved to `runs/<run_id>.jsonl` and can be replayed from the dashboard. The audit report is at `runs/<run_id>.report.md`.
+Press **Start live run** on the dashboard. Every run is saved to `runs/<run_id>.jsonl` and can be replayed; the audit report is at `runs/<run_id>.report.md`.
+
+</Step>
+<Step>
+
+### Record the demo
+
+```bash
+pnpm demo                          # retries until round 1 is breached, a patch is vetoed and utility holds
+pnpm --filter @kavach/web video    # films the site and the run: runs/video/kavach-demo.mp4
+```
+
+`pnpm demo` saves `runs/demo_run.jsonl` and fills the results table in the README.
 
 </Step>
 </Steps>
@@ -67,8 +71,8 @@ Every run is saved to `runs/<run_id>.jsonl` and can be replayed from the dashboa
 
 | Path | What's there |
 | --- | --- |
-| `backend/` | Python API: target bot, scoring, agents, orchestrator, Band client |
-| `apps/dashboard/` | The live dashboard (Vite + React) |
+| `backend/` | Python API: target bot, scoring, agents, orchestrator, Lyzr and Band clients, setup wizard |
+| `apps/dashboard/` | The live dashboard (Vite, React, shadcn/ui, Magic UI, React Bits, Aceternity) |
 | `apps/web/` | This site: landing page and docs (Next.js + Fumadocs) |
 | `packages/brand/` | The Guardrail K logo and design tokens |
 | `prompts/`, `data/` | Agent prompts, the target's system prompt, mock data, attack library |

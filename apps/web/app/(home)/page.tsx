@@ -15,12 +15,13 @@ const SPONSORS = [
 ] as const;
 
 const QUICKSTART = `git clone ${links.github}.git && cd kavach
-cd backend && uv sync
-BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake \\
-  TARGET_URL=inprocess FAKE_DELAY_S=1 make api
+pnpm install
 
-# second terminal, repo root
-pnpm install && pnpm dev:dashboard`;
+# API, dashboard and this site, with scripted agents
+pnpm dev:offline
+
+# dashboard  http://localhost:5173
+# site       http://localhost:3000`;
 
 function Heading({ id, title, children }: { id: string; title: string; children?: React.ReactNode }) {
   return (
@@ -44,7 +45,7 @@ export default function HomePage() {
         />
         <div className="relative mx-auto max-w-[1200px] px-5 pt-14 pb-20 md:pt-20">
           <div className="grid items-end gap-x-12 gap-y-8 lg:grid-cols-12">
-            <h1 className="font-display text-[3.1rem] leading-[0.98] tracking-[-0.01em] text-ink text-balance sm:text-[4.4rem] lg:col-span-8 lg:text-[5.3rem]">
+            <h1 className="font-display text-[3.1rem] leading-[0.98] text-ink text-balance sm:text-[4.4rem] lg:col-span-8 lg:text-[5.3rem]">
               Your support bot can issue refunds. So can anyone who talks to it.
             </h1>
             <div className="lg:col-span-4 lg:pb-3">
@@ -159,7 +160,8 @@ export default function HomePage() {
               localhost:5173 and press Start live run.
             </p>
             <p>
-              For a real run, add a Lyzr key, your seven Band agents and a model key.{' '}
+              For a real run, <code className="font-mono text-[0.92em] text-ink">pnpm bootstrap</code> asks for your Lyzr, Band
+              and model keys, then creates all fourteen agents for you.{' '}
               <Link href="/docs" className="font-semibold text-hold underline underline-offset-4 hover:text-ink">
                 The docs walk through it.
               </Link>
