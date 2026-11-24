@@ -44,7 +44,7 @@ class Settings(BaseSettings):
 
     # band
     band_enabled: bool = True
-    band_api_base: str = "https://api.band.ai/api/v1"
+    band_api_base: str = "https://app.band.ai/api/v1"
     band_agent_config: str = "agent_config.yaml"
     band_owner_user_id: str = ""
     band_owner_handle: str = ""  # optional: lets the Referee @mention you in the final message
