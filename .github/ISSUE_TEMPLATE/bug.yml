@@ -1,0 +1,20 @@
+name: Bug report
+description: Something in Kavach does not work as documented
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, what you saw.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or run file
+      description: Paste the error, or attach the runs/<id>.jsonl. Remove any keys first.
+  - type: input
+    id: mode
+    attributes:
+      label: Mode
+      description: offline (fake brains), lyzr, or direct; target model name
