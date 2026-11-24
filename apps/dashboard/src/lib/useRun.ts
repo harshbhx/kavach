@@ -16,6 +16,19 @@ import type {
 
 export type LogoSignal = { state: 'attack' | 'breach' | 'secured'; at: number }
 
+/** Phases of one round, in order. Probe only happens in round 1 (Recon's dossier is reused after that). */
+export const PHASES = ['probe', 'attack', 'detect', 'patch', 'audit'] as const
+export type Phase = (typeof PHASES)[number] | 'done'
+
+export interface RoundProgress {
+  phase: Phase
+  /** highest phase index reached (5 = round finished) */
+  reached: number
+  attempts: number
+  vetoes: number
+  breachRate: number | null
+}
+
 export interface ChartPoint {
   round: number
   breach: number | null
@@ -43,6 +56,8 @@ export interface RunView {
   logo: LogoSignal | null
   configsVersion: number
   lastSeq: number
+  progress: Record<number, RoundProgress>
+  speaker: { agent: AgentName; at: number } | null
 }
 
 export const emptyRun: RunView = {
@@ -65,9 +80,20 @@ export const emptyRun: RunView = {
   logo: null,
   configsVersion: 0,
   lastSeq: -1,
+  progress: {},
+  speaker: null,
 }
 
 type Action = { type: 'reset'; runId: string; mode: 'live' | 'replay' } | { type: 'event'; ev: KavachEvent } | { type: 'closed' }
+
+const progressOf = (s: RunView, r: number): RoundProgress =>
+  s.progress[r] ?? { phase: 'attack', reached: 0, attempts: 0, vetoes: 0, breachRate: null }
+
+function advance(s: RunView, r: number, phase: Phase, patch: Partial<RoundProgress> = {}): Record<number, RoundProgress> {
+  const cur = progressOf(s, r)
+  const idx = phase === 'done' ? PHASES.length : PHASES.indexOf(phase)
+  return { ...s.progress, [r]: { ...cur, ...patch, phase, reached: Math.max(cur.reached, idx) } }
+}
 
 const point = (s: RunView, round: number): ChartPoint => s.chart[round] ?? { round, breach: null, utility: null, vetoed: [] }
 
@@ -88,7 +114,9 @@ function apply(s: RunView, ev: KavachEvent): RunView {
     case 'band.room':
       return { ...s, bandUrl: d.url ?? null }
     case 'round.started':
-      return { ...s, currentRound: r, logo: { state: 'attack', at: now } }
+      return { ...s, currentRound: r, logo: { state: 'attack', at: now }, progress: advance(s, r, r === 1 ? 'probe' : 'attack') }
+    case 'recon.dossier':
+      return { ...s, progress: advance(s, r, 'attack') }
     case 'agent.message':
       return {
         ...s,
@@ -96,9 +124,15 @@ function apply(s: RunView, ev: KavachEvent): RunView {
           ...s.messages,
           { seq: ev.seq, round: ev.round, agent: d.agent as AgentName, squad: d.squad as Squad, text: d.text, mentions: d.mentions ?? [] },
         ],
+        speaker: { agent: d.agent as AgentName, at: now },
       }
     case 'attack.launched':
-      return { ...s, attacks: { ...s.attacks, [d.attack_id]: d as AttackInfo }, logo: { state: 'attack', at: now } }
+      return {
+        ...s,
+        attacks: { ...s.attacks, [d.attack_id]: d as AttackInfo },
+        logo: { state: 'attack', at: now },
+        progress: progressOf(s, r).reached > 1 ? s.progress : advance(s, r, 'attack'),
+      }
     case 'toolcall.intercepted': {
       if (d.kind === 'probe' || d.kind === 'benign') return s
       const card: ToolCard = {
@@ -117,9 +151,18 @@ function apply(s: RunView, ev: KavachEvent): RunView {
     case 'breach.detected':
       return { ...s, logo: { state: 'breach', at: now } }
     case 'round.breach_scored':
-      return { ...s, chart: { ...s.chart, [r]: { ...point(s, r), breach: d.breach_rate } } }
+      return {
+        ...s,
+        chart: { ...s.chart, [r]: { ...point(s, r), breach: d.breach_rate } },
+        progress: advance(s, r, d.breach_rate > 0 ? 'patch' : 'done', { breachRate: d.breach_rate }),
+      }
     case 'patch.proposed':
-      return { ...s, patches: [...s.patches, { ...(d as PatchProposed), round: r }], configsVersion: s.configsVersion + 1 }
+      return {
+        ...s,
+        patches: [...s.patches, { ...(d as PatchProposed), round: r }],
+        configsVersion: s.configsVersion + 1,
+        progress: advance(s, r, 'audit', { attempts: d.attempt ?? progressOf(s, r).attempts + 1 }),
+      }
     case 'audit.result': {
       const audit = d as AuditResult
       const patches = s.patches.map((p) =>
@@ -130,12 +173,15 @@ function apply(s: RunView, ev: KavachEvent): RunView {
         audit.decision === 'veto'
           ? { ...s.chart, [r]: { ...pt, vetoed: [...pt.vetoed, { attempt: audit.attempt, utility: audit.utility?.score ?? null, reasons: audit.reasons }] } }
           : { ...s.chart, [r]: { ...pt, utility: audit.utility?.score ?? null } }
-      return { ...s, patches, chart }
+      const pr = progressOf(s, r)
+      const progress =
+        audit.decision === 'veto' ? advance(s, r, 'patch', { vetoes: pr.vetoes + 1 }) : advance(s, r, 'done')
+      return { ...s, patches, chart, progress }
     }
     case 'patch.applied':
       return { ...s, deployedVersion: d.version, logo: { state: 'secured', at: now }, configsVersion: s.configsVersion + 1 }
     case 'round.scored':
-      return { ...s, rounds: { ...s.rounds, [r]: d as RoundSummary } }
+      return { ...s, rounds: { ...s.rounds, [r]: d as RoundSummary }, progress: advance(s, r, 'done') }
     case 'report.ready':
       return { ...s, reportReady: true }
     case 'run.completed':
@@ -149,20 +195,32 @@ function apply(s: RunView, ev: KavachEvent): RunView {
   }
 }
 
-export function useRun() {
+export function useRun(onEvent?: (ev: KavachEvent) => void) {
   const [state, dispatch] = useReducer(reduce, emptyRun)
   const source = useRef<EventSource | null>(null)
+  const listener = useRef(onEvent)
+  useEffect(() => {
+    listener.current = onEvent
+  })
+  const seen = useRef(-1)
 
   const attach = (runId: string, mode: 'live' | 'replay') => {
     source.current?.close()
     dispatch({ type: 'reset', runId, mode })
+    seen.current = -1
     const es = new EventSource(api.eventsUrl(runId))
     source.current = es
     const onMessage = (msg: MessageEvent) => {
+      let ev: KavachEvent
       try {
-        dispatch({ type: 'event', ev: JSON.parse(msg.data) as KavachEvent })
+        ev = JSON.parse(msg.data) as KavachEvent
       } catch {
-        /* ignore malformed */
+        return
+      }
+      dispatch({ type: 'event', ev })
+      if (ev.seq > seen.current) {
+        seen.current = ev.seq
+        listener.current?.(ev)
       }
     }
     es.onmessage = onMessage

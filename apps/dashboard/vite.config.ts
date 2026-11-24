@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 
 // Dev and preview servers proxy /api to the Kavach API, so the dashboard works with no extra config.
@@ -8,6 +9,7 @@ const proxy = { '/api': { target: process.env.KAVACH_API ?? 'http://localhost:80
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: { port: 5173, proxy },
   preview: { port: 4173, proxy },
   build: { chunkSizeWarningLimit: 900 },

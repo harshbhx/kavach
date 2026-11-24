@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@import "@kavach/brand/theme.css";
+
+/* The dashboard is dark only: shadcn's dark: variants always apply. */
+@custom-variant dark (&:where(html, html *));
+
+/* shadcn/ui tokens mapped onto the Kavach palette */
+:root {
+  --background: #0a0a16;
+  --foreground: #f5f5fa;
+  --card: #12121f;
+  --card-foreground: #f5f5fa;
+  --popover: #1a1a2b;
+  --popover-foreground: #f5f5fa;
+  --primary: #7c5cff;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a2b;
+  --secondary-foreground: #f5f5fa;
+  --muted: #1a1a2b;
+  --muted-foreground: #a1a1b5;
+  --accent: #26263a;
+  --accent-foreground: #f5f5fa;
+  --destructive: #ff4d6d;
+  --border: #26263a;
+  --input: #26263a;
+  --ring: #7c5cff;
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(1100px 520px at 0% -12%, rgb(124 92 255 / 0.09), transparent 60%),
+      radial-gradient(800px 420px at 100% -8%, rgb(255 77 109 / 0.05), transparent 60%),
+      var(--kv-bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--kv-border-strong);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+.font-display {
+  font-variation-settings: "wdth" 88, "opsz" 48;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
