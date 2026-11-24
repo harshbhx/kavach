@@ -8,12 +8,25 @@ import type { AgentMessage, AgentName } from '@/lib/types'
 import type { RunView } from '@/lib/useRun'
 import { useStickyScroll } from '@/lib/useStickyScroll'
 import { cn } from '@/lib/utils'
+import { JumpPill } from './jump-pill'
 import { Empty, Panel, Stamp } from './panel'
 
 const ORDER: AgentName[] = ['recon', 'injection', 'social', 'referee', 'monitor', 'patcher', 'auditor']
-const TONE = { red: 'text-kv-attack', blue: 'text-kv-defend', neutral: 'text-kv-verdict' } as const
-const RING = { red: 'ring-kv-attack', blue: 'ring-kv-defend', neutral: 'ring-kv-verdict' } as const
-const BEAM = { red: ['#c8203f', '#ef7f93'], blue: ['#0b6e7f', '#5fb8c6'], neutral: ['#9a6a0e', '#d7aa52'] } as const
+const TONE = {
+  red: 'text-kv-attack',
+  blue: 'text-kv-defend',
+  neutral: 'text-kv-verdict',
+} as const
+const RING = {
+  red: 'ring-kv-attack',
+  blue: 'ring-kv-defend',
+  neutral: 'ring-kv-verdict',
+} as const
+const BEAM = {
+  red: ['#c8203f', '#ef7f93'],
+  blue: ['#0b6e7f', '#5fb8c6'],
+  neutral: ['#9a6a0e', '#d7aa52'],
+} as const
 const NAME_TO_AGENT: Record<string, AgentName> = Object.fromEntries(
   (Object.keys(AGENTS) as AgentName[]).map((a) => [AGENTS[a].name.toLowerCase(), a]),
 )
@@ -63,9 +76,22 @@ function target(m: AgentMessage): AgentName | null {
 }
 
 /** Seven seals in a row; a beam travels from whoever just spoke to whoever they @mentioned. */
-function Handoffs({ last, speaking }: { last: AgentMessage | null; speaking: AgentName | null }) {
+function Handoffs({
+  last,
+  speaking,
+  only,
+  onOnly,
+}: {
+  last: AgentMessage | null
+  speaking: AgentName | null
+  only: AgentName | null
+  onOnly: (a: AgentName | null) => void
+}) {
   const box = useRef<HTMLDivElement>(null)
-  const refs = useMemo(() => Object.fromEntries(ORDER.map((a) => [a, createRef<HTMLDivElement>()])) as Record<AgentName, RefObject<HTMLDivElement | null>>, [])
+  const refs = useMemo(
+    () => Object.fromEntries(ORDER.map((a) => [a, createRef<HTMLDivElement>()])) as Record<AgentName, RefObject<HTMLDivElement | null>>,
+    [],
+  )
   const to = last ? target(last) : null
   const from = last?.agent ?? null
   const tone = from ? AGENTS[from].squad : 'neutral'
@@ -77,7 +103,15 @@ function Handoffs({ last, speaking }: { last: AgentMessage | null; speaking: Age
         return (
           <Tooltip key={a}>
             <TooltipTrigger asChild>
-              <div className="z-10 flex w-12 flex-col items-center gap-1">
+              <button
+                type="button"
+                onClick={() => onOnly(only === a ? null : a)}
+                aria-pressed={only === a}
+                className={cn(
+                  'z-10 flex w-12 flex-col items-center gap-1 rounded-lg pt-0.5 pb-1 transition-opacity focus-visible:outline-2 focus-visible:outline-kv-defend',
+                  only && only !== a && 'opacity-40 hover:opacity-80',
+                )}
+              >
                 <div
                   ref={refs[a]}
                   className={cn(
@@ -87,13 +121,18 @@ function Handoffs({ last, speaking }: { last: AgentMessage | null; speaking: Age
                 >
                   <img src={avatar(a)} alt="" className="size-7 rounded-full" />
                 </div>
-                <span className={cn('text-[10.5px] leading-none', speaking === a ? cn('font-semibold', TONE[meta.squad]) : 'text-kv-faint')}>
+                <span
+                  className={cn(
+                    'text-[10.5px] leading-none',
+                    speaking === a || only === a ? cn('font-semibold', TONE[meta.squad]) : 'text-kv-faint',
+                  )}
+                >
                   {meta.name.split(' ')[0]}
                 </span>
-              </div>
+              </button>
             </TooltipTrigger>
             <TooltipContent>
-              {meta.name}, {meta.role}
+              {meta.name}, {meta.role}. {only === a ? 'Show everyone' : 'Show only this agent'}
             </TooltipContent>
           </Tooltip>
         )
@@ -164,38 +203,59 @@ function useSpeaking(speaker: RunView['speaker']) {
 }
 
 export function RoomPanel({ run }: { run: RunView }) {
-  const box = useStickyScroll([run.messages.length])
+  const [only, setOnly] = useState<AgentName | null>(null)
+  const messages = only ? run.messages.filter((m) => m.agent === only) : run.messages
+  const { box, behind, jump } = useStickyScroll(messages.length)
   const speaking = useSpeaking(run.speaker)
   const last = run.messages[run.messages.length - 1] ?? null
 
   return (
-    <Panel title="The Kavach room" hint="Every handoff is a message that @mentions the next agent" className="h-full" bodyClassName="flex flex-col">
-      <Handoffs last={last} speaking={speaking} />
-      <div ref={box} className="kv-ruled min-h-0 flex-1 overflow-y-auto pb-4">
-        {run.messages.length === 0 ? (
-          <Empty icon={<MessagesSquare className="size-5" />} title="The room is quiet">
-            Start a live run or replay a recorded one. The Referee opens the room, then Recon speaks.
-          </Empty>
-        ) : (
-          <ul>
-            {run.messages.map((m, i) => {
-              const prev = run.messages[i - 1]
-              const newRound = m.round != null && m.round !== prev?.round
-              return (
-                <Fragment key={m.seq}>
-                  {newRound && (
-                    <li className="flex items-center gap-3 px-4 pt-4 pb-1">
-                      <span className="h-px flex-1 bg-kv-border-strong/60" />
-                      <span className="font-display text-[14px] text-kv-muted">Round {m.round}</span>
-                      <span className="h-px flex-1 bg-kv-border-strong/60" />
-                    </li>
-                  )}
-                  <Message m={m} first={newRound || !prev || prev.agent !== m.agent} />
-                </Fragment>
-              )
-            })}
-          </ul>
-        )}
+    <Panel
+      title="The Kavach room"
+      hint="Every handoff is a message that @mentions the next agent"
+      className="h-full"
+      bodyClassName="flex flex-col"
+    >
+      <Handoffs last={last} speaking={speaking} only={only} onOnly={setOnly} />
+      {only && (
+        <div className="flex items-center justify-between gap-3 border-b border-kv-border bg-kv-defend-soft/40 px-4 py-1.5 text-[12.5px]">
+          <span className="text-kv-muted">
+            Showing <b className={TONE[AGENTS[only].squad]}>{AGENTS[only].name}</b> only, {messages.length} message
+            {messages.length === 1 ? '' : 's'}
+          </span>
+          <button type="button" onClick={() => setOnly(null)} className="font-semibold text-kv-defend hover:underline">
+            Show everyone
+          </button>
+        </div>
+      )}
+      <div className="relative min-h-0 flex-1">
+        <div ref={box} className="kv-ruled h-full overflow-y-auto pb-4">
+          {messages.length === 0 ? (
+            <Empty icon={<MessagesSquare className="size-5" />} title="The room is quiet">
+              Start a live run or replay a recorded one. The Referee opens the room, then Recon speaks.
+            </Empty>
+          ) : (
+            <ul>
+              {messages.map((m, i) => {
+                const prev = messages[i - 1]
+                const newRound = m.round != null && m.round !== prev?.round
+                return (
+                  <Fragment key={m.seq}>
+                    {newRound && (
+                      <li className="flex items-center gap-3 px-4 pt-4 pb-1">
+                        <span className="h-px flex-1 bg-kv-border-strong/60" />
+                        <span className="font-display text-[14px] text-kv-muted">Round {m.round}</span>
+                        <span className="h-px flex-1 bg-kv-border-strong/60" />
+                      </li>
+                    )}
+                    <Message m={m} first={newRound || !prev || prev.agent !== m.agent} />
+                  </Fragment>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+        <JumpPill count={behind} noun="message" onJump={jump} />
       </div>
     </Panel>
   )
