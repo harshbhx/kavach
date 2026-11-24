@@ -71,7 +71,7 @@ export function RoundRail({ run, total }: { run: RunView; total: number }) {
                           skipped && 'border-dashed border-kv-border text-kv-faint',
                           !skipped && !done && !now && 'border-kv-border-strong bg-kv-bg',
                           done && 'border-kv-secure/60 bg-kv-secure-soft text-kv-secure',
-                          now && 'border-kv-brand bg-kv-brand text-white',
+                          now && 'border-kv-brand bg-kv-brand text-kv-bg',
                         )}
                       >
                         {done && <Check className="size-3" strokeWidth={3} />}

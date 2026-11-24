@@ -5,16 +5,16 @@
   color-scheme: dark;
 
   /* surfaces */
-  --kv-bg: #0a0a16;          /* page */
-  --kv-surface: #12121f;     /* panels */
-  --kv-surface-2: #1a1a2b;   /* cards, inputs, chips */
-  --kv-border: #26263a;      /* hairlines */
-  --kv-border-strong: #3a3a55;
+  --kv-bg: #0b1311;          /* page */
+  --kv-surface: #111c19;     /* panels */
+  --kv-surface-2: #172420;   /* cards, inputs, chips */
+  --kv-border: #22332d;      /* hairlines */
+  --kv-border-strong: #33483f;
 
   /* text */
-  --kv-text: #f5f5fa;
-  --kv-muted: #a1a1b5;
-  --kv-faint: #6b6b80;
+  --kv-text: #eef4f1;
+  --kv-muted: #9fb3aa;
+  --kv-faint: #66796f;
 
   /* semantic */
   --kv-attack: #ff4d6d;      /* red agents, breaches */
@@ -26,10 +26,10 @@
   --kv-verdict: #ffb020;     /* referee, scores, VETOED outline */
   --kv-verdict-soft: rgba(255, 176, 32, 0.12);
 
-  /* brand accent: primary buttons, links, focus */
-  --kv-brand: #7c5cff;
-  --kv-brand-hover: #9a82ff;
-  --kv-brand-soft: rgba(124, 92, 255, 0.16);
+  /* brand accent: primary buttons, links, focus. Paper on ink: no purple anywhere. */
+  --kv-brand: #e8f0ec;
+  --kv-brand-hover: #ffffff;
+  --kv-brand-soft: rgba(232, 240, 236, 0.1);
 
   /* shape + type + motion */
   --kv-radius: 14px;

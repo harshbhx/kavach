@@ -154,7 +154,7 @@ export function ArenaPanel({ run }: { run: RunView }) {
           </ul>
         )}
       </div>
-      {live && <BorderBeam size={140} duration={7} colorFrom="#ff4d6d" colorTo="#7c5cff" />}
+      {live && <BorderBeam size={140} duration={7} colorFrom="#ff5a6e" colorTo="#2fd3e6" />}
     </Panel>
   )
 }

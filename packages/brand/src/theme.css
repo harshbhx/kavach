@@ -1,14 +1,14 @@
 /* Tailwind v4: import after `@import "tailwindcss";` to get classes like
    bg-kv-surface, text-kv-muted, border-kv-attack, bg-kv-attack-soft, font-display, rounded-kv. */
 @theme {
-  --color-kv-bg: #0a0a16;
-  --color-kv-surface: #12121f;
-  --color-kv-surface-2: #1a1a2b;
-  --color-kv-border: #26263a;
-  --color-kv-border-strong: #3a3a55;
-  --color-kv-text: #f5f5fa;
-  --color-kv-muted: #a1a1b5;
-  --color-kv-faint: #6b6b80;
+  --color-kv-bg: #0b1311;
+  --color-kv-surface: #111c19;
+  --color-kv-surface-2: #172420;
+  --color-kv-border: #22332d;
+  --color-kv-border-strong: #33483f;
+  --color-kv-text: #eef4f1;
+  --color-kv-muted: #9fb3aa;
+  --color-kv-faint: #66796f;
   --color-kv-attack: #ff4d6d;
   --color-kv-attack-soft: rgb(255 77 109 / 0.14);
   --color-kv-defend: #22d3ee;
@@ -17,9 +17,9 @@
   --color-kv-secure-soft: rgb(52 211 153 / 0.12);
   --color-kv-verdict: #ffb020;
   --color-kv-verdict-soft: rgb(255 176 32 / 0.12);
-  --color-kv-brand: #7c5cff;
-  --color-kv-brand-hover: #9a82ff;
-  --color-kv-brand-soft: rgb(124 92 255 / 0.16);
+  --color-kv-brand: #e8f0ec;
+  --color-kv-brand-hover: #ffffff;
+  --color-kv-brand-soft: rgb(232 240 236 / 0.1);
   --font-sans: "Inter", system-ui, sans-serif;
   --font-display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
