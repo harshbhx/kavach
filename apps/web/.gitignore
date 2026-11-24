@@ -31,3 +31,4 @@ next-env.d.ts
 # the dashboard demo, built by `pnpm --filter @kavach/dashboard build:site`
 /public/dashboard/
 /.brand-card.html
+/.wrangler/

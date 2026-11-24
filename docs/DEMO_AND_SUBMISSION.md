@@ -64,7 +64,7 @@ Prompt-only defences are fragile; tool-level guardrails plus prompt changes hold
 Plug in any team's agent through an OpenAPI tool spec, add a CI mode ("fail the build if the breach rate goes up"), and publish the attack and hardening skill packs on Finch.
 
 ### Built with
-python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, recharts, next.js, fumadocs, turborepo, lyzr, band, agent37, adal
+python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, recharts, next.js, fumadocs, turborepo, cloudflare-workers, lyzr, band, agent37, adal
 
 **Last line of the description (required):**
 *HiDevs account: harshbhx@gmail.com (same person as Devpost bhanushaliharsh434@gmail.com).*
@@ -74,7 +74,8 @@ python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, r
 - [ ] The repo is public, the README is complete, and there are no secrets.
 - [ ] `runs/demo_run.jsonl` is committed (`pnpm demo` fills the README results and the numbers above) and replay works from a fresh clone.
 - [ ] The video is ≤ 2:00, uploaded, and the link works in a private window.
-- [ ] Devpost: description, video URL, repo URL, screenshots, "Built with", track chosen.
+- [ ] The site is live on Cloudflare (*Actions → Deploy site*, after adding `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`); `/dashboard/?demo=sample` plays.
+- [ ] Devpost: description, video URL, repo URL, live site URL, screenshots, "Built with", track chosen.
 - [ ] HiDevs: submitted on the hackathon page (Dr. Agent repo evaluation if prompted).
 - [ ] The HiDevs email line is in the Devpost description.
 - [ ] Sponsor screenshots are in the README (Lyzr agents, Band room, Agent37 instance).

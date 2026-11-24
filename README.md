@@ -105,9 +105,17 @@ runs              Recorded runs; sample_simulated_run.jsonl powers the browser d
 Fills in when you run `pnpm demo`. The bundled offline sample (`runs/sample_simulated_run.jsonl`, scripted agents) goes 100% → 0% → 0% breach with utility at 100% after one vetoed patch.
 <!-- results:end -->
 
-## Deploy the site
+## Where it runs
 
-Import the repo on Vercel and set the root directory to `apps/web`. The build syncs `docs/` into the docs site and bundles the dashboard with the recorded runs, so `/dashboard?demo=sample` works with no backend.
+| Part | Hosted on |
+|---|---|
+| Landing page, docs and the in-browser dashboard demo | **Cloudflare** (Workers static assets), deployed by the *Deploy site* workflow |
+| The seven agents | **Lyzr** Studio |
+| The shared room where agents hand off | **Band** |
+| DiwaliMart, the target bot | **Agent37** sandbox (`scripts/deploy_target_agent37.sh`), or locally |
+| Kavach API (orchestrator, scoring, live dashboard feed) | Wherever you run `pnpm dev` |
+
+**Deploy the site to Cloudflare:** add two repository secrets, `CLOUDFLARE_API_TOKEN` (the "Edit Cloudflare Workers" token template) and `CLOUDFLARE_ACCOUNT_ID`, then run *Actions → Deploy site*. Every push to `main` redeploys. The build is a static export (`pnpm --filter @kavach/web build:cf`), so the docs search, the llms files, the OG images and `/dashboard?demo=sample` all work with no server. To deploy from your own machine: `pnpm --filter @kavach/web deploy:cf` after `npx wrangler login`.
 
 ## Architecture
 

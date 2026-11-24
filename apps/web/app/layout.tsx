@@ -10,7 +10,8 @@ const deva = IBM_Plex_Sans_Devanagari({ subsets: ['devanagari'], variable: '--fo
 const mono = IBM_Plex_Mono({ subsets: ['latin'], variable: '--font-plex-mono', weight: ['400', '500', '600'] });
 const sign = Herr_Von_Muellerhoff({ weight: '400', subsets: ['latin'], variable: '--font-sign' });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+// Set NEXT_PUBLIC_SITE_URL to the deployed address so social cards point at the real site.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -32,7 +33,10 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col font-sans antialiased">
-        <RootProvider theme={{ forcedTheme: 'light', defaultTheme: 'light', enableSystem: false }}>
+        <RootProvider
+          theme={{ forcedTheme: 'light', defaultTheme: 'light', enableSystem: false }}
+          search={{ options: { type: 'static' } }}
+        >
           {children}
         </RootProvider>
       </body>

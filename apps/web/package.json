@@ -8,6 +8,9 @@
     "dev": "next dev",
     "prebuild": "node scripts/sync-docs.mjs && pnpm --filter @kavach/dashboard build:site",
     "build": "next build",
+    "build:cf": "STATIC_EXPORT=1 pnpm run build",
+    "deploy:cf": "pnpm run build:cf && wrangler deploy",
+    "preview:cf": "wrangler dev",
     "start": "next start",
     "lint": "next typegen && oxlint && tsc --noEmit",
     "typecheck": "tsc --noEmit",
@@ -40,6 +43,7 @@
     "postcss": "^8.5.32",
     "puppeteer-core": "^25.18.1",
     "tailwindcss": "^4.3.5",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "wrangler": "^4.167.0"
   }
 }

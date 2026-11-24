@@ -1,0 +1,12 @@
+// Cloudflare Workers static assets: the landing page, the docs and the dashboard demo, served from out/.
+// Build with `pnpm build:cf`, deploy with `pnpm deploy:cf` (or the "Deploy site" GitHub workflow).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kavach",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./out",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

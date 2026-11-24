@@ -13,13 +13,26 @@ import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { getPageImageUrl, gitConfig } from '@/lib/shared';
 
+// Synced pages are copies of the repo's docs/*.md (scripts/sync-docs.mjs); "Edit on GitHub" opens the original.
+const SOURCES: Record<string, string> = {
+  architecture: 'docs/ARCHITECTURE.md',
+  'target-bot': 'docs/TARGET_BOT.md',
+  scoring: 'docs/SCORING.md',
+  agents: 'docs/AGENT_ROSTER.md',
+  api: 'docs/API_CONTRACTS.md',
+  sponsors: 'docs/SPONSORS.md',
+  product: 'docs/PRD.md',
+};
+
 export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
   const MDX = page.data.body;
-  const markdownUrl = `${page.url}.md`;
+  // The llms.mdx route is a static file, so this works on a static host (Cloudflare) as well as on a Node server.
+  const markdownUrl = `/llms.mdx${page.url}.md`;
+  const sourcePath = SOURCES[page.slugs[0] ?? ''] ?? `apps/web/content/docs/${page.path}`;
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
@@ -29,7 +42,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
           markdownUrl={markdownUrl}
-          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${encodeURI(page.path)}`}
+          githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/${encodeURI(sourcePath)}`}
         />
       </div>
       <DocsBody>
