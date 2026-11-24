@@ -281,7 +281,7 @@ class KavachRun:
             summary.status = "no_breach"
             await self.band.post(
                 "monitor",
-                f"🚨 No breaches in round {r}. {self.deployed.version} holds.",
+                f"🛡️ No breaches in round {r}. {self.deployed.version} holds.",
                 ["referee"],
                 round=r,
             )
