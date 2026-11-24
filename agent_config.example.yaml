@@ -1,0 +1,24 @@
+# Band remote-agent credentials. Copy to agent_config.yaml (gitignored) and fill in.
+# Create each agent in app.band.ai → Agents → Connect remote agent. The API key is shown only once.
+# Same format as the Band SDK's Agent.from_config("<key>").
+recon:
+  agent_id: ""
+  api_key: ""
+injection:
+  agent_id: ""
+  api_key: ""
+social:
+  agent_id: ""
+  api_key: ""
+monitor:
+  agent_id: ""
+  api_key: ""
+patcher:
+  agent_id: ""
+  api_key: ""
+auditor:
+  agent_id: ""
+  api_key: ""
+referee:
+  agent_id: ""
+  api_key: ""

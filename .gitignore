@@ -1,0 +1,26 @@
+# secrets
+.env
+.env.*
+!.env.example
+agent_config.yaml
+
+# run logs (keep the recorded demo)
+runs/*.jsonl
+!runs/demo_run.jsonl
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# node
+node_modules/
+frontend/dist/
+
+# os / editors
+.DS_Store
+.idea/
+.vscode/
