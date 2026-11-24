@@ -63,9 +63,11 @@ export default function App() {
   const [caption, setCaption] = useState<{ text: string; key: number } | null>(null)
   const [announcement, setAnnouncement] = useState('')
   const wide = useMinWidth(1280)
+  // Which recording actually played: ?demo=live falls back to the sample until a live run is recorded.
+  const played = useRef<string | null>(null)
   const onEvent = useCallback(
     (ev: KavachEvent) => {
-      const text = narrationFor(ev, Boolean(demoParam()) && demoParam() !== 'live')
+      const text = narrationFor(ev, played.current === 'sample')
       // Screen readers hear the moments that matter, in the same words as the presenter captions.
       if (text && ANNOUNCED.has(ev.type)) setAnnouncement((prev) => (prev === text ? prev : text))
       if (!NARRATE) return toasts(ev)
@@ -75,6 +77,12 @@ export default function App() {
   )
   const { state: run, attach, attachDemo, demoData } = useRun(onEvent)
   const demo = demoParam()
+  const playedName = run.runId?.startsWith('demo-') ? run.runId.slice(5) : null
+  useEffect(() => {
+    played.current = playedName
+  }, [playedName])
+  // Label the recording that loaded, never the one asked for, so a fallback to the sample never reads as live.
+  const demoLabel = demo ? (playedName ? DEMO_RUNS[playedName]?.label : null) ?? 'Loading the recorded run' : null
   const [logo, setLogo] = useState<KavachLogoState>('idle')
 
   // Logo follows the run (docs/assets/brand/BRAND.md, "Logo states")
@@ -132,7 +140,7 @@ export default function App() {
         <TopBar
           run={run}
           logoState={logo}
-          demo={demo ? (DEMO_RUNS[demo] ?? DEMO_RUNS.sample).label : null}
+          demo={demoLabel}
           onReplayDemo={(speed) => demo && attachDemo(demo, speed)}
           onLive={() => start(() => api.startLive(), 'live')}
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}
