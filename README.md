@@ -134,7 +134,7 @@ All customer data is fake. The target's tools are pure functions over a local mo
 
 ## Docs
 
-[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Contributing](CONTRIBUTING.md)
+[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Film kit](docs/film/README.md) · [Contributing](CONTRIBUTING.md)
 
 ---
 

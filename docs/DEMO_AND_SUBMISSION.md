@@ -2,6 +2,8 @@
 
 ## 1. The two-minute video
 
+**The motion-graphics film** is fully planned in [`docs/film/`](./film/README.md): script, voiceover, brief and stills of the current UI. Saying "start motion" to Claude builds it. The quick screen-recorded cut below still works as a fallback.
+
 **Made for you:** `pnpm --filter @kavach/web video` films the site and a run on the dashboard with captions and writes `runs/video/kavach-demo.mp4` (1080p, 30 fps, about a minute; start the site first with `pnpm --filter @kavach/web build && pnpm --filter @kavach/web start`). It plays `runs/demo_run.jsonl` when you have recorded one with `pnpm demo`, otherwise the offline sample (and says so on screen). Upload it to YouTube as unlisted.
 
 What it shows, in order:

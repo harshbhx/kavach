@@ -40,6 +40,7 @@ kavach/               # pnpm + Turborepo workspace (apps/*, packages/*) plus the
   docs/assets/brand/  # logo, favicon, thumbnails, agent avatars (see BRAND.md); use these in the dashboard
   scripts/            # probe_v1.py, band_setup.py, deploy_target_agent37.sh, build_brand.py
   docs/assets/gallery # Devpost gallery screenshots (3:2)
+  docs/film/          # the submission film: script, voiceover, brief, YouTube copy, UI stills
   runs/               # JSONL run logs (demo_run.jsonl = real live run; sample_simulated_run.jsonl = offline fake run)
   backend/
     pyproject.toml  Makefile
@@ -65,6 +66,7 @@ kavach/               # pnpm + Turborepo workspace (apps/*, packages/*) plus the
     scripts/sync-docs.mjs        copies docs/*.md into content/docs before dev/build (edit docs/, not content/)
     scripts/record-video.mjs     films the site + a run into runs/video/kavach-demo.mp4
     scripts/make-brand-cards.mjs renders the social card and Devpost thumbnail
+    scripts/film-lift.mjs        lifts the latest UI states + run numbers into runs/film/ for the film (docs/film/)
     wrangler.jsonc               Cloudflare Workers static assets (STATIC_EXPORT=1 build → out/)
   packages/brand/   (@kavach/brand: KavachLogo + tokens.css + theme.css + fonts.css, shared by both apps)
   .github/workflows ci.yml (lint, tests, offline run, builds) · deploy-site.yml (Cloudflare)
