@@ -137,3 +137,11 @@ async def test_full_offline_run(settings, tmp_path):
     ]:
         assert t in types, t
     assert "## Hardened system prompt" in state.report_md
+
+
+def test_extract_json_keeps_outer_object_when_strings_have_raw_newlines():
+    # LLMs put literal newlines inside long string values; the outer object must still win over nested ones.
+    text = 'Here you go:\n{"candidate": {"system_prompt": "line one\nline two", "guard_policy": {"refund": {}}}, "changelog": []}'
+    out = extract_json(text)
+    assert set(out) == {"candidate", "changelog"}
+    assert out["candidate"]["system_prompt"] == "line one\nline two"

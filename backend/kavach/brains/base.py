@@ -42,7 +42,9 @@ def extract_json(text: str) -> dict:
     """Return the first JSON object in text (tolerates markdown fences and chatter around it)."""
     if isinstance(text, dict):
         return text
-    decoder = json.JSONDecoder()
+    # strict=False: models often put raw newlines inside string values (long system prompts); without it the
+    # outer object fails and we would wrongly return a nested one.
+    decoder = json.JSONDecoder(strict=False)
     start = text.find("{")
     while start != -1:
         try:
