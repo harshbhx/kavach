@@ -5,7 +5,7 @@
 //   pnpm --filter @kavach/web video                                       # in another
 //
 // Options: --url http://localhost:3000  --run live|sample (default: live if runs/demo_run.jsonl was bundled)
-//          --speed 2.5  --out ../../runs/video/kavach-demo.mp4  --chrome /path/to/chrome
+//          --speed 1.6  --out ../../runs/video/kavach-demo.mp4  --chrome /path/to/chrome
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -18,7 +18,7 @@ const arg = (name, fallback) => {
   return i > -1 ? process.argv[i + 1] : fallback;
 };
 const URL_BASE = arg('url', 'http://localhost:3000').replace(/\/$/, '');
-const SPEED = arg('speed', '2.5');
+const SPEED = arg('speed', '1.6');
 const OUT = path.resolve(here, arg('out', '../../../runs/video/kavach-demo.mp4'));
 const WORK = path.join(path.dirname(OUT), 'scenes');
 const CHROME =
@@ -79,10 +79,10 @@ async function film(page, name, { seconds, until, tail = 0 }) {
 }
 
 const CARD_CSS = `
-  body{margin:0;width:${W}px;height:${H}px;display:grid;place-items:center;background:#e6efe9 url(/print/rosette-large.svg) no-repeat right -260px top -220px/1100px;font-family:var(--font-anek),system-ui,sans-serif;color:#0e231c;overflow:hidden}
+  body{margin:0;width:${W}px;height:${H}px;display:grid;place-items:center;background:#e6efe9 url(/print/rosette-large.svg) no-repeat right -260px top -220px/1100px;font-family:var(--font-plex),system-ui,sans-serif;color:#0e231c;overflow:hidden}
   .wrap{display:flex;flex-direction:column;align-items:center;gap:28px;text-align:center}
-  .mark{transform:scale(3.2);transform-origin:center;margin:60px 0 40px}
-  h1{font-family:var(--font-rozha),Georgia,serif;font-weight:400;font-size:112px;line-height:1;margin:0}
+  .mark{display:block;margin:0 0 8px}
+  h1{font-family:var(--font-plex),system-ui,sans-serif;font-weight:600;letter-spacing:-0.035em;font-size:112px;line-height:1;margin:0}
   h1 span{color:#5f7a70;font-size:.6em;margin-left:.3em}
   p{font-size:34px;margin:0;color:#3a574c;max-width:1300px;line-height:1.35}
   .small{font-size:26px;color:#5f7a70}
@@ -95,7 +95,8 @@ async function card(page, html) {
   await page.evaluate(
     (css, body, logoSvg) => {
       document.body.className = '';
-      document.body.innerHTML = `<style>${css}</style>${body.replace('{{LOGO}}', `<span class="kv-logo kv-logo--attack mark" style="height:56px">${logoSvg}</span>`)}`;
+      const big = logoSvg.replace(/\swidth="[^"]*"/, ' width="168"').replace(/\sheight="[^"]*"/, ' height="168"');
+      document.body.innerHTML = `<style>${css}</style>${body.replace('{{LOGO}}', `<span class="kv-logo kv-logo--attack mark" style="height:168px">${big}</span>`)}`;
     },
     CARD_CSS,
     html,
@@ -111,7 +112,7 @@ async function caption(page, text) {
       el = document.createElement('div');
       el.id = 'kv-caption';
       el.style.cssText =
-        'position:fixed;left:50%;bottom:44px;transform:translateX(-50%);z-index:9999;max-width:1240px;padding:16px 28px;border-radius:16px;background:rgba(14,35,28,.92);color:#f1f6f2;font:500 28px/1.35 var(--font-anek),system-ui,sans-serif;text-align:center;box-shadow:0 20px 60px rgba(14,35,28,.35);transition:opacity .3s';
+        'position:fixed;left:50%;bottom:44px;transform:translateX(-50%);z-index:9999;max-width:1240px;padding:16px 28px;border-radius:16px;background:rgba(14,35,28,.92);color:#f1f6f2;font:500 28px/1.35 var(--font-plex),system-ui,sans-serif;text-align:center;box-shadow:0 20px 60px rgba(14,35,28,.35);transition:opacity .3s';
       document.body.appendChild(el);
     }
     el.style.opacity = '0';
@@ -155,7 +156,7 @@ try {
   await dash.goto(`${URL_BASE}/dashboard/?demo=${run}&narrate=1&speed=${SPEED}`, { waitUntil: 'load' });
   await sleep(400);
   await film(dash, '3-dashboard', {
-    until: () => dash.evaluate(() => document.querySelector('header')?.textContent?.includes('Run complete') ?? false),
+    until: () => dash.evaluate(() => /COMPLETE/.test(document.querySelector('header')?.innerText ?? '')),
     tail: 4.5,
   });
 
