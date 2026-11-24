@@ -29,6 +29,8 @@ from kavach.target_client import TargetClient
 
 
 async def main() -> int:
+    # Model replies contain emoji; the Windows console (cp1252) would crash the probe while printing them.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--round", default="1", choices=["1", "2", "3"])
     ap.add_argument("--repeat", type=int, default=1)
