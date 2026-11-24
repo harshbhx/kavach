@@ -26,7 +26,7 @@ At rest the two pieces form a K. In motion the attack hits the rail, the rail fl
 | `kavach-social-card.png` (1280×640) | GitHub social preview and the video title card |
 | `kavach-devpost-thumbnail.png` (1200×800, 3:2) | Devpost thumbnail |
 | `agents/*.png` (256×256) | Avatars for the 7 agents (Band, Lyzr, dashboard feed) |
-| `frontend/` | `KavachLogo.tsx`, `kavach-logo.css`, `brand-tokens.css`, `tailwind-theme.css` (v4), `tailwind.brand.cjs` (v3) |
+| `frontend/` | Originals; the live copy is the `packages/brand` workspace package. `KavachLogo.tsx`, `kavach-logo.css`, `brand-tokens.css`, `tailwind-theme.css` (v4), `tailwind.brand.cjs` (v3) |
 
 The wordmarks in the logo SVGs are converted to outlines, so they don't need fonts. The two cards use live text (Inter), so **use the PNGs** for those.
 

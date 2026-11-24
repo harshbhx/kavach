@@ -15,7 +15,11 @@
 Built with **Lyzr · Band · Agent37 · AdaL**
 
 ![Kavach dashboard](docs/assets/dashboard.png)
-<sub>Dashboard after an offline run (fake brains, in-process target). <!-- TODO: swap for a live Lyzr + Band run --></sub>
+<sub>The dashboard after an offline run (scripted agents, in-process target). <!-- TODO: swap for a live Lyzr + Band run --></sub>
+
+The repo also ships a landing page and a docs site (`apps/web`, Next.js + Fumadocs): `pnpm dev:web`.
+
+![Kavach landing page](docs/assets/landing.png)
 
 ---
 
@@ -62,7 +66,8 @@ Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 ```bash
 cd backend && uv sync
 BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess FAKE_DELAY_S=1 make api
-cd ../frontend && npm install && npm run dev      # http://localhost:5173 → "Start live run"
+# second terminal, repo root
+pnpm install && pnpm dev:dashboard                # http://localhost:5173 → "Start live run"
 ```
 Or pick `sample_simulated_run.jsonl` and click **Replay** (a recorded offline run, labelled as simulated).
 
@@ -75,8 +80,9 @@ make probe                                        # is v1 breakable by your TARG
 uv run python ../scripts/band_setup.py            # checks the 7 Band identities, posts a test message
 make target                                       # DiwaliMart target on :8001
 make api                                          # Kavach API on :8000
-cd ../frontend && npm run dev
+pnpm dev:dashboard                                # from the repo root
 ```
+Landing page and docs site: `pnpm dev:web` (http://localhost:3000, docs at `/docs`).
 Headless: `cd backend && uv run python -m kavach.cli run --rounds 3` (events → `runs/<id>.jsonl`, report → `runs/<id>.report.md`).
 Target in an Agent37 sandbox: `scripts/deploy_target_agent37.sh` (see [docs/SPONSORS.md](docs/SPONSORS.md#3-agent37-isolated-sandbox-for-the-target)).
 

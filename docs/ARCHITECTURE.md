@@ -59,7 +59,8 @@ Plain-text version (for the README image if Mermaid doesn't render):
 | Band | `backend/kavach/band/` | `client.py` (REST: create room, add participants, send message, post event, get me), `room.py` (one room per run; each agent posts as itself with mentions; every post is mirrored as an `agent.message` event; never blocks the run). |
 | API | `backend/kavach/api/app.py` | REST + SSE for the dashboard; serves the report. |
 | Report | `backend/kavach/report/markdown.py` | Builds `report.md` from the run state + Referee narrative. |
-| Dashboard | `frontend/` | Single page, dark mode, 4 panels + scoreboard. |
+| Dashboard | `apps/dashboard/` | Single page, dark mode: round rail, KPI strip, room, arena (tool calls), trend chart, patch diff. |
+| Site | `apps/web/` | Landing page and docs (Next.js + Fumadocs). Docs pages are generated from `docs/*.md`. |
 | Scripts | `scripts/` | `probe_v1.py` (is v1 breakable?), `band_setup.py` (resolve handles, test post), `deploy_target_agent37.sh`, `build_brand.py`. |
 
 ## 3. Round sequence

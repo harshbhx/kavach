@@ -29,8 +29,9 @@ Seven AI agents (Recon, Injector, Social Engineer / Monitor, Patcher, Auditor / 
 
 ## Repo layout
 ```
-kavach/
+kavach/               # pnpm + Turborepo workspace (apps/*, packages/*) plus the Python backend
   AGENTS.md  CLAUDE.md  README.md  .env.example  agent_config.example.yaml  .gitignore
+  package.json  pnpm-workspace.yaml  turbo.json
   docs/               # specs (source of truth)
   prompts/target/     # DiwaliMart v1 system prompt
   prompts/agents/     # 7 Kavach agent prompts (also pasted into Lyzr Studio)
@@ -52,10 +53,13 @@ kavach/
       api/         app.py
       report/      markdown.py
     tests/         (pytest, all offline: conftest.py test_target.py test_scoring.py test_run.py)
-  frontend/        (Vite + React 19 + TS + Tailwind v4 + Recharts; see frontend/README.md)
-    src/lib/       api.ts types.ts useRun.ts (SSE → view state) format.ts useStickyScroll.ts
-    src/components/ Header Feed BreachChart ToolFeed DiffPanel Scoreboard
-    src/brand/     logo + tokens (copied from docs/assets/brand/frontend/)
+  apps/dashboard/   (Vite + React 19 + TS + Tailwind v4 + shadcn/ui + Magic UI + React Bits + Recharts)
+    src/lib/        api.ts types.ts useRun.ts (SSE → view state, round phases) format.ts useStickyScroll.ts
+    src/components/ top-bar round-rail kpi-strip room-panel arena-panel trend-panel patch-panel panel; ui/ (shadcn + Magic UI)
+  apps/web/         (Next.js 16 + Fumadocs: landing page at /, docs at /docs built from ../../docs/*.md)
+    app/(home)/     landing page; components/landing/ hero exploit replay, round diagram, squad, chart
+    scripts/sync-docs.mjs   copies docs/*.md into content/docs before dev/build (edit docs/, not content/)
+  packages/brand/   (@kavach/brand: KavachLogo + tokens.css + theme.css + fonts.css, shared by both apps)
 ```
 
 ## Commands
@@ -71,14 +75,20 @@ make smoke         # offline 3-round run: BRAIN_PROVIDER=fake BAND_ENABLED=false
 uv run python ../scripts/probe_v1.py     # Phase 1 exit check (v1 breach rate >= 50%)
 uv run python ../scripts/band_setup.py   # verify the 7 Band identities + test room
 
-# frontend
-cd frontend && npm install && npm run dev   # VITE_API_BASE=http://localhost:8000
+# web apps (Node 20+, pnpm), from the repo root
+pnpm install
+pnpm dev:dashboard   # http://localhost:5173, proxies /api to :8000 (KAVACH_API to change)
+pnpm dev:web         # http://localhost:3000, landing page + /docs
+pnpm build           # turbo builds every app
+pnpm lint            # oxlint + tsc in each app
+# add UI components with the shadcn CLI from an app folder, e.g.
+#   pnpm dlx shadcn@latest add @magicui/number-ticker @react-bits/ShinyText-TS-TW @aceternity/spotlight-new
 ```
 
 ## Code style
 - Python: type hints everywhere, `async` for I/O, pydantic v2 models, `ruff` defaults (line length 100). Small modules, pure functions in `scoring/`.
 - Log with `logging` (module loggers), not print. Include `run_id` and `round` in log records.
-- Dashboard look: use `docs/assets/brand/frontend/` (tokens, Tailwind theme, `KavachLogo` component with idle/attack/breach/secured states). Violet `--kv-brand` is the only CTA colour; rose/cyan/mint/gold carry meaning only. See `docs/assets/brand/BRAND.md`.
+- UI look: use `@kavach/brand` (tokens, Tailwind theme, `KavachLogo` with idle/attack/breach/secured states). Headlines use Bricolage Grotesque (condensed), UI text Inter, code JetBrains Mono. Components come from shadcn/ui, Magic UI, React Bits and Aceternity via the registries in each app's `components.json`. Violet `--kv-brand` is the only CTA colour; rose/cyan/mint/gold carry meaning only. See `docs/assets/brand/BRAND.md`.
 - TypeScript: `strict: true`, function components + hooks, no `any` in the event types (mirror `docs/API_CONTRACTS.md`).
 - Tests: every detector rule and guard field has unit tests. Use `respx` to mock Lyzr/Band HTTP. No network in tests.
 

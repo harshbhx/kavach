@@ -62,7 +62,7 @@ Tick boxes as you go (`[x]`). One ticket = one focused change. Run `make check` 
 
 ## Phase 3: Dashboard
 
-- [x] P3-1 **Scaffold** `frontend/` (Vite React TS, Tailwind, Recharts, jsdiff). Copy `docs/assets/brand/frontend/*` into `frontend/src/brand/`; import `brand-tokens.css` at the root and `tailwind-theme.css` after Tailwind; `kavach-favicon.svg` as the favicon; agent avatars from `docs/assets/brand/agents/`. Env `VITE_API_BASE`.
+- [x] P3-1 **Scaffold** `frontend/` _(now `apps/dashboard/` in the pnpm monorepo)_ (Vite React TS, Tailwind, Recharts, jsdiff). Copy `docs/assets/brand/frontend/*` into `frontend/src/brand/`; import `brand-tokens.css` at the root and `tailwind-theme.css` after Tailwind; `kavach-favicon.svg` as the favicon; agent avatars from `docs/assets/brand/agents/`. Env `VITE_API_BASE`.
 - [x] P3-2 **Run controls + SSE hook.** Header with `<KavachLogo wordmark state={logoState} />` (state from events, table in BRAND.md "Logo states"), Start Live / Start Replay / speed, status chip, target badge (Local / Agent37), Band room link. `useRunEvents(runId)` reduces events into state.
 - [x] P3-3 **Live feed** (left): `agent.message` bubbles with squad colour (red/blue/amber), agent avatar emoji, @mentions highlighted, and VETOED/APPROVED badges.
 - [x] P3-4 **Breach vs Utility chart** (centre top): x = round; red line = breach rate; green line = utility of the applied patch; hollow red dots for vetoed candidates (tooltip with the reasons).
