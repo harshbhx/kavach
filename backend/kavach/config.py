@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     band_api_base: str = "https://api.band.ai/api/v1"
     band_agent_config: str = "agent_config.yaml"
     band_owner_user_id: str = ""
+    band_owner_handle: str = ""  # optional: lets the Referee @mention you in the final message
 
     # run
     rounds: int = 3
@@ -57,6 +58,7 @@ class Settings(BaseSettings):
     max_concurrency: int = 6
     llm_timeout_s: float = 45.0
     seed: int = 42
+    fake_delay_s: float = 0.0  # fake brain only: pause per agent call so live fake runs look real in the UI
 
     # api
     dashboard_origin: str = "http://localhost:5173"
