@@ -10,6 +10,7 @@ import { RoundRail } from '@/components/round-rail'
 import { TopBar } from '@/components/top-bar'
 import { TrendPanel } from '@/components/trend-panel'
 import { Toaster } from '@/components/ui/sonner'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
 import { DEMO_RUNS, demoParam } from '@/lib/demo'
@@ -38,6 +39,21 @@ function useRunToasts() {
   }, [])
 }
 
+/** True at and above the given width, kept in sync with resizes. */
+function useMinWidth(px: number) {
+  const query = `(min-width: ${px}px)`
+  const [match, setMatch] = useState(() => window.matchMedia(query).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(query)
+    const on = () => setMatch(mq.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [query])
+  return match
+}
+
+const ANNOUNCED = new Set(['breach.detected', 'audit.result', 'patch.applied', 'round.started', 'run.completed'])
+
 const params = new URLSearchParams(window.location.search)
 const NARRATE = params.get('narrate') === '1'
 const DEMO_SPEED = Number(params.get('speed')) || 1.5
@@ -45,10 +61,14 @@ const DEMO_SPEED = Number(params.get('speed')) || 1.5
 export default function App() {
   const toasts = useRunToasts()
   const [caption, setCaption] = useState<{ text: string; key: number } | null>(null)
+  const [announcement, setAnnouncement] = useState('')
+  const wide = useMinWidth(1280)
   const onEvent = useCallback(
     (ev: KavachEvent) => {
-      if (!NARRATE) return toasts(ev)
       const text = narrationFor(ev, Boolean(demoParam()) && demoParam() !== 'live')
+      // Screen readers hear the moments that matter, in the same words as the presenter captions.
+      if (text && ANNOUNCED.has(ev.type)) setAnnouncement((prev) => (prev === text ? prev : text))
+      if (!NARRATE) return toasts(ev)
       if (text) setCaption({ text, key: ev.seq })
     },
     [toasts],
@@ -70,6 +90,19 @@ export default function App() {
     const t = setTimeout(() => setLogo(rest), HOLD_MS[sig.state])
     return () => clearTimeout(t)
   }, [run.logo, run.status])
+
+  // The tab title says where the run is, so a backgrounded tab still shows progress.
+  useEffect(() => {
+    const where =
+      run.status === 'running'
+        ? `Round ${run.currentRound || 1}, ${run.mode === 'live' ? 'live' : 'replaying'}`
+        : run.status === 'completed'
+          ? 'Run complete'
+          : run.status === 'failed'
+            ? 'Run failed'
+            : null
+    document.title = where ? `${where} | Kavach` : 'Kavach dashboard'
+  }, [run.status, run.currentRound, run.mode])
 
   // ?run=<id>[&mode=replay] re-attaches after a refresh
   useEffect(() => {
@@ -112,22 +145,56 @@ export default function App() {
         {run.errors.length > 0 && (
           <p className="mx-4 rounded-xl border border-kv-verdict/40 bg-kv-verdict-soft px-4 py-2 text-xs text-kv-verdict">{run.errors[run.errors.length - 1]}</p>
         )}
-        <main className="grid min-h-0 flex-1 grid-cols-1 gap-3 px-4 xl:grid-cols-12">
-          <div className="h-[520px] min-w-0 xl:col-span-4 xl:h-auto xl:min-h-0">
-            <RoomPanel run={run} />
-          </div>
-          <div className="flex min-h-0 min-w-0 flex-col gap-3 xl:col-span-5">
-            <div className="h-[480px] min-h-0 xl:h-auto xl:flex-1">
+        {wide ? (
+          <main className="grid min-h-0 flex-1 grid-cols-12 gap-3 px-4">
+            <div className="col-span-4 min-h-0 min-w-0">
+              <RoomPanel run={run} />
+            </div>
+            <div className="col-span-5 min-h-0 min-w-0">
               <ArenaPanel run={run} />
             </div>
-          </div>
-          <div className="flex min-h-0 min-w-0 flex-col gap-3 xl:col-span-3">
-            <TrendPanel run={run} rounds={ROUNDS} />
-            <div className="h-[460px] min-h-0 xl:h-auto xl:flex-1">
-              <PatchPanel run={run} demoData={demoData} />
+            <div className="col-span-3 flex min-h-0 min-w-0 flex-col gap-3">
+              <TrendPanel run={run} rounds={ROUNDS} />
+              <div className="min-h-0 flex-1">
+                <PatchPanel run={run} demoData={demoData} />
+              </div>
             </div>
-          </div>
-        </main>
+          </main>
+        ) : (
+          <Tabs defaultValue="calls" className="px-4">
+            <TabsList className="grid h-10 w-full grid-cols-3 rounded-xl border border-kv-border-strong/60 bg-kv-surface-2 p-1">
+              {[
+                ['room', 'Room', run.messages.length],
+                ['calls', 'Tool calls', run.toolCards.length],
+                ['scores', 'Scores', null],
+              ].map(([value, label, count]) => (
+                <TabsTrigger
+                  key={value as string}
+                  value={value as string}
+                  className="rounded-lg text-[13.5px] text-kv-muted data-[state=active]:bg-kv-surface data-[state=active]:text-kv-text data-[state=active]:shadow-sm"
+                >
+                  {label}
+                  {count ? <span className="ml-1 font-mono text-[11.5px] text-kv-faint">{count}</span> : null}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            <TabsContent value="room" forceMount className="h-[75vh] data-[state=inactive]:hidden">
+              <RoomPanel run={run} />
+            </TabsContent>
+            <TabsContent value="calls" forceMount className="h-[75vh] data-[state=inactive]:hidden">
+              <ArenaPanel run={run} />
+            </TabsContent>
+            <TabsContent value="scores" forceMount className="space-y-3 data-[state=inactive]:hidden">
+              <TrendPanel run={run} rounds={ROUNDS} />
+              <div className="h-[70vh]">
+                <PatchPanel run={run} demoData={demoData} />
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
+        <p aria-live="polite" className="sr-only">
+          {announcement}
+        </p>
       </div>
       {NARRATE ? <Narration latest={caption} /> : <Toaster position="bottom-center" richColors closeButton />}
     </TooltipProvider>

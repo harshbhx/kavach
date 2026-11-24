@@ -68,6 +68,21 @@ export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, o
   const [speed, setSpeed] = useState('1.5')
   const running = run.status === 'running'
 
+  // While the backend is down, check again every few seconds so the page recovers on its own.
+  useEffect(() => {
+    if (demo || !apiDown) return
+    const t = setInterval(() => {
+      api
+        .health()
+        .then((h) => {
+          setHealth(h)
+          setApiDown(false)
+        })
+        .catch(() => {})
+    }, 4000)
+    return () => clearInterval(t)
+  }, [apiDown, demo])
+
   useEffect(() => {
     if (demo) return
     api
@@ -171,12 +186,24 @@ export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, o
           )}
         </div>
       </div>
+      {apiDown && !demo && (
+        <div role="status" className="mx-4 mb-1 flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl border border-kv-attack/30 bg-kv-attack-soft/50 px-4 py-2.5 text-[13.5px]">
+          <span className="font-semibold text-kv-attack">The backend isn’t running.</span>
+          <span className="text-kv-muted">
+            Start it from the repo root with <code className="font-mono text-kv-text">pnpm dev</code>, or{' '}
+            <code className="font-mono text-kv-text">pnpm dev:offline</code> with no keys. This page reconnects on its own.
+          </span>
+          <a href="?demo=sample" className="font-semibold text-kv-defend hover:underline sm:ml-auto">
+            Watch a recorded run instead
+          </a>
+        </div>
+      )}
     </header>
   )
 }
 
 function StatusStamp({ run, apiDown }: { run: RunView; apiDown: boolean }) {
-  if (apiDown) return <Stamp tone="attack">API offline: run make api</Stamp>
+  if (apiDown) return <Stamp tone="attack">BACKEND OFFLINE</Stamp>
   if (run.status === 'running')
     return (
       <span className="inline-flex items-center gap-2 rounded-full border border-kv-defend/40 bg-kv-defend-soft px-3 py-1 text-[13px] font-semibold">

@@ -20,8 +20,8 @@ export function Panel({ title, hint, actions, children, className, bodyClassName
       )}
     >
       <div className="kv-band h-2.5 border-b border-kv-border/80 opacity-80" aria-hidden />
-      <header className="flex min-h-12 items-center gap-3 border-b border-kv-border px-4 py-2">
-        <div className="min-w-0 flex-1">
+      <header className="flex min-h-12 flex-wrap items-center gap-x-3 gap-y-2 border-b border-kv-border px-4 py-2">
+        <div className="min-w-0 flex-1 basis-44">
           <h2 className="font-display text-[17px] leading-tight text-kv-text">{title}</h2>
           {hint && <p className="truncate text-[12px] text-kv-faint">{hint}</p>}
         </div>
