@@ -14,8 +14,8 @@
 **Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition)** · Track: **Security (Attack & Defend)**
 Built with **Lyzr · Band · Agent37 · AdaL**
 
-<!-- TODO: replace with a GIF/screenshot of the dashboard during a run -->
 ![Kavach dashboard](docs/assets/dashboard.png)
+<sub>Dashboard after an offline run (fake brains, in-process target). <!-- TODO: swap for a live Lyzr + Band run --></sub>
 
 ---
 
@@ -57,24 +57,30 @@ Kavach runs an autonomous **Attack → Detect → Patch → Audit** loop against
 Details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 ## Quickstart
+
+**Try it with no keys (2 minutes).** Fake brains + an in-process fake target run the whole loop offline:
 ```bash
-# 1. config
-cp .env.example .env                      # fill in the keys
-cp agent_config.example.yaml agent_config.yaml   # Band agent IDs + keys
-
-# 2. backend
 cd backend && uv sync
-make target    # DiwaliMart target on :8001
-make api       # Kavach API on :8000
-
-# 3. dashboard
-cd ../frontend && npm install && npm run dev   # http://localhost:5173
-
-# Offline demo (no keys needed): replay the recorded run
-#   → in the dashboard click "Replay demo"
-# Offline smoke test
-cd backend && make smoke
+BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess FAKE_DELAY_S=1 make api
+cd ../frontend && npm install && npm run dev      # http://localhost:5173 → "Start live run"
 ```
+Or pick `sample_simulated_run.jsonl` and click **Replay** (a recorded offline run, labelled as simulated).
+
+**Live run (Lyzr + Band + a real target model):**
+```bash
+cp .env.example .env                              # Lyzr key + 7 agent IDs, model key, Band settings
+cp agent_config.example.yaml agent_config.yaml    # 7 Band agent IDs + API keys
+cd backend && uv sync
+make probe                                        # is v1 breakable by your TARGET_MODEL? (needs >= 50%)
+uv run python ../scripts/band_setup.py            # checks the 7 Band identities, posts a test message
+make target                                       # DiwaliMart target on :8001
+make api                                          # Kavach API on :8000
+cd ../frontend && npm run dev
+```
+Headless: `cd backend && uv run python -m kavach.cli run --rounds 3` (events → `runs/<id>.jsonl`, report → `runs/<id>.report.md`).
+Target in an Agent37 sandbox: `scripts/deploy_target_agent37.sh` (see [docs/SPONSORS.md](docs/SPONSORS.md#3-agent37-isolated-sandbox-for-the-target)).
+
+Checks: `cd backend && make check` (ruff + 35 tests, all offline) · `make smoke` (full 3-round offline run).
 
 ## Results (recorded run)
 <!-- TODO: fill from runs/demo_run.jsonl -->

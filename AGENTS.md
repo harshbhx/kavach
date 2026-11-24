@@ -23,7 +23,7 @@ Seven AI agents (Recon, Injector, Social Engineer / Monitor, Patcher, Auditor / 
 5. **Band never blocks the run.** Band errors → `band.error` event + log, then continue. Every Band message must @mention ≥ 1 participant, and the handle must appear in `content`.
 6. **Feature flags must keep working:** `BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake make smoke` runs 3 rounds offline. Keep it green.
 7. **Contracts are the docs.** If you need to change a schema, event or endpoint, update the matching doc in the same change.
-8. **No secrets in git.** `.env`, `agent_config.yaml` and `runs/*.jsonl` (except `runs/demo_run.jsonl`) are gitignored. Never print keys in logs.
+8. **No secrets in git.** `.env`, `agent_config.yaml` and `runs/*.jsonl` (except `runs/demo_run.jsonl` and `runs/sample_simulated_run.jsonl`) are gitignored. Never print keys in logs.
 9. **Keep it simple.** No databases, auth, queues or extra services. One run at a time. In-memory state + JSONL.
 10. **Hackathon rule:** project code is written during the event. Libraries and APIs are fine; don't paste in old project code.
 
@@ -37,22 +37,25 @@ kavach/
   data/               # mock_db.json, guard_policy_v1.json, benign_suite.json, attack_library.json
   skills/             # Finch-ready skill packs (stretch)
   docs/assets/brand/  # logo, favicon, thumbnails, agent avatars (see BRAND.md); use these in the dashboard
-  scripts/            # probe_v1.py, band_setup.py, deploy_target_agent37.sh, record_demo.sh
-  runs/               # JSONL run logs (demo_run.jsonl committed)
+  scripts/            # probe_v1.py, band_setup.py, deploy_target_agent37.sh, build_brand.py
+  runs/               # JSONL run logs (demo_run.jsonl = real live run; sample_simulated_run.jsonl = offline fake run)
   backend/
     pyproject.toml  Makefile
     kavach/
-      config.py models.py
-      target/      service.py llm.py tools.py guards.py db.py
+      config.py models.py runtime.py cli.py target_client.py
+      target/      service.py llm.py runner.py tools.py guards.py db.py fake_model.py
       brains/      base.py lyzr.py direct.py fake.py
-      agents/      recon.py injection.py social.py monitor.py patcher.py auditor.py referee.py
+      agents/      red.py (recon, injector, social) blue.py (monitor, patcher, auditor) referee.py
       scoring/     detectors.py benign.py metrics.py
       orchestrator/ run.py audit.py events.py replay.py
-      band/        client.py bus.py
+      band/        client.py room.py
       api/         app.py
       report/      markdown.py
-    tests/         (pytest; fixtures/fake_brain/*.json)
-  frontend/        (Vite + React + TS + Tailwind + Recharts)
+    tests/         (pytest, all offline: conftest.py test_target.py test_scoring.py test_run.py)
+  frontend/        (Vite + React 19 + TS + Tailwind v4 + Recharts; see frontend/README.md)
+    src/lib/       api.ts types.ts useRun.ts (SSE → view state) format.ts useStickyScroll.ts
+    src/components/ Header Feed BreachChart ToolFeed DiffPanel Scoreboard
+    src/brand/     logo + tokens (copied from docs/assets/brand/frontend/)
 ```
 
 ## Commands

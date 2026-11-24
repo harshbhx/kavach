@@ -53,14 +53,14 @@ Plain-text version (for the README image if Mermaid doesn't render):
 | Target service | `backend/kavach/target/` | DiwaliMart agent, 4 mock tools, guard engine, tool log. Stateless per request (DB reset each call). Deployable alone (Agent37). |
 | Models | `backend/kavach/models.py` | All pydantic models: `TargetConfig`, `GuardPolicy`, `ToolCallRecord`, `Attack`, `AttackResult`, `Finding`, agent I/O models, `Event`. |
 | Brains | `backend/kavach/brains/` | `Brain` protocol + `LyzrBrain`, `DirectBrain`, `FakeBrain`. JSON extraction + validation + 1 repair retry. |
-| Agents | `backend/kavach/agents/` | One thin module per agent: builds the payload, calls the brain, validates, applies fallbacks. |
+| Agents | `backend/kavach/agents/` | Thin functions per agent, grouped by squad (`red.py`, `blue.py`, `referee.py`): build the payload, call the brain, validate, apply fallbacks. |
 | Scoring | `backend/kavach/scoring/` | `detectors.py`, `benign.py`, `metrics.py`. Pure functions, heavily unit-tested. |
 | Orchestrator | `backend/kavach/orchestrator/` | `run.py` (round loop), `audit.py` (patch acceptance), `events.py` (event bus), `replay.py`. |
-| Band | `backend/kavach/band/` | `client.py` (REST: create room, add participants, send message, post event, get me), `bus.py` (maps Kavach events → agent messages with mentions; never blocks the run). |
+| Band | `backend/kavach/band/` | `client.py` (REST: create room, add participants, send message, post event, get me), `room.py` (one room per run; each agent posts as itself with mentions; every post is mirrored as an `agent.message` event; never blocks the run). |
 | API | `backend/kavach/api/app.py` | REST + SSE for the dashboard; serves the report. |
 | Report | `backend/kavach/report/markdown.py` | Builds `report.md` from the run state + Referee narrative. |
 | Dashboard | `frontend/` | Single page, dark mode, 4 panels + scoreboard. |
-| Scripts | `scripts/` | `deploy_target_agent37.sh`, `band_setup.py` (resolve handles, test post), `record_demo.sh`. |
+| Scripts | `scripts/` | `probe_v1.py` (is v1 breakable?), `band_setup.py` (resolve handles, test post), `deploy_target_agent37.sh`, `build_brand.py`. |
 
 ## 3. Round sequence
 
