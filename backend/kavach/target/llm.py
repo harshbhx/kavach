@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import time
@@ -55,6 +56,28 @@ async def run_chat(req: ChatRequest, config: TargetConfig, settings: Settings) -
     )
 
 
+_LLM_SLOTS = asyncio.Semaphore(2)
+
+
+async def _complete(litellm, settings: Settings, messages: list[dict]):
+    """One model call. Free-tier providers (Groq) cap tokens per minute and answer bursts with 429, so a rate
+    limit waits and retries instead of failing the whole customer turn; only two calls run at once."""
+    for attempt in range(10):
+        try:
+            async with _LLM_SLOTS:
+                return await litellm.acompletion(
+                    model=settings.target_model,
+                    messages=messages,
+                    tools=TOOL_SCHEMAS,
+                    temperature=settings.target_temperature,
+                    timeout=settings.llm_timeout_s,
+                )
+        except litellm.RateLimitError:
+            if attempt == 9:
+                raise
+            await asyncio.sleep(min(3 * (attempt + 1), 15))
+
+
 async def _llm_loop(message: str, system_prompt: str, runner: ToolRunner, settings: Settings) -> str:
     import litellm  # imported lazily: slow import, not needed in fake mode
 
@@ -63,13 +86,7 @@ async def _llm_loop(message: str, system_prompt: str, runner: ToolRunner, settin
         {"role": "user", "content": message},
     ]
     for _ in range(MAX_TOOL_ROUNDS):
-        resp = await litellm.acompletion(
-            model=settings.target_model,
-            messages=messages,
-            tools=TOOL_SCHEMAS,
-            temperature=settings.target_temperature,
-            timeout=settings.llm_timeout_s,
-        )
+        resp = await _complete(litellm, settings, messages)
         msg = resp.choices[0].message
         tool_calls = getattr(msg, "tool_calls", None) or []
         if not tool_calls:
