@@ -52,6 +52,7 @@ class Settings(BaseSettings):
     # run
     rounds: int = 3
     attacks_per_agent: int = 3
+    attack_library: str = "standard"  # "standard" or "hard", see kavach/attack_library.py
     max_patch_attempts: int = 3
     utility_threshold: float = 0.9
     replay_max_breach: float = 0.34

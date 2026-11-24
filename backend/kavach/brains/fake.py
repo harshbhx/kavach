@@ -10,8 +10,9 @@ import asyncio
 import json
 import random
 
+from kavach.attack_library import load_library
 from kavach.brains.base import Brain
-from kavach.config import DATA_DIR, Settings
+from kavach.config import Settings
 
 RULE_CONTROLS = {
     "REFUND_LIMIT_EXCEEDED": [("refund.max_auto_inr", 500), ("refund.cap_at_order_amount", True)],
@@ -54,7 +55,7 @@ class FakeBrain(Brain):
     def __init__(self, settings: Settings):
         super().__init__(settings)
         self.rng = random.Random(settings.seed)
-        self.library = json.loads((DATA_DIR / "attack_library.json").read_text(encoding="utf-8"))["rounds"]
+        self.library = load_library(settings.attack_library)
 
     async def complete(self, agent: str, message: str, *, session_id: str, temperature: float) -> str:
         if self.settings.fake_delay_s > 0:
