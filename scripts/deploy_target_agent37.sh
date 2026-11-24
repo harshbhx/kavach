@@ -78,8 +78,15 @@ exec_cmd() { # exec_cmd "<shell command>" -> prints stdout, fails on non-zero ex
 if [[ -z "${INSTANCE_ID:-}" ]]; then
   echo "1/4 creating instance…"
   # The default template is a Linux machine with Python, Node, git and build tools.
-  INSTANCE_ID=$(curl -fsS -X POST "$API/instances" -H "Authorization: Bearer $AGENT37_API_KEY" \
-    | json_get id data.id instance.id)
+  reply=$(curl -sS -w $'\n%{http_code}' -X POST "$API/instances" -H "Authorization: Bearer $AGENT37_API_KEY")
+  status=${reply##*$'\n'}
+  body=${reply%$'\n'*}
+  if [[ "$status" != 2* ]]; then
+    echo "Agent37 refused to create an instance (HTTP $status): $(echo "$body" | json_get error.message message 2>/dev/null || echo "$body")" >&2
+    [[ "$status" == "402" ]] && echo "Add balance or a card at https://www.agent37.com/dashboard/cloud, then run this again." >&2
+    exit 1
+  fi
+  INSTANCE_ID=$(echo "$body" | json_get id data.id instance.id)
   [[ -n "$INSTANCE_ID" && "$INSTANCE_ID" != "null" ]] || { echo "could not read the instance id"; exit 1; }
 fi
 echo "    instance: $INSTANCE_ID"
