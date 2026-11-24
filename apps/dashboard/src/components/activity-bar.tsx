@@ -1,9 +1,12 @@
 import { Check, LoaderCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { AGENTS, avatar } from '@/lib/format'
+import { AgentAvatar } from '@kavach/brand/avatar'
+import { api } from '@/lib/api'
+import { AGENTS, pct } from '@/lib/format'
 import type { AgentName } from '@/lib/types'
 import type { Phase, RunView } from '@/lib/useRun'
 import { cn } from '@/lib/utils'
+import { Stamp } from './panel'
 
 const ORDER: AgentName[] = ['referee', 'recon', 'injection', 'social', 'monitor', 'patcher', 'auditor']
 
@@ -25,6 +28,7 @@ export function ActivityBar({ run, starting }: { run: RunView; starting: boolean
     return () => clearInterval(t)
   }, [run.status, starting])
 
+  if (run.status === 'completed' && !starting) return <VerdictBanner run={run} />
   if (run.status !== 'running' && !starting) return null
 
   const round = run.currentRound || 1
@@ -35,7 +39,9 @@ export function ActivityBar({ run, starting }: { run: RunView; starting: boolean
     ? 'Starting the run: opening the Band room and waking the agents…'
     : first
       ? 'Run started. Waiting for the Referee to open the room…'
-      : `Round ${round}: ${phase ? PHASE_TEXT[phase] : 'working'}`
+      : phase === 'done'
+        ? `Round ${round} complete. The next round is warming up…`
+        : `Round ${round}: ${phase ? PHASE_TEXT[phase] : 'working'}`
   const spokeThisRound = new Set(run.messages.filter((m) => m.round === round).map((m) => m.agent))
   const slow = waitedFor >= 20
 
@@ -61,14 +67,11 @@ export function ActivityBar({ run, starting }: { run: RunView; starting: boolean
           const speaking = run.speaker?.agent === a && now - run.speaker.at < 15000
           return (
             <li key={a} title={`${AGENTS[a].name}: ${AGENTS[a].role}`} className="relative">
-              <img
-                src={avatar(a)}
-                alt={AGENTS[a].name}
-                className={cn(
-                  'size-8 rounded-full border-2 border-kv-border-strong object-cover opacity-45 transition',
-                  spokeThisRound.has(a) && 'opacity-100',
-                  speaking && 'scale-110 border-kv-defend opacity-100 ring-2 ring-kv-defend/40',
-                )}
+              <AgentAvatar
+                agent={a}
+                size={36}
+                expression={speaking ? 'talking' : 'idle'}
+                className={cn('opacity-45 transition', spokeThisRound.has(a) && 'opacity-100', speaking && 'scale-110 opacity-100')}
               />
               {speaking ? (
                 <span className="absolute -right-0.5 -bottom-0.5 size-2.5 animate-ping rounded-full bg-kv-defend" />
@@ -79,6 +82,62 @@ export function ActivityBar({ run, starting }: { run: RunView; starting: boolean
           )
         })}
       </ul>
+    </div>
+  )
+}
+
+/** The ending: what the run proved, in one line a viewer can read at a glance. */
+function VerdictBanner({ run }: { run: RunView }) {
+  const rounds = Object.values(run.rounds).sort((a, b) => a.round - b.round)
+  const first = rounds[0]?.breach_rate ?? null
+  const last = run.final?.final_breach_rate ?? rounds[rounds.length - 1]?.breach_rate ?? null
+  const hardened = first !== null && first > 0 && last !== null && last < first
+  const held = first === 0
+  const tone = hardened ? 'secure' : held ? 'defend' : 'attack'
+  const word = hardened ? 'HARDENED' : held ? 'HELD' : 'STILL BREACHED'
+  const tth = rounds.map((r) => r.tth_seconds).find((v) => v !== null && v !== undefined)
+  const vetoes = rounds.reduce((n, r) => n + r.vetoes, 0)
+  return (
+    <div
+      role="status"
+      className={cn(
+        'mx-4 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border px-4 py-3',
+        hardened ? 'border-kv-secure/40 bg-kv-secure-soft/70' : held ? 'border-kv-defend/40 bg-kv-defend-soft/60' : 'border-kv-attack/35 bg-kv-attack-soft/50',
+      )}
+    >
+      <AgentAvatar agent="referee" size={44} expression={hardened || held ? 'happy' : 'alert'} />
+      <div className="min-w-0 flex-1 basis-72">
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[15px] font-semibold text-kv-text">
+          <Stamp tone={tone}>{word}</Stamp>
+          <span>
+            Breach rate{' '}
+            <span className="font-mono">
+              {rounds.map((r, i) => (
+                <span key={r.round}>
+                  {i > 0 && <span className="text-kv-faint"> → </span>}
+                  <b className={r.breach_rate > 0 ? 'text-kv-attack' : 'text-kv-secure'}>{pct(r.breach_rate)}</b>
+                </span>
+              ))}
+            </span>
+          </span>
+        </p>
+        <p className="mt-1 text-[13px] text-kv-muted">
+          {run.final?.final_utility !== null && run.final?.final_utility !== undefined ? `Everyday requests still served: ${pct(run.final.final_utility)}. ` : ''}
+          Deployed <span className="font-mono text-kv-text">{run.final?.deployed_version ?? run.deployedVersion}</span>
+          {tth ? `, hardened in ${Math.round(tth)}s` : ''}
+          {vetoes > 0 ? `, ${vetoes} patch${vetoes > 1 ? 'es' : ''} vetoed along the way` : ''}. Code scored every breach.
+        </p>
+      </div>
+      {run.reportReady && run.mode !== 'demo' && run.runId && (
+        <a
+          href={api.reportUrl(run.runId)}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-lg border border-kv-border-strong bg-kv-surface px-3.5 py-2 text-[13.5px] font-semibold text-kv-text transition-colors hover:bg-kv-surface-2"
+        >
+          Open the audit report
+        </a>
+      )}
     </div>
   )
 }

@@ -1,0 +1,91 @@
+/* Motion for <AgentAvatar>. Everything here is decoration and switches off under prefers-reduced-motion. */
+
+.kav-avatar * {
+  transform-box: fill-box;
+}
+
+.kav-bob {
+  transform-origin: 50% 100%;
+  animation: kav-bob 3.8s ease-in-out infinite;
+}
+
+.kav-blink {
+  transform-origin: 50% 50%;
+  animation: kav-blink 5.2s infinite;
+}
+
+/* the pupils lean toward the pointer; --kav-px/--kav-py are -1..1, set on :root by one shared listener */
+.kav-look {
+  transform: translate(calc(var(--kav-px, 0) * 2.6px), calc(var(--kav-py, 0) * 2px));
+  transition: transform 0.18s ease-out;
+}
+
+.kav-look-up {
+  transform: translate(2px, -2.6px);
+}
+
+.kav-talk {
+  transform-origin: 50% 50%;
+  animation: kav-talk 0.46s ease-in-out infinite;
+}
+
+.kav-ping {
+  transform-origin: 50% 50%;
+  animation: kav-ping 2.2s ease-out infinite;
+}
+
+@keyframes kav-bob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  50% {
+    transform: translateY(-1.6px) scale(1.012, 0.994);
+  }
+}
+
+@keyframes kav-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes kav-talk {
+  0%,
+  100% {
+    transform: scale(1, 0.45);
+  }
+  50% {
+    transform: scale(1, 1.15);
+  }
+}
+
+@keyframes kav-ping {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  70%,
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kav-bob,
+  .kav-blink,
+  .kav-talk,
+  .kav-ping {
+    animation: none;
+  }
+  .kav-look {
+    transform: none;
+    transition: none;
+  }
+}

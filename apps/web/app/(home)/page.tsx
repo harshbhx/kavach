@@ -3,7 +3,10 @@ import { AuditForms } from '@/components/landing/audit-forms';
 import { Passbook } from '@/components/landing/passbook';
 import { RefundSlip } from '@/components/landing/refund-slip';
 import { SecurityFeatures } from '@/components/landing/security-features';
+import { RoomCast } from '@/components/landing/room-cast';
 import { Signatories } from '@/components/landing/signatories';
+import { AGENTS } from '@/components/landing/agents-data';
+import { AgentAvatar } from '@kavach/brand/avatar';
 import { GitHubIcon } from '@/components/landing/site-chrome';
 import { links } from '@/lib/shared';
 
@@ -67,6 +70,17 @@ export default function HomePage() {
                   Run it locally
                 </a>
               </div>
+              <ul className="mt-7 flex flex-wrap items-center gap-x-1.5 gap-y-2" aria-label="The seven agents">
+                {AGENTS.map((a) => (
+                  <li key={a.id} title={`${a.name}: ${a.job}`}>
+                    <AgentAvatar agent={a.id} size={42} label={a.name} />
+                  </li>
+                ))}
+                <li className="ml-2 text-[13px] leading-tight text-ink-3">
+                  3 attack, 3 harden,
+                  <br />1 keeps score
+                </li>
+              </ul>
             </div>
           </div>
           <div className="mt-12">
@@ -125,9 +139,10 @@ export default function HomePage() {
       <section className="border-t border-ink/15 bg-paper-2/60">
         <div className="mx-auto max-w-[1200px] px-5 py-24">
           <Heading id="signatories" title="Seven agents in one room, every handoff signed.">
-            <p>The lines below come from the sample run in the repo.</p>
+            <p>Press an agent to hear it. The lines come from the sample run in the repo, and on a real run each one is posted to Band.</p>
           </Heading>
-          <div className="mt-12">
+          <div className="mt-12 space-y-8">
+            <RoomCast />
             <Signatories />
           </div>
         </div>

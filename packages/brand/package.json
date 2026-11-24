@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/KavachLogo.tsx",
+    "./avatar": "./src/AgentAvatar.tsx",
     "./tokens.css": "./src/tokens.css",
     "./theme.css": "./src/theme.css",
     "./fonts.css": "./src/fonts.css",

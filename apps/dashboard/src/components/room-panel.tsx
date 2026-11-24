@@ -3,7 +3,8 @@ import { motion } from 'motion/react'
 import { createRef, Fragment, type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatedBeam } from '@/components/ui/animated-beam'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { AGENTS, avatar } from '@/lib/format'
+import { AgentAvatar } from '@kavach/brand/avatar'
+import { AGENTS } from '@/lib/format'
 import type { AgentMessage, AgentName } from '@/lib/types'
 import type { RunView } from '@/lib/useRun'
 import { useStickyScroll } from '@/lib/useStickyScroll'
@@ -119,7 +120,7 @@ function Handoffs({
                     speaking === a && cn('scale-110 ring-2 ring-offset-2 ring-offset-kv-surface-2', RING[meta.squad]),
                   )}
                 >
-                  <img src={avatar(a)} alt="" className="size-7 rounded-full" />
+                  <AgentAvatar agent={a} size={30} />
                 </div>
                 <span
                   className={cn(
@@ -169,7 +170,7 @@ function Message({ m, first }: { m: AgentMessage; first: boolean }) {
       transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
       className={cn('grid grid-cols-[2.25rem_1fr] gap-x-3 px-4', first ? 'pt-3' : 'pt-0.5')}
     >
-      <div>{first && <img src={avatar(m.agent)} alt="" className="size-9 rounded-full border border-kv-border bg-kv-surface" />}</div>
+      <div>{first && <AgentAvatar agent={m.agent} size={38} />}</div>
       <div className="min-w-0">
         {first && (
           <p className="flex items-baseline gap-2">

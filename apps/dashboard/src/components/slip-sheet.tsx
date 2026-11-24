@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Kbd } from '@/components/ui/kbd'
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { AGENTS, avatar, TECHNIQUE_LABEL } from '@/lib/format'
+import { AgentAvatar, type AgentId } from '@kavach/brand/avatar'
+import { AGENTS, TECHNIQUE_LABEL } from '@/lib/format'
 import { RULE_INFO, STAMP_TONE, stampOf, verdictExplained, verdictLine } from '@/lib/slips'
 import type { AgentName, AttackInfo, ToolCard, ToolCallRecord } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -141,7 +142,7 @@ export function SlipSheet({
               {attack && (
                 <Section title="The attack behind it">
                   <div className="flex items-center gap-2.5">
-                    <img src={avatar(attack.agent)} alt="" className="size-8 rounded-full border border-kv-border" />
+                    <AgentAvatar agent={attack.agent as AgentId} size={34} />
                     <div className="min-w-0">
                       <p className="text-[13.5px] font-semibold text-kv-attack">{agent?.name ?? attack.agent}</p>
                       <p className="text-[12px] text-kv-faint">{TECHNIQUE_LABEL(attack.technique)}</p>

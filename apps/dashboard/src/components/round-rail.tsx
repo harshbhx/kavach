@@ -82,7 +82,9 @@ export function RoundRail({ run, total }: { run: RunView; total: number }) {
                       <span className={cn('text-[11.5px]', now ? 'font-semibold text-kv-text' : done ? 'text-kv-muted' : 'text-kv-faint')}>
                         {skipped ? 'Reused' : LABEL[ph]}
                       </span>
-                      {vetoes > 0 && <span className="-mt-0.5 text-[10.5px] font-semibold text-kv-verdict">{vetoes} vetoed</span>}
+                      {ph === 'patch' && (
+                        <span className="-mt-0.5 h-3.5 text-[10.5px] leading-[14px] font-semibold text-kv-verdict">{vetoes > 0 ? `${vetoes} vetoed` : ''}</span>
+                      )}
                     </div>
                     {i < PHASES.length - 1 && (
                       <span className={cn('mt-3 h-px flex-1', reached > i || summary ? 'bg-kv-secure/60' : 'bg-kv-border-strong/60')} />

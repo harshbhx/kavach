@@ -186,3 +186,23 @@ body {
 .shiki span[style*='#D73A49' i] {
   color: var(--stamp) !important;
 }
+
+/* the agent's line in <RoomCast> settles in when the speaker changes */
+.kv-bubble {
+  animation: kv-bubble 0.4s ease-out both;
+}
+@keyframes kv-bubble {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kv-bubble {
+    animation: none;
+  }
+}

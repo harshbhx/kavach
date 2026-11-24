@@ -212,7 +212,7 @@ export default function App() {
           {announcement}
         </p>
       </div>
-      {NARRATE ? <Narration latest={caption} /> : <Toaster position="bottom-center" richColors closeButton />}
+      {NARRATE ? <Narration latest={caption} /> : <Toaster position="bottom-right" richColors closeButton />}
     </TooltipProvider>
   )
 }
