@@ -11,7 +11,7 @@ const mono = IBM_Plex_Mono({ subsets: ['latin'], variable: '--font-plex-mono', w
 const sign = Herr_Von_Muellerhoff({ weight: '400', subsets: ['latin'], variable: '--font-sign' });
 
 // Set NEXT_PUBLIC_SITE_URL to the deployed address so social cards point at the real site.
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://kavach.creharsh.workers.dev';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
