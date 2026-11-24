@@ -5,11 +5,12 @@ import ShinyText from '@/components/ShinyText'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { api } from '@/lib/api'
+import { api, type CustomRun } from '@/lib/api'
 import type { GalleryEntry } from '@/lib/demo'
 import type { Health } from '@/lib/types'
 import type { RunView } from '@/lib/useRun'
 import { Stamp } from './panel'
+import { TryPromptSheet } from './try-prompt-sheet'
 
 interface Props {
   run: RunView
@@ -24,6 +25,8 @@ interface Props {
   onPickDemo?: (key: string, speed: number) => void
   onReplayDemo: (speed: number) => void
   onLive: () => void
+  /** run on the visitor's own prompt, rules and requests (live mode only) */
+  onCustom?: (c: CustomRun) => void
   onReplay: (file: string, speed: number) => void
   onStop: () => void
 }
@@ -67,7 +70,7 @@ function SpeedSelect({ value, onChange }: { value: string; onChange: (v: string)
   )
 }
 
-export function TopBar({ run, logoState, demo, starting = false, gallery = [], demoKey = null, onPickDemo, onReplayDemo, onLive, onReplay, onStop }: Props) {
+export function TopBar({ run, logoState, demo, starting = false, gallery = [], demoKey = null, onPickDemo, onReplayDemo, onLive, onCustom, onReplay, onStop }: Props) {
   const [health, setHealth] = useState<Health | null>(null)
   const [apiDown, setApiDown] = useState(false)
   const [replays, setReplays] = useState<string[]>([])
@@ -201,6 +204,7 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
               <Button variant="outline" disabled={!file || starting} onClick={() => onReplay(file, Number(speed))} className="border-kv-border-strong bg-transparent">
                 <RotateCcw className="size-3.5" /> Replay
               </Button>
+              {onCustom && <TryPromptSheet disabled={apiDown || starting} onRun={onCustom} />}
               <Button onClick={onLive} disabled={apiDown || starting} className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
                 {starting ? <LoaderCircle className="size-3.5 animate-spin" /> : <Play className="size-3.5 fill-current" />}
                 {starting ? 'Starting…' : 'Start live run'}
