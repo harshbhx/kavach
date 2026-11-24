@@ -83,8 +83,8 @@
   4. The chart: the breach line falls 100% → 0% while utility holds above the 90% floor; the vetoed point sits below it. (1:28–1:32)
   5. Patch amendments: the guard-policy diff, `"max_auto_inr": null` → `500`, `"require_order_ownership": true`. (1:32–1:36)
 - **Label (small, top-left, whole scene):** *Recorded live run, target gpt-4o-mini* or *Simulated run, scripted agents*.
-- **VO (Narrator):** "This is a real run. Round one: breached. The first patch, vetoed. The second, approved. Every handoff is a message in Band, every agent runs on Lyzr, and the bot under attack lives in its own sandbox."
-  - *If the target did not run on Agent37, the last clause becomes "and the bot under attack runs on fake data, never real money."*
+- **VO (Narrator):** "This is a recorded run. Round one: breached. The first patch, vetoed. The second, approved. Every handoff is a message in Band, every agent runs on Lyzr, and the bot under attack is a sandboxed copy with fake data."
+  - *The veto and the 70% counter exist only in the offline sample run (scripted agents). The recorded live runs approved the first patch. If the film shows a live run instead, use: "This is a real run. Round one: breached. One patch, approved. Every later round, held." Never call the sample footage a real run. The target has not been deployed on Agent37, so the last clause must not claim it.*
 
 ### 9. Results (1:36–1:46)
 - **Picture:** three figures set large on paper, each counted up by a numbering-machine roll:
@@ -97,7 +97,7 @@
 ## Act 4. Close (1:46–1:55)
 
 ### 10. Built with, and the end card (1:46–1:55)
-- **Picture:** four sponsor tiles set like a colophon, each with what it does here: **Lyzr**, the seven agents · **Band**, the room they talk in · **Agent37**, the sandbox · **Cloudflare**, the site. (AdaL only if you used it on the project.) Then the end card: the Kavach mark, *github.com/harshbhx/kavach*, the live site link, and *Built by Harsh Bhanushali, DualMind Labs*.
+- **Picture:** four sponsor tiles set like a colophon, each with what it does here: **Lyzr**, the seven agents · **Band**, the room they talk in · **Agent37**, the sandbox (include this tile only if the target was deployed there) · **Cloudflare**, the site. (AdaL only if you used it on the project.) Then the end card: the Kavach mark, *github.com/harshbhx/kavach*, the live site link, and *Built by Harsh Bhanushali, DualMind Labs*.
 - **VO (Narrator):** "Kavach. Built for the Agent-to-Agent Hackathon by DualMind Labs."
 - **Sound:** the score resolves on the end card; a last soft stamp as the URL settles.
 

@@ -3,7 +3,7 @@
 You're helping build **Kavach** for a hackathon with a hard deadline: **24 Nov 2026, 10:00 PM IST (submit by 9:30 PM)**. Speed matters, but the demo must work. Follow this file on every turn.
 
 ## What we're building (30-second version)
-Seven AI agents (Recon, Injector, Social Engineer / Monitor, Patcher, Auditor / Referee) attack and harden **DiwaliMart Support**, a tool-using support agent with 4 mock tools (refunds, orders, KYC, coupons) and fake data. Breaches are detected **by code** from the tool-call log. Patches = system prompt + policy-as-code guardrails. A patch is accepted only if the exploits fail **and** benign utility stays ≥ 90%. Agents talk in a **Band** room; their brains run on **Lyzr**; the target runs in an **Agent37** sandbox; a React dashboard streams it all over SSE.
+Seven AI agents (Recon, Injector, Social Engineer / Monitor, Patcher, Auditor / Referee) attack and harden **DiwaliMart Support**, a tool-using support agent with 4 mock tools (refunds, orders, KYC, coupons) and fake data. Breaches are detected **by code** from the tool-call log. Patches = system prompt + policy-as-code guardrails. A patch is accepted only if the exploits fail **and** benign utility stays ≥ 90%. Agents talk in a **Band** room; their brains run on **Lyzr**; the target runs locally (an **Agent37** deploy script is included, not deployed); a React dashboard streams it all over SSE.
 
 ## Read before coding (in this order)
 1. `docs/PRD.md`: scope, must/should/could, key decisions

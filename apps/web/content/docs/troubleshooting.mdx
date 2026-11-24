@@ -29,7 +29,7 @@ Only one run can be active at a time, and the API answers `409` while one is. Pr
 </Accordion>
 <Accordion title="Calls fail with rate limits or time out">
 
-The bot queues and retries calls that hit a provider rate limit, but a small quota can still run out in round 1, which sends about 40 calls. Lower `MAX_CONCURRENCY` (try 2), or raise `LLM_TIMEOUT_S` for slow models. Agent calls that still fail fall back: Recon to a built-in dossier, the attackers to the seeded attack library, and a Patcher that returns nothing counts as a vetoed attempt. The room says when a fallback was used.
+The bot queues and retries calls that hit a provider rate limit, but a small quota can still run out in round 1, which sends about 40 calls. The bot already makes only two model calls at a time (`TARGET_CONCURRENCY`, default 2; raise it on a paid tier). A daily token cap is not retried, so wait for it to reset or pick another `TARGET_MODEL`. For slow models, raise `LLM_TIMEOUT_S`. Agent calls that still fail fall back: Recon to a built-in dossier, the attackers to the seeded attack library, and a Patcher that returns nothing counts as a vetoed attempt. The room says when a fallback was used.
 
 </Accordion>
 <Accordion title="Lyzr returns 401, or an agent is not found">
@@ -79,7 +79,7 @@ The cheapest way to stop every attack is to stop helping anyone. Without the gat
 </Accordion>
 <Accordion title="Can I point it at my own bot?">
 
-Yes, if your bot speaks the target contract: `POST /chat` with a message and the logged-in user, answering with the reply and the tool calls it made (see [Target bot](/docs/target-bot)). Set `TARGET_URL` to it. Your guard policy will need its own fields, and the breach rules assume tools like refunds, KYC lookups and coupons, so expect to adapt `backend/kavach/scoring/detectors.py` to what your tools can do wrong.
+Not yet. Pointing `TARGET_URL` at a service that copies the target contract (`POST /chat` with a message and the logged-in user, answering with the reply and the tool calls it made; see [Target bot](/docs/target-bot)) will connect, but the breach rules and the attacks assume the DiwaliMart tools, customers and order IDs, so the results would not mean much for another bot. Testing your own agent is on the roadmap. Pasting your own system prompt works today: see [Bring your own prompt](/docs/bring-your-prompt).
 
 </Accordion>
 <Accordion title="How much does a run cost?">

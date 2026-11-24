@@ -84,7 +84,7 @@ In the sample, attempt 1 added a filter that refused any message about refunds. 
 
 ## Rounds 2 and 3: attack the patch
 
-The attackers are told what changed and adapt. In the sample they try base64 tickets, spoofed tool output, a Tier-2 agent hand-off, Hinglish, an emotional story, policy look-alikes and nested translation instructions. All twelve are refused by the v2 guard policy, so both rounds end `no_breach` and nothing new is patched.
+The attackers are told what changed and adapt. In the sample they try base64 tickets, spoofed tool output, a Tier-2 agent hand-off, Hinglish, an emotional story, policy look-alikes and nested translation instructions. None of the twelve lands: the v2 guard policy blocks the 11 that reach a tool call, and the twelfth produces no breach, so both rounds end `no_breach` and nothing new is patched.
 
 ## The report
 

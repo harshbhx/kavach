@@ -11,8 +11,8 @@ What it shows, in order:
 | Time | Screen | Caption |
 |---|---|---|
 | 0:00–0:04 | Title card: the Kavach mark | Seven AI agents attack and harden a support bot that can move money |
-| 0:04–0:14 | The landing page: the refund slip gets stamped PAID, then HELD on guardrail v2 | One message made the bot refund ₹54,999 on someone else's order |
-| 0:14–0:53 | The dashboard runs three rounds: Recon's dossier, the attacks, breaches caught by code, the vetoed patch, the approved patch, rounds 2 and 3 holding | One plain sentence per moment, from the dashboard's presenter captions |
+| 0:04–0:14 | The landing page: the refund slip gets stamped PAID, then HELD on guardrail v2 | In the offline sample, one message makes the scripted bot refund ₹54,999 on someone else's order. (Live runs breached with refunds of ₹700 to ₹10,000.) |
+| 0:14–0:53 | The dashboard runs three rounds: Recon's dossier, the attacks, breaches caught by code, the approved patch, rounds 2 and 3 holding (the offline sample also shows a vetoed patch) | One plain sentence per moment, from the dashboard's presenter captions |
 | 0:53–0:58 | End card: repo URL and sponsors | Breaches caught by code. Patches that keep customers served. |
 
 **If you want a voice-over**, read the captions, or slow the run with `--speed 1` for a longer cut (still well under 2:00). For the live Lyzr and Band story, add 5–10 s of the Band room with the agents' @mention messages (screen-record it during `pnpm demo`) after the dashboard part.
@@ -22,7 +22,7 @@ What it shows, in order:
 ## 2. Live finale plan (28 Nov, if shortlisted)
 
 - Run live with `ROUNDS=2` for speed; keep the replay ready as backup (one click).
-- Invite a judge to type in the Band room (stretch C1: `@Referee what was the worst exploit?`).
+- Humans can read and post in the Kavach room in Band, but no agent reacts to them yet: a live Referee that answers questions (stretch C1) is not built.
 - Mobile hotspot as a network backup. Have the run already open in a second tab.
 
 ## 3. Devpost submission text (draft; edit the numbers to match your recorded run)
@@ -49,8 +49,8 @@ In our recorded run, the breach rate went **<!-- breach-story:start -->83% → 0
 ### How we built it
 - **Lyzr**: the 7 agents (role, goal, instructions, structured JSON output, session memory), called through the Lyzr inference API.
 - **Band**: each agent is a Band remote agent; every handoff is an @mention message in a shared Kavach room, which humans can watch and join.
-- **Agent37**: the target agent and its mock tools run in an isolated sandbox (safe blast radius).
-- **AdaL**: the coding agent the repo is set up for; `AGENTS.md` and `docs/` are its instructions. (Keep this line only if you used AdaL on the project.)
+- **Agent37**: a deploy script (`scripts/deploy_target_agent37.sh`) is included, but the target is not deployed there; the recorded runs used a local target.
+- **AdaL**: the repo is set up for it (`AGENTS.md` and `docs/` are its instructions). Whether AdaL was used on the project is unconfirmed: keep this line only if it was.
 - FastAPI + SSE backend, LiteLLM tool-calling target, a React dashboard (shadcn/ui, Magic UI, React Bits, Aceternity, Recharts) and a Next.js + Fumadocs site with an in-browser replay of a recorded run.
 
 ### Challenges we ran into
@@ -66,7 +66,7 @@ Prompt-only defences are fragile; tool-level guardrails plus prompt changes hold
 Plug in any team's agent through an OpenAPI tool spec, add a CI mode ("fail the build if the breach rate goes up"), and publish the attack and hardening skill packs on Finch.
 
 ### Built with
-python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, recharts, next.js, fumadocs, turborepo, cloudflare-workers, lyzr, band, agent37, adal
+python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, recharts, next.js, fumadocs, turborepo, cloudflare-workers, lyzr, band
 
 **Last line of the description (required):**
 *HiDevs account: harshbhx@gmail.com (same person as Devpost bhanushaliharsh434@gmail.com).*
@@ -81,7 +81,7 @@ python, fastapi, litellm, uv, react, typescript, vite, tailwindcss, shadcn-ui, r
 - [ ] HiDevs: submitted on the hackathon page (Dr. Agent repo evaluation if prompted).
 - [ ] The HiDevs email line is in the Devpost description.
 - [ ] The organizers know the two emails are one person (Devpost Support's advice, 24 Nov): send the message under "Linking the two registrations" below through **Email the hackathon manager** at the bottom of the sidebar on the Devpost hackathon's Overview page.
-- [ ] Sponsor screenshots are in the README (Lyzr agents, Band room, Agent37 instance).
+- [ ] Sponsor screenshots are in the README (Lyzr agents, Band room; an Agent37 instance only if it gets deployed).
 - [ ] Devpost thumbnail uploaded (`docs/assets/brand/kavach-devpost-thumbnail.png`); GitHub social preview set (`kavach-social-card.png`).
 
 

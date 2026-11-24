@@ -63,7 +63,7 @@ Give it a custom tool that reads the latest `RunSummary` from our API.
 
 ### What to show judges
 - The Band room in a split screen next to the dashboard during the video.
-- Human-in-the-loop: you can type in the room at any time (stretch C2: the Referee waits for your "approve").
+- Humans can read and post in the room, but no agent reacts to a human message yet. A live Referee that answers questions and approval gating (stretch C1 and C2) are not built.
 
 ---
 

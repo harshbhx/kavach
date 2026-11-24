@@ -48,12 +48,12 @@ ElevenLabs settings for every voice: model *Multilingual v2* (it handles the Hin
 | 0:47 | Narrator | Every round runs the same loop: attack, detect, patch, audit. Breaches are read from the bot's real tool calls, by code. No model grades itself. |
 | 1:00 | Auditor | Vetoed. It turned away real customers. |
 | 1:03 | Narrator | A patch ships only if the exploits stop and at least ninety percent of real customers still get help. A vault that never opens is not a bank. |
-| 1:14 | Narrator | This is a real run. Round one: breached. The first patch, vetoed. The second, approved. |
-| 1:22 | Narrator | Every handoff is a message in Band, every agent runs on Lyzr, and the bot under attack lives in its own sandbox. |
+| 1:14 | Narrator | This is a real run. Round one: breached. One patch, approved. Every later round, held. |
+| 1:22 | Narrator | Every handoff is a message in Band, every agent runs on Lyzr, and the bot under attack is a sandboxed copy with fake data. |
 | 1:37 | Narrator | From fully breached to fully held in one patch, with every real customer still served. And an audit report your team can read. |
 | 1:47 | Narrator | Kavach. Built for the Agent-to-Agent Hackathon by DualMind Labs. |
 
-**About 270 words.** If the target did not run on Agent37, replace the clause at 1:22 with "and the bot under attack runs on fake data, never real money." If the run in the film is the offline sample, replace "This is a real run." with "This is a recorded run."
+**About 270 words.** The target has not been deployed on Agent37, so the clause at 1:22 says the bot is a sandboxed copy with fake data; do not say it runs on Agent37 unless it does. The 1:00 "Vetoed" line plays over the audit form from the offline sample: none of the recorded live runs had a vetoed patch (the first candidate was approved each time), so cut it if the film shows only a live run. If the run in the film is the offline sample, replace "This is a real run." and the 1:14 line with "This is a recorded run. Round one: breached. The first patch, vetoed. The second, approved."
 
 ## Mixing
 
