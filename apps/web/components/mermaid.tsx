@@ -15,30 +15,29 @@ export function Mermaid({ chart }: { chart: string }) {
         startOnLoad: false,
         securityLevel: 'strict',
         theme: 'base',
-        fontFamily: 'var(--font-inter), system-ui, sans-serif',
+        fontFamily: 'var(--font-anek), system-ui, sans-serif',
         themeVariables: {
-          darkMode: true,
-          background: '#0a0a16',
-          primaryColor: '#1a1a2b',
-          primaryTextColor: '#f5f5fa',
-          primaryBorderColor: '#3a3a55',
-          secondaryColor: '#12121f',
-          tertiaryColor: '#12121f',
-          lineColor: '#7c5cff',
-          textColor: '#d6d6e2',
-          clusterBkg: '#12121f',
-          clusterBorder: '#26263a',
-          actorBkg: '#1a1a2b',
-          actorBorder: '#3a3a55',
-          actorTextColor: '#f5f5fa',
-          signalColor: '#a1a1b5',
-          signalTextColor: '#f5f5fa',
-          noteBkgColor: '#1a1a2b',
-          noteTextColor: '#f5f5fa',
-          noteBorderColor: '#3a3a55',
-          labelBoxBkgColor: '#1a1a2b',
-          loopTextColor: '#a1a1b5',
-          edgeLabelBackground: '#12121f',
+          background: '#f1f6f2',
+          primaryColor: '#e6efe9',
+          primaryTextColor: '#0e231c',
+          primaryBorderColor: '#5f7a70',
+          secondaryColor: '#f1f6f2',
+          tertiaryColor: '#f1f6f2',
+          lineColor: '#0b6e7f',
+          textColor: '#0e231c',
+          clusterBkg: '#f1f6f2',
+          clusterBorder: '#b9cdc2',
+          actorBkg: '#e6efe9',
+          actorBorder: '#5f7a70',
+          actorTextColor: '#0e231c',
+          signalColor: '#3a574c',
+          signalTextColor: '#0e231c',
+          noteBkgColor: '#f1f6f2',
+          noteTextColor: '#0e231c',
+          noteBorderColor: '#b9cdc2',
+          labelBoxBkgColor: '#e6efe9',
+          loopTextColor: '#3a574c',
+          edgeLabelBackground: '#f1f6f2',
         },
       });
       try {
@@ -56,7 +55,7 @@ export function Mermaid({ chart }: { chart: string }) {
   if (error) return <pre className="overflow-x-auto rounded-lg border p-4 text-xs">{chart}</pre>;
   return (
     <div
-      className="not-prose my-6 flex justify-center overflow-x-auto rounded-xl border border-kv-border bg-kv-surface/60 p-4 [&_svg]:h-auto [&_svg]:max-w-full"
+      className="not-prose my-6 flex justify-center overflow-x-auto rounded-xl border border-rule bg-paper-2 p-4 [&_svg]:h-auto [&_svg]:max-w-full"
       aria-label="Diagram"
       dangerouslySetInnerHTML={{ __html: svg }}
     />
