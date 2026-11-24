@@ -154,42 +154,8 @@ def bg(w, h, pid):
             f'<rect width="{w}" height="{h}" fill="url(#{pid}a)"/><rect width="{w}" height="{h}" fill="url(#{pid}b)"/>')
 
 
-# 5. GitHub social card / video title card 1280x640
-W, H = 1280, 640
-cd, cw = text_path("Kavach", 136)
-tx = 470
-chips_y = 422
-c1, w1 = chip(tx, chips_y, ROSE, "Red agents attack", 20)
-c2, w2 = chip(tx + w1 + 14, chips_y, CYAN, "Blue agents patch", 20)
-c3, _ = chip(tx + w1 + w2 + 28, chips_y, GOLD, "Code-scored", 20)
-body = (bg(W, H, "s") + f'<g transform="translate(90 170) scale(2.35)">{mark()}</g>'
-        f'<path transform="translate({tx} 250)" d="{cd}" fill="{TEXT}"/>'
-        f'<text x="{tx + 4}" y="314" font-family="Inter" font-weight="500" font-size="32" fill="#C8C8D8">AI agents that attack and harden your</text>'
-        f'<text x="{tx + 4}" y="358" font-family="Inter" font-weight="500" font-size="32" fill="#C8C8D8">support bot, before customers do.</text>'
-        f'{c1}{c2}{c3}'
-        f'<text x="{tx + 4}" y="548" font-family="Inter" font-weight="500" font-size="20" fill="{MUTED}">Diwali Festiverse · Agent-to-Agent Hackathon (India Edition)</text>'
-        f'<text x="{tx + 4}" y="578" font-family="Inter" font-weight="600" font-size="20" fill="{MUTED}">Built with Lyzr · Band · Agent37 · AdaL</text>')
-p = write("kavach-social-card.svg", svg(W, H, body))
-render(p, OUT / "kavach-social-card.png", W)
+# 5-6. The social card and Devpost thumbnail moved to apps/web/scripts/make-brand-cards.mjs (security-paper style).
 
-# 6. Devpost thumbnail 1200x800 (3:2)
-W, H = 1200, 800
-dd, dw = text_path("Kavach", 150)
-_, w1 = chip(0, 0, ROSE, "Red agents attack", 24)
-_, w2 = chip(0, 0, CYAN, "Blue agents patch", 24)
-_, w3 = chip(0, 0, GOLD, "Code-scored", 24)
-x0 = (W - (w1 + w2 + w3 + 28)) / 2
-c1, _ = chip(x0, 560, ROSE, "Red agents attack", 24)
-c2, _ = chip(x0 + w1 + 14, 560, CYAN, "Blue agents patch", 24)
-c3, _ = chip(x0 + w1 + w2 + 28, 560, GOLD, "Code-scored", 24)
-body = (bg(W, H, "d") + f'<g transform="translate({W / 2 - 128 * 2.1 / 2:.1f} 60) scale(2.1)">{mark()}</g>'
-        f'<path transform="translate({(W - dw) / 2:.1f} 448)" d="{dd}" fill="{TEXT}"/>'
-        f'<text x="{W / 2}" y="514" text-anchor="middle" font-family="Inter" font-weight="500" font-size="32" fill="#C8C8D8">AI agents that attack and harden your support bot</text>'
-        f'{c1}{c2}{c3}'
-        f'<text x="{W / 2}" y="702" text-anchor="middle" font-family="Inter" font-weight="500" font-size="22" fill="{MUTED}">Diwali Festiverse · Agent-to-Agent Hackathon (India Edition)</text>'
-        f'<text x="{W / 2}" y="736" text-anchor="middle" font-family="Inter" font-weight="600" font-size="22" fill="{MUTED}">Built with Lyzr · Band · Agent37 · AdaL</text>')
-p = write("kavach-devpost-thumbnail.svg", svg(W, H, body))
-render(p, OUT / "kavach-devpost-thumbnail.png", W)
 
 # 7. agent avatars: dark disc, squad-colour ring and icon
 def S(col, w=14):
