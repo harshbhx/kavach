@@ -36,7 +36,7 @@ export function Stamp({
       )}
       style={{ boxShadow: 'inset 0 0 0 2px currentColor' }}
     >
-      <span className="font-display text-[2.6rem] leading-none tracking-[0.04em] sm:text-5xl">{title}</span>
+      <span className="font-display text-[2.6rem] leading-none font-bold tracking-[0.08em] [font-stretch:85%] sm:text-5xl">{title}</span>
       {lines.map((l) => (
         <span key={l} className="mt-1 text-[11px] font-semibold leading-tight tracking-wide sm:text-xs">
           {l}
@@ -177,7 +177,7 @@ export function RefundSlip() {
                 className="pointer-events-none absolute inset-0 z-0 grid place-items-center"
               >
                 <span
-                  className="font-display text-[9rem] leading-none tracking-[0.12em] text-transparent sm:text-[12rem]"
+                  className="font-display text-[9rem] leading-none font-bold tracking-[0.12em] text-transparent [font-stretch:85%] sm:text-[12rem]"
                   style={{
                     backgroundImage: 'url(/print/lattice.svg), url(/print/lattice.svg)',
                     backgroundSize: '6px 6px, 9px 9px',

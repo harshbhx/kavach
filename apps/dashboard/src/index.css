@@ -29,10 +29,9 @@
   --color-kv-brand-hover: #0b6e7f;
   --color-kv-brand-soft: rgb(14 35 28 / 0.07);
   --color-kv-thread: #b07d1a;
-  --font-sans: "Anek Latin Variable", system-ui, sans-serif;
-  --font-display: "Rozha One", Georgia, serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
-  --font-sign: "Herr Von Muellerhoff", cursive;
+  --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans Devanagari", system-ui, sans-serif;
+  --font-display: "IBM Plex Sans Variable", "IBM Plex Sans Devanagari", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --radius-kv: 12px;
 }
 
@@ -51,7 +50,7 @@
   --kv-defend: #0b6e7f;
   --kv-secure: #1f7a4d;
   --kv-verdict: #9a6a0e;
-  --kv-font-wordmark: "Anek Latin Variable", system-ui, sans-serif;
+  --kv-font-wordmark: "IBM Plex Sans Variable", system-ui, sans-serif;
 
   /* shadcn/ui */
   --background: #e6efe9;
@@ -162,5 +161,13 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Plex Sans carries headings and stamps at semibold. In the base layer so weight and tracking utilities still win. */
+@layer base {
+  .font-display {
+    font-weight: 600;
+    letter-spacing: -0.012em;
   }
 }

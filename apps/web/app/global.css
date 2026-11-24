@@ -34,7 +34,7 @@
   --kv-secure: #1f7a4d;
   --kv-verdict: #b07d1a;
   --kv-text: var(--ink);
-  --kv-font-wordmark: var(--font-anek);
+  --kv-font-wordmark: var(--font-plex);
 
   /* Fumadocs */
   --color-fd-background: var(--paper-2);
@@ -69,9 +69,9 @@
   --color-hold: var(--hold);
   --color-hold-soft: var(--hold-soft);
   --color-thread: var(--thread);
-  --font-sans: var(--font-anek), system-ui, sans-serif;
-  --font-display: var(--font-rozha), Georgia, serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-sans: var(--font-plex), var(--font-plex-deva), system-ui, sans-serif;
+  --font-display: var(--font-plex), var(--font-plex-deva), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --font-sign: var(--font-sign), cursive;
 }
 
@@ -161,4 +161,28 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
+}
+
+/* Plex Sans carries the headings: semibold, set tight. In the base layer so weight and tracking utilities still win. */
+@layer base {
+  .font-display {
+    font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+  h1.font-display,
+  h2.font-display {
+    letter-spacing: -0.032em;
+  }
+}
+
+/* Code blocks: keep Shiki's default theme but print it in the site's inks (no purple). */
+.shiki span[style*='#6F42C1' i] {
+  color: var(--hold) !important;
+}
+.shiki span[style*='#005CC5' i],
+.shiki span[style*='#032F62' i] {
+  color: var(--guilloche) !important;
+}
+.shiki span[style*='#D73A49' i] {
+  color: var(--stamp) !important;
 }

@@ -1,12 +1,13 @@
 import { RootProvider } from 'fumadocs-ui/provider/next';
 import type { Metadata, Viewport } from 'next';
-import { Anek_Latin, Herr_Von_Muellerhoff, JetBrains_Mono, Rozha_One } from 'next/font/google';
+import { Herr_Von_Muellerhoff, IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_Devanagari } from 'next/font/google';
 import './global.css';
 
-// Rozha One and Anek come from Indian foundries (ITF, Ek Type); Rozha carries the Devanagari for कवच.
-const rozha = Rozha_One({ weight: '400', subsets: ['latin', 'devanagari'], variable: '--font-rozha' });
-const anek = Anek_Latin({ subsets: ['latin'], variable: '--font-anek', axes: ['wdth'] });
-const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains' });
+// IBM Plex throughout: Sans for headings and text, Mono for tool calls and serials, Sans Devanagari for कवच.
+// The script face is only for the signature on the refund slip.
+const plex = IBM_Plex_Sans({ subsets: ['latin'], variable: '--font-plex', axes: ['wdth'] });
+const deva = IBM_Plex_Sans_Devanagari({ subsets: ['devanagari'], variable: '--font-plex-deva', weight: ['500', '600'] });
+const mono = IBM_Plex_Mono({ subsets: ['latin'], variable: '--font-plex-mono', weight: ['400', '500', '600'] });
 const sign = Herr_Von_Muellerhoff({ weight: '400', subsets: ['latin'], variable: '--font-sign' });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
@@ -27,7 +28,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
-      className={`${anek.variable} ${rozha.variable} ${mono.variable} ${sign.variable}`}
+      className={`${plex.variable} ${deva.variable} ${mono.variable} ${sign.variable}`}
       suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col font-sans antialiased">

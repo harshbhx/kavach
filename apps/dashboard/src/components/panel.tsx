@@ -47,7 +47,7 @@ export function Stamp({ tone, children, className }: { tone: 'attack' | 'defend'
   return (
     <span
       className={cn(
-        'kv-ink inline-block -rotate-[4deg] rounded-[5px] border-2 px-1.5 py-px font-display text-[13px] leading-tight tracking-wide',
+        'kv-ink inline-block -rotate-[4deg] rounded-[5px] border-2 px-1.5 py-px font-display text-[12px] leading-tight font-bold tracking-[0.09em] [font-stretch:85%]',
         tone === 'attack' && 'border-kv-attack text-kv-attack',
         tone === 'defend' && 'border-kv-defend text-kv-defend',
         tone === 'secure' && 'border-kv-secure text-kv-secure',

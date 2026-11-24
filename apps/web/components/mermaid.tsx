@@ -15,7 +15,7 @@ export function Mermaid({ chart }: { chart: string }) {
         startOnLoad: false,
         securityLevel: 'strict',
         theme: 'base',
-        fontFamily: 'var(--font-anek), system-ui, sans-serif',
+        fontFamily: 'var(--font-plex), system-ui, sans-serif',
         themeVariables: {
           background: '#f1f6f2',
           primaryColor: '#e6efe9',

@@ -14,16 +14,13 @@ importers:
 
   apps/dashboard:
     dependencies:
-      '@fontsource-variable/anek-latin':
+      '@fontsource-variable/ibm-plex-sans':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/jetbrains-mono':
+      '@fontsource/ibm-plex-mono':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/herr-von-muellerhoff':
-        specifier: ^5.3.0
-        version: 5.3.0
-      '@fontsource/rozha-one':
+      '@fontsource/ibm-plex-sans-devanagari':
         specifier: ^5.3.0
         version: 5.3.0
       '@kavach/brand':
@@ -427,17 +424,14 @@ packages:
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
 
-  '@fontsource-variable/anek-latin@5.3.0':
-    resolution: {integrity: sha512-NqJVtTUYWkPMPXsEy4Ve/xRnXrKLw/gfUYzLidSsdJAMEgNsRNYpJZkorD/xDyBS2mxhfu/y6KsWTetowCQjrQ==}
+  '@fontsource-variable/ibm-plex-sans@5.3.0':
+    resolution: {integrity: sha512-agG8tXFEo0hD9+J7npa4vbbWult52eMLVaQ6WQRlhs/iCAojrMAoejru85W9HTVXHfyUj96KM7gp/KGAS87XaQ==}
 
-  '@fontsource-variable/jetbrains-mono@5.3.0':
-    resolution: {integrity: sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==}
+  '@fontsource/ibm-plex-mono@5.3.0':
+    resolution: {integrity: sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==}
 
-  '@fontsource/herr-von-muellerhoff@5.3.0':
-    resolution: {integrity: sha512-VOE/9IbMILLfTJwei5l73IFNHMI0t551/QvI+3/cxKOGj8EKjCBO48NlbAVOuRDGbZd/EGn7Dkl8Yv+Jh06IJA==}
-
-  '@fontsource/rozha-one@5.3.0':
-    resolution: {integrity: sha512-/IUdv9LTshBBIqym7gbgOp/RbyD4HxwYOb+5lZKcv78m1xrD0wWWTWp20PNN9W5RVOQfAYQRkT76inav6uAPqg==}
+  '@fontsource/ibm-plex-sans-devanagari@5.3.0':
+    resolution: {integrity: sha512-jPhKEfsF4bYClUBD/AG9NoYs7Zk+iBDvFn5oncQ3u6H8osnQstjY4kOrKqkT7ym7X4MjVn7LDISrloSwrBVPww==}
 
   '@fuma-translate/react@1.0.2':
     resolution: {integrity: sha512-uOiOtBx3nRXR8Nu1GzBf1tApgF1FErDBTHxRIAQeyQdyOoZbrNRN6H4kDCWObY4qyGeGbHydG0DHzgeUgFDMIw==}
@@ -3812,13 +3806,11 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@fontsource-variable/anek-latin@5.3.0': {}
+  '@fontsource-variable/ibm-plex-sans@5.3.0': {}
 
-  '@fontsource-variable/jetbrains-mono@5.3.0': {}
+  '@fontsource/ibm-plex-mono@5.3.0': {}
 
-  '@fontsource/herr-von-muellerhoff@5.3.0': {}
-
-  '@fontsource/rozha-one@5.3.0': {}
+  '@fontsource/ibm-plex-sans-devanagari@5.3.0': {}
 
   '@fuma-translate/react@1.0.2(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
