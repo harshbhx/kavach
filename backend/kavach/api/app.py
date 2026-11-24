@@ -83,8 +83,8 @@ class RulesIn(BaseModel):
 
 class StartRun(BaseModel):
     mode: Literal["live", "replay"] = "live"
-    rounds: int | None = None
-    attacks_per_agent: int | None = None
+    rounds: int | None = Field(None, ge=1, le=10)
+    attacks_per_agent: int | None = Field(None, ge=1, le=10)
     replay_file: str | None = None
     speed: float = 1.0
     # Bring your own prompt (live runs only). All optional: omitting them leaves a run exactly as it was.

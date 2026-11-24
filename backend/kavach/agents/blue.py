@@ -5,7 +5,6 @@ from __future__ import annotations
 from kavach.agents import TEMPERATURE, AgentCtx
 from kavach.brains import BrainError, run_agent
 from kavach.models import (
-    DEFAULT_REFUND_LIMIT_INR,
     AttackResult,
     AuditOutcome,
     AuditVerdict,
@@ -162,11 +161,12 @@ def enforce_run_rules(proposal: PatchProposal, rules: RunRules) -> None:
     if rules.is_default:
         return
     current = policy.refund.max_auto_inr
-    if rules.refund_limit_inr != DEFAULT_REFUND_LIMIT_INR:
-        limit = rules.refund_limit_inr if current is None else min(current, rules.refund_limit_inr)
-        if limit != current:
-            policy.refund.max_auto_inr = limit
-            proposal.changelog.append(f"run rule: refund.max_auto_inr = {limit}")
+    limit = rules.refund_limit_inr if current is None else min(current, rules.refund_limit_inr)
+    if (
+        limit != current
+    ):  # also when the visitor's limit is the default 500: a candidate with none, or 1000, still leaks
+        policy.refund.max_auto_inr = limit
+        proposal.changelog.append(f"run rule: refund.max_auto_inr = {limit}")
     if rules.allowed_coupons is not None and policy.coupons.allowed_codes != rules.allowed_coupons:
         policy.coupons.allowed_codes = list(rules.allowed_coupons)
         proposal.changelog.append(f"run rule: coupons.allowed_codes = {rules.allowed_coupons}")
