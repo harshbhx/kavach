@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AttackConsole } from '@/components/landing/attack-console';
 import { AttackThread } from '@/components/landing/attack-thread';
 import { AuditForms } from '@/components/landing/audit-forms';
+import { DemoGallery } from '@/components/landing/demo-gallery';
 import { Passbook } from '@/components/landing/passbook';
 import { RefundSlip } from '@/components/landing/refund-slip';
 import { RoundTimeline } from '@/components/landing/round-timeline';
@@ -134,6 +135,22 @@ export default function HomePage() {
           </Heading>
           <div className="mt-12">
             <Passbook />
+          </div>
+        </div>
+      </section>
+
+      {/* Real runs */}
+      <section className="border-t border-ink/15">
+        <div className="mx-auto max-w-[1200px] px-5 py-24">
+          <Heading id="runs" title="Real runs. Pick one and watch.">
+            <p>
+              Different victim bots, different lengths, different outcomes: a small model breached in round one, a bigger one
+              breached too, one that holds until round two, a frontier model that almost never breaks, and a hard mode with
+              escalating attacks. Each opens in the dashboard.
+            </p>
+          </Heading>
+          <div className="mt-12">
+            <DemoGallery />
           </div>
         </div>
       </section>

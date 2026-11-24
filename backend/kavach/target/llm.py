@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import time
 
 from kavach.config import Settings
@@ -56,7 +57,8 @@ async def run_chat(req: ChatRequest, config: TargetConfig, settings: Settings) -
     )
 
 
-_LLM_SLOTS = asyncio.Semaphore(2)
+# Free-tier providers cap tokens per minute, so the default is two calls at a time; set TARGET_CONCURRENCY higher on a paid tier.
+_LLM_SLOTS = asyncio.Semaphore(int(os.environ.get("TARGET_CONCURRENCY", "2")))
 
 
 def _extra_params(model: str) -> dict:

@@ -14,7 +14,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { api } from '@/lib/api'
-import { DEMO_RUNS, demoParam } from '@/lib/demo'
+import { demoLabel as labelOfDemo, demoParam, loadGallery, type GalleryEntry } from '@/lib/demo'
 import { RULE_LABEL } from '@/lib/format'
 import type { KavachEvent } from '@/lib/types'
 import { useRun } from '@/lib/useRun'
@@ -83,7 +83,16 @@ export default function App() {
     played.current = playedName
   }, [playedName])
   // Label the recording that loaded, never the one asked for, so a fallback to the sample never reads as live.
-  const demoLabel = demo ? (playedName ? DEMO_RUNS[playedName]?.label : null) ?? 'Loading the recorded run' : null
+  const demoLabel = demo ? (playedName ? labelOfDemo(playedName) : null) ?? 'Loading the recorded run' : null
+  const [gallery, setGallery] = useState<GalleryEntry[]>([])
+  useEffect(() => {
+    if (demo) loadGallery().then(setGallery)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  const pickDemo = (key: string, speed: number) => {
+    window.history.replaceState(null, '', `?demo=${key}`)
+    attachDemo(key, speed).catch((e) => toast.error('Could not load that recording', { description: String(e) }))
+  }
   const [logo, setLogo] = useState<KavachLogoState>('idle')
   const [starting, setStarting] = useState(false)
 
@@ -148,6 +157,9 @@ export default function App() {
           logoState={logo}
           starting={starting}
           demo={demoLabel}
+          gallery={gallery}
+          demoKey={playedName}
+          onPickDemo={pickDemo}
           onReplayDemo={(speed) => demo && attachDemo(demo, speed)}
           onLive={() => start(() => api.startLive(), 'live')}
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}

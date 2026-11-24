@@ -30,6 +30,7 @@ export function Wordmark({ size = 26 }: { size?: number }) {
 const NAV = [
   ['try', 'Try it'],
   ['round', 'A round'],
+  ['runs', 'Real runs'],
   ['features', 'Breach rules'],
   ['signatories', 'The agents'],
   ['quickstart', 'Run it'],
@@ -150,6 +151,7 @@ const FOOTER: { title: string; items: [string, string][] }[] = [
       ['/dashboard/?demo=live', 'Watch a recorded run'],
       ['/#quickstart', 'Run it locally'],
       ['/#passbook', 'How a round runs'],
+      ['/#runs', 'Real runs'],
       ['/#features', 'Breach rules'],
     ],
   },

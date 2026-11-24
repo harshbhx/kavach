@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { api } from '@/lib/api'
+import type { GalleryEntry } from '@/lib/demo'
 import type { Health } from '@/lib/types'
 import type { RunView } from '@/lib/useRun'
 import { Stamp } from './panel'
@@ -17,6 +18,10 @@ interface Props {
   demo: string | null
   /** true between the click on Start and the first event; the button locks so a second click cannot start twice */
   starting?: boolean
+  /** the recorded runs the Demo picker offers (demo mode only) */
+  gallery?: GalleryEntry[]
+  demoKey?: string | null
+  onPickDemo?: (key: string, speed: number) => void
   onReplayDemo: (speed: number) => void
   onLive: () => void
   onReplay: (file: string, speed: number) => void
@@ -62,7 +67,7 @@ function SpeedSelect({ value, onChange }: { value: string; onChange: (v: string)
   )
 }
 
-export function TopBar({ run, logoState, demo, starting = false, onReplayDemo, onLive, onReplay, onStop }: Props) {
+export function TopBar({ run, logoState, demo, starting = false, gallery = [], demoKey = null, onPickDemo, onReplayDemo, onLive, onReplay, onStop }: Props) {
   const [health, setHealth] = useState<Health | null>(null)
   const [apiDown, setApiDown] = useState(false)
   const [replays, setReplays] = useState<string[]>([])
@@ -151,6 +156,21 @@ export function TopBar({ run, logoState, demo, starting = false, onReplayDemo, o
         <div className="ml-auto flex flex-wrap items-center gap-2">
           {demo ? (
             <>
+              {gallery.length > 0 && onPickDemo && (
+                <Select value={demoKey ?? ''} onValueChange={(k) => onPickDemo(k, Number(speed))}>
+                  <SelectTrigger className="h-9 w-80 border-kv-border-strong bg-kv-surface text-sm" aria-label="Choose a recorded demo">
+                    <SelectValue placeholder="Choose a demo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gallery.map((g, i) => (
+                      <SelectItem key={g.id} value={g.id}>
+                        Demo {i + 1} · {g.title}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="sample">Sample (simulated, scripted agents)</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
               <SpeedSelect value={speed} onChange={setSpeed} />
               <Button variant="outline" onClick={() => onReplayDemo(Number(speed))} className="border-kv-border-strong bg-transparent">
                 <RotateCcw className="size-3.5" /> Play again

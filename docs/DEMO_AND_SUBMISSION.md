@@ -44,7 +44,7 @@ Kavach runs a red-team vs blue-team arena against DiwaliMart Support, a tool-usi
 - 🧪 **Code-based detectors** read the tool-call log: refunds over ₹500, cross-account actions, PII leaks, system-prompt exfiltration (canary), staff-coupon abuse.
 - 🔵 **Blue squad:** Monitor explains each incident; Patcher rewrites the system prompt and the policy-as-code guardrails; Auditor replays the exploits and runs a 10-query benign suite. A patch is approved only if exploits fail **and** utility stays ≥ 90%, otherwise it's vetoed and Blue tries again.
 - ⚖️ **Referee** scores Breach Rate, Utility and Time-to-Harden, and exports a hardened prompt + an OWASP-mapped audit report.
-In our recorded run, the breach rate went **<!-- breach-story:start -->X% → Y% → Z%<!-- breach-story:end -->** across three rounds while utility stayed at **90% or more**.
+In our recorded run, the breach rate went **<!-- breach-story:start -->83% → 0% → 0%<!-- breach-story:end -->** across three rounds while utility stayed at **90% or more**.
 
 ### How we built it
 - **Lyzr**: the 7 agents (role, goal, instructions, structured JSON output, session memory), called through the Lyzr inference API.

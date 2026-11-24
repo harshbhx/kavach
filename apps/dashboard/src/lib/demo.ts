@@ -18,12 +18,51 @@ export const DEMO_RUNS: Record<string, { file: string; label: string }> = {
   sample: { file: 'sample_simulated_run.jsonl', label: 'Sample run (simulated, scripted agents)' },
 }
 
+/** One recorded run in the gallery (runs/gallery.json, built by scripts/build_gallery.py from the recordings themselves). */
+export interface GalleryEntry {
+  id: string
+  file: string
+  title: string
+  blurb: string
+  model: string
+  rounds: number
+  trend: number[]
+  vetoes: number
+  utility: number | null
+  tthSeconds: number | null
+  verdict: 'hardened' | 'held' | 'breached'
+}
+
+let galleryCache: Promise<GalleryEntry[]> | null = null
+export function loadGallery(): Promise<GalleryEntry[]> {
+  galleryCache ??= fetch(`${import.meta.env.BASE_URL}runs/gallery.json`)
+    .then((r) => (r.ok ? (r.json() as Promise<GalleryEntry[]>) : []))
+    .catch(() => [])
+  return galleryCache
+}
+
+const galleryLabels: Record<string, string> = {}
+/** The name shown for a recording that has loaded (bundled run or gallery demo). */
+export function demoLabel(name: string): string | undefined {
+  return DEMO_RUNS[name]?.label ?? galleryLabels[name]
+}
+
 export function demoParam(): string | null {
   return new URLSearchParams(window.location.search).get('demo')
 }
 
 export async function loadDemo(name: string): Promise<DemoRun> {
-  const entry = DEMO_RUNS[name] ?? DEMO_RUNS.sample
+  let entry = DEMO_RUNS[name]
+  let known = Boolean(entry)
+  if (!entry) {
+    const g = (await loadGallery()).find((e) => e.id === name)
+    if (g) {
+      entry = { file: g.file, label: g.title }
+      galleryLabels[name] = g.title
+      known = true
+    }
+  }
+  entry ??= DEMO_RUNS.sample
   const res = await fetch(`${import.meta.env.BASE_URL}runs/${entry.file}`)
   if (!res.ok) {
     if (name !== 'sample') return loadDemo('sample')
@@ -37,7 +76,7 @@ export async function loadDemo(name: string): Promise<DemoRun> {
     | { report_md?: string; configs?: Record<string, TargetConfig> }
     | undefined
   return {
-    name: DEMO_RUNS[name] ? name : 'sample',
+    name: known ? name : 'sample',
     events: events.filter((e) => e.type !== 'replay.extras'),
     configs: extras?.configs ?? {},
     reportMd: extras?.report_md ?? null,

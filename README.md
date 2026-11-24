@@ -60,7 +60,7 @@ flowchart LR
 
 **The utility trap.** A patch ships only if the exploits stop working **and** at least 90% of normal requests still succeed. A "refuse everything" patch is vetoed in the room and the Patcher has to try again.
 
-**A report you can hand to someone.** Every run turns into a four-page branded audit report with the verdict, the evidence, the patch, the hardened prompt and the SHA-256 of the recording it came from: `uv run python scripts/build_report_pdf.py runs/<run>.jsonl out.pdf`. See the [sample](docs/Kavach-Audit-Report-sample.pdf).
+**A report you can hand to someone.** Every run turns into a four-page branded audit report with the verdict, the evidence, the patch, the hardened prompt and the SHA-256 of the recording it came from: `uv run python scripts/build_report_pdf.py runs/<run>.jsonl out.pdf`. See [the report for the headline run](docs/Kavach-Audit-Report.pdf) and the [offline sample](docs/Kavach-Audit-Report-sample.pdf).
 
 ## What we learned
 
@@ -148,8 +148,31 @@ runs              Recorded runs; sample_simulated_run.jsonl powers the browser d
 ## Results
 
 <!-- results:start -->
-Fills in when you run `pnpm demo`. The bundled offline sample (`runs/sample_simulated_run.jsonl`, scripted agents) goes 100% → 0% → 0% breach with utility at 100% after one vetoed patch.
+| Round | Config attacked | Attacks | Breach rate | Patch applied | Utility | Vetoes |
+|---|---|---|---|---|---|---|
+| 1 | v1 | 6 | 83% | v2 | 100% | 0 |
+| 2 | v2 | 6 | 0% | – | – | 0 |
+| 3 | v2 | 6 | 0% | – | – | 0 |
+
+<sub>Run `kv-20261124-1742-1d3a`, target model `groq/openai/gpt-oss-20b`. Replay it: `runs/demo_run.jsonl`.</sub>
 <!-- results:end -->
+
+### Recorded runs
+
+Every run below is a real recording (Lyzr agents, a Band room, a live model as the victim bot). Open one in the [dashboard](https://kavach.creharsh.workers.dev/dashboard/?demo=demo1) with the Demo picker, or from the landing page. The table is generated from the recordings by `python scripts/build_gallery.py`.
+
+<!-- gallery:start -->
+| Demo | Victim model | Breach rate by round | Utility | Hardened in |
+|---|---|---|---|---|
+| 1 · [Headline run](https://kavach.creharsh.workers.dev/dashboard/?demo=demo1) | `groq/openai/gpt-oss-20b` | 83% → 0% → 0% | 100% | 38s |
+| 2 · [Deep run: 5 rounds](https://kavach.creharsh.workers.dev/dashboard/?demo=demo2) | `groq/openai/gpt-oss-20b` | 80% → 0% → 0% → 0% → 0% | 100% | 71s |
+| 3 · [Four rounds](https://kavach.creharsh.workers.dev/dashboard/?demo=demo3) | `groq/openai/gpt-oss-20b` | 50% → 0% → 0% → 0% | 100% | 66s |
+| 4 · [Bigger victim: gpt-oss-120b](https://kavach.creharsh.workers.dev/dashboard/?demo=demo4) | `groq/openai/gpt-oss-120b` | 67% → 0% → 0% | 100% | 87s |
+| 5 · [A late find: Qwen 27B](https://kavach.creharsh.workers.dev/dashboard/?demo=demo5) | `groq/qwen/qwen3.8-27b` | 0% → 17% → 0% | 100% | 36s |
+| 6 · [Frontier victim: Claude Haiku 5.5](https://kavach.creharsh.workers.dev/dashboard/?demo=demo6) | `anthropic/claude-haiku-5-5` | 17% → 0% → 0% | 90% | 82s |
+| 7 · [Hard mode: escalating attacks](https://kavach.creharsh.workers.dev/dashboard/?demo=demo7) | `groq/openai/gpt-oss-20b` | 60% → 0% → 0% | 100% | 58s |
+| 8 · [Hard mode vs the bigger model](https://kavach.creharsh.workers.dev/dashboard/?demo=demo8) | `groq/openai/gpt-oss-120b` | 10% → 0% → 0% | 100% | 53s |
+<!-- gallery:end -->
 
 ## Where it runs
 
