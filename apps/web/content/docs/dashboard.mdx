@@ -5,6 +5,10 @@ description: A tour of the live dashboard, what each panel shows, how to read a 
 
 The dashboard is where you watch a run. It listens to the API's event stream, so everything appears the moment the backend emits it, and it can replay any saved run at up to 4× speed. Open it at http://localhost:5173 after `pnpm dev` or `pnpm dev:offline`, or try it in the browser with no backend at <a href="/dashboard/?demo=live">/dashboard?demo=live</a>.
 
+<img src="https://raw.githubusercontent.com/harshbhx/kavach/main/docs/assets/gifs/dashboard-headline-run.gif" width="1000" height="625" alt="The dashboard replaying the headline run: breach slips land in round 1 at 83%, guardrail v2 is deployed, rounds 2 and 3 hold at 0%, and the header turns to COMPLETE with a HARDENED verdict" style={{ borderRadius: 12, border: '1px solid rgb(0 0 0 / 0.12)' }} />
+
+*The headline run (<a href="/dashboard/?demo=demo1">Demo 1</a>), a recorded live run with `gpt-oss-20b` as the victim bot, replayed in the browser and sped up.*
+
 ## Top bar
 
 - **Start live run** starts a run with the settings in `.env`. It shows *Starting* and ignores repeat clicks while the API answers.
@@ -38,6 +42,10 @@ Every tool call the bot tried, as a slip: the tool and its arguments, whether it
 - For a breach, the rule, its OWASP LLM Top 10 category and a plain explanation.
 
 In the sheet, <kbd>↓</kbd> or <kbd>j</kbd> moves to the next slip and <kbd>↑</kbd> or <kbd>k</kbd> to the previous one.
+
+<img src="https://raw.githubusercontent.com/harshbhx/kavach/main/docs/assets/gifs/dashboard-breach-slip.gif" width="1000" height="625" alt="Filtering intercepted tool calls to breaches and opening a slip: the sheet shows the issue_refund call, what the tool returned and the Injector's message, then steps to the next slips" style={{ borderRadius: 12, border: '1px solid rgb(0 0 0 / 0.12)' }} />
+
+*Breaches only, then a slip from the headline run: the call, the tool's answer and the attack behind it.*
 
 ## Breach and utility
 

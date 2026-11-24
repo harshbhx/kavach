@@ -30,9 +30,24 @@
 
 *Kavach (कवच) means armour in Hindi.* Built for **Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition)**, Security track.
 
-![The Kavach dashboard after the headline run: breach rate 83% to 0% to 0%, utility 100%](docs/assets/dashboard.jpg)
+<p align="center">
+  <a href="https://kavach.dualmindlab.tech/dashboard/?demo=demo1"><img src="docs/assets/gifs/dashboard-headline-run.gif" width="100%" alt="The Kavach dashboard replaying the headline run: the seven agents hand off in the room, round 1 breach slips land at 83%, the Patcher's guardrail v2 is deployed, rounds 2 and 3 hold at 0%, and the header turns to COMPLETE with a HARDENED verdict and 100% utility"></a>
+</p>
 
-<sub>The dashboard at the end of the headline run (Demo 1): round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Pick any of the eight recorded runs with the Demo picker at https://kavach.dualmindlab.tech/dashboard/?demo=demo1, or locally with `pnpm dev:web` → http://localhost:3000/dashboard?demo=demo1 (no backend needed).</sub>
+<sub>The headline run (Demo 1) replaying in the dashboard: a recorded live run with `gpt-oss-20b` as the victim bot. Round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Sped up from the site's 4× replay. Pick any of the eight recorded runs with the Demo picker at https://kavach.dualmindlab.tech/dashboard/?demo=demo1, or locally with `pnpm dev:web` → http://localhost:3000/dashboard?demo=demo1 (no backend needed).</sub>
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <a href="https://kavach.dualmindlab.tech/#try"><img src="docs/assets/gifs/attack-console-sample.gif" alt="The landing page's attack console: picking attack messages and switching between v1 as found, the first patch and v2 as shipped, so the stamp changes from BREACH to HELD"></a>
+      <br><b>Send Diya an attack.</b> <sub>Pick a message, then switch builds: v1 as found (BREACH), the first patch (held, but it also refused real customers) and v2 as shipped (HELD). From the offline sample run, on the <a href="https://kavach.dualmindlab.tech/#try">landing page</a>.</sub>
+    </td>
+    <td width="50%" valign="top">
+      <a href="https://kavach.dualmindlab.tech/dashboard/?demo=demo1"><img src="docs/assets/gifs/dashboard-breach-slip.gif" alt="Filtering the dashboard's intercepted tool calls to breaches and opening a slip: the sheet shows the issue_refund call, what the tool returned, the Injector's message behind it, and steps through slips 1 to 3 of 6"></a>
+      <br><b>Open any breach.</b> <sub>Every slip carries the exact tool call, what the tool returned and the attack behind it, so you can check the code's verdict yourself. From the recorded headline run.</sub>
+    </td>
+  </tr>
+</table>
 
 ## The problem
 

@@ -19,6 +19,11 @@ What it shows, in order:
 
 **Shots worth capturing for the README and Devpost gallery:** the 7 agents in Lyzr Studio, the Kavach room in Band, the target in Agent37 if you deploy it there.
 
+**Animated GIFs** (in the README, and fine for the Devpost gallery), recorded from https://kavach.dualmindlab.tech in headless Chrome:
+- `docs/assets/gifs/dashboard-headline-run.gif`: the headline run (Demo 1, a recorded live run, victim `gpt-oss-20b`) replaying to COMPLETE and HARDENED.
+- `docs/assets/gifs/dashboard-breach-slip.gif`: the Breaches filter and a slip's detail sheet, from the same recorded run.
+- `docs/assets/gifs/attack-console-sample.gif`: the landing page's attack console switching builds (BREACH to HELD). It shows the offline sample run, so caption it that way.
+
 ## 2. Live finale plan (28 Nov, if shortlisted)
 
 - Run live with `ROUNDS=2` for speed; keep the replay ready as backup (one click).
