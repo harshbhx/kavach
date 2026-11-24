@@ -16,6 +16,22 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test": {},
+    "dev:offline": {
+      "cache": false,
+      "persistent": true
     }
-  }
+  },
+  "globalPassThroughEnv": [
+    "BRAIN_PROVIDER",
+    "BAND_ENABLED",
+    "TARGET_MODEL",
+    "TARGET_URL",
+    "FAKE_DELAY_S",
+    "KAVACH_API",
+    "VITE_API_BASE",
+    "NEXT_PUBLIC_SITE_URL",
+    "UV_*"
+  ]
 }
