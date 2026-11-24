@@ -1,5 +1,5 @@
 import { KavachLogo, type KavachLogoState } from '@kavach/brand'
-import { ExternalLink, Play, RotateCcw, Square } from 'lucide-react'
+import { ExternalLink, LoaderCircle, Play, RotateCcw, Square } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ShinyText from '@/components/ShinyText'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,8 @@ interface Props {
   logoState: KavachLogoState
   /** label of the bundled recording when the dashboard runs without an API */
   demo: string | null
+  /** true between the click on Start and the first event; the button locks so a second click cannot start twice */
+  starting?: boolean
   onReplayDemo: (speed: number) => void
   onLive: () => void
   onReplay: (file: string, speed: number) => void
@@ -60,7 +62,7 @@ function SpeedSelect({ value, onChange }: { value: string; onChange: (v: string)
   )
 }
 
-export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, onStop }: Props) {
+export function TopBar({ run, logoState, demo, starting = false, onReplayDemo, onLive, onReplay, onStop }: Props) {
   const [health, setHealth] = useState<Health | null>(null)
   const [apiDown, setApiDown] = useState(false)
   const [replays, setReplays] = useState<string[]>([])
@@ -176,11 +178,12 @@ export function TopBar({ run, logoState, demo, onReplayDemo, onLive, onReplay, o
                 </SelectContent>
               </Select>
               <SpeedSelect value={speed} onChange={setSpeed} />
-              <Button variant="outline" disabled={!file} onClick={() => onReplay(file, Number(speed))} className="border-kv-border-strong bg-transparent">
+              <Button variant="outline" disabled={!file || starting} onClick={() => onReplay(file, Number(speed))} className="border-kv-border-strong bg-transparent">
                 <RotateCcw className="size-3.5" /> Replay
               </Button>
-              <Button onClick={onLive} disabled={apiDown} className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
-                <Play className="size-3.5 fill-current" /> Start live run
+              <Button onClick={onLive} disabled={apiDown || starting} className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
+                {starting ? <LoaderCircle className="size-3.5 animate-spin" /> : <Play className="size-3.5 fill-current" />}
+                {starting ? 'Starting…' : 'Start live run'}
               </Button>
             </>
           )}

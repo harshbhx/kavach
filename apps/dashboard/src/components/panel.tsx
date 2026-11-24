@@ -43,6 +43,25 @@ export function Empty({ icon, title, children }: { icon: ReactNode; title: strin
   )
 }
 
+/** Shimmering placeholder rows shown while a run is starting, so an empty panel never looks broken. */
+export function SkeletonRows({ label, rows = 4 }: { label: string; rows?: number }) {
+  return (
+    <div role="status" aria-label={label} className="space-y-4 px-4 py-4">
+      <p className="text-[13px] text-kv-faint">{label}</p>
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className="flex animate-pulse gap-3" style={{ animationDelay: `${i * 120}ms` }}>
+          <div className="size-9 shrink-0 rounded-full bg-kv-border" />
+          <div className="flex-1 space-y-2 pt-1">
+            <div className="h-3 w-1/4 rounded bg-kv-border" />
+            <div className="h-3 w-11/12 rounded bg-kv-border/70" />
+            <div className="h-3 w-2/3 rounded bg-kv-border/70" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** Rubber stamp, slightly rotated, unevenly inked. */
 export function Stamp({ tone, children, className }: { tone: 'attack' | 'defend' | 'secure' | 'verdict'; children: ReactNode; className?: string }) {
   return (

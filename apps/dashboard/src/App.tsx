@@ -7,6 +7,7 @@ import { Narration, narrationFor } from '@/components/narration'
 import { PatchPanel } from '@/components/patch-panel'
 import { RoomPanel } from '@/components/room-panel'
 import { RoundRail } from '@/components/round-rail'
+import { ActivityBar } from '@/components/activity-bar'
 import { TopBar } from '@/components/top-bar'
 import { TrendPanel } from '@/components/trend-panel'
 import { Toaster } from '@/components/ui/sonner'
@@ -84,6 +85,7 @@ export default function App() {
   // Label the recording that loaded, never the one asked for, so a fallback to the sample never reads as live.
   const demoLabel = demo ? (playedName ? DEMO_RUNS[playedName]?.label : null) ?? 'Loading the recorded run' : null
   const [logo, setLogo] = useState<KavachLogoState>('idle')
+  const [starting, setStarting] = useState(false)
 
   // Logo follows the run (docs/assets/brand/BRAND.md, "Logo states")
   useEffect(() => {
@@ -125,12 +127,16 @@ export default function App() {
   }, [])
 
   const start = async (fn: () => Promise<{ run_id: string }>, mode: 'live' | 'replay') => {
+    if (starting) return // one click is enough; ignore the rest while the API answers
+    setStarting(true)
     try {
       const { run_id } = await fn()
       window.history.replaceState(null, '', `?run=${run_id}${mode === 'replay' ? '&mode=replay' : ''}`)
       attach(run_id, mode)
     } catch (e) {
       toast.error('Could not start the run', { description: String(e).replace(/^Error:\s*/, '') })
+    } finally {
+      setStarting(false)
     }
   }
 
@@ -140,12 +146,14 @@ export default function App() {
         <TopBar
           run={run}
           logoState={logo}
+          starting={starting}
           demo={demoLabel}
           onReplayDemo={(speed) => demo && attachDemo(demo, speed)}
           onLive={() => start(() => api.startLive(), 'live')}
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}
           onStop={() => run.runId && api.stop(run.runId)}
         />
+        <ActivityBar run={run} starting={starting} />
         <div className="grid gap-3 px-4 min-[2200px]:grid-cols-[1.5fr_1fr]">
           <RoundRail run={run} total={ROUNDS} />
           <KpiStrip run={run} />

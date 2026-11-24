@@ -10,7 +10,7 @@ import type { RunView } from '@/lib/useRun'
 import { useStickyScroll } from '@/lib/useStickyScroll'
 import { cn } from '@/lib/utils'
 import { JumpPill } from './jump-pill'
-import { Empty, Panel, Stamp } from './panel'
+import { Empty, Panel, SkeletonRows, Stamp } from './panel'
 import { SlipSheet } from './slip-sheet'
 
 type Filter = 'all' | 'breach' | 'blocked'
@@ -153,7 +153,9 @@ export function ArenaPanel({ run }: { run: RunView }) {
     >
       <div className="relative min-h-0 flex-1">
         <div ref={box} className="h-full overflow-y-auto">
-          {shown.length === 0 ? (
+          {shown.length === 0 && run.status === 'running' && filter === 'all' ? (
+            <SkeletonRows label="Waiting for the first attack to hit the target…" rows={3} />
+          ) : shown.length === 0 ? (
             <Empty
               icon={filter === 'blocked' ? <ShieldCheck className="size-5" /> : <Swords className="size-5" />}
               title={

@@ -9,7 +9,7 @@ import type { RunView } from '@/lib/useRun'
 import { useStickyScroll } from '@/lib/useStickyScroll'
 import { cn } from '@/lib/utils'
 import { JumpPill } from './jump-pill'
-import { Empty, Panel, Stamp } from './panel'
+import { Empty, Panel, SkeletonRows, Stamp } from './panel'
 
 const ORDER: AgentName[] = ['recon', 'injection', 'social', 'referee', 'monitor', 'patcher', 'auditor']
 const TONE = {
@@ -230,7 +230,9 @@ export function RoomPanel({ run }: { run: RunView }) {
       )}
       <div className="relative min-h-0 flex-1">
         <div ref={box} className="kv-ruled h-full overflow-y-auto pb-4">
-          {messages.length === 0 ? (
+          {messages.length === 0 && run.status === 'running' ? (
+            <SkeletonRows label="Opening the Band room. The first message appears in a few seconds…" />
+          ) : messages.length === 0 ? (
             <Empty icon={<MessagesSquare className="size-5" />} title="The room is quiet">
               Start a live run or replay a recorded one. The Referee opens the room, then Recon speaks.
             </Empty>

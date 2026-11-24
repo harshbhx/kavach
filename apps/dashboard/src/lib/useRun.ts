@@ -58,6 +58,9 @@ export interface RunView {
   configsVersion: number
   lastSeq: number
   progress: Record<number, RoundProgress>
+  /** wall-clock ms of the newest event and of the run start, for the 'last update Ns ago' heartbeat */
+  lastEventAt: number | null
+  startedAt: number | null
   speaker: { agent: AgentName; at: number } | null
 }
 
@@ -82,6 +85,8 @@ export const emptyRun: RunView = {
   configsVersion: 0,
   lastSeq: -1,
   progress: {},
+  lastEventAt: null,
+  startedAt: null,
   speaker: null,
 }
 
@@ -99,10 +104,10 @@ function advance(s: RunView, r: number, phase: Phase, patch: Partial<RoundProgre
 const point = (s: RunView, round: number): ChartPoint => s.chart[round] ?? { round, breach: null, utility: null, vetoed: [] }
 
 function reduce(s: RunView, a: Action): RunView {
-  if (a.type === 'reset') return { ...emptyRun, runId: a.runId, mode: a.mode, status: 'running' }
+  if (a.type === 'reset') return { ...emptyRun, runId: a.runId, mode: a.mode, status: 'running', startedAt: Date.now() }
   if (a.type === 'closed') return s.status === 'running' ? { ...s, status: s.final ? 'completed' : s.status } : s
   if (a.ev.seq <= s.lastSeq) return s // EventSource reconnects replay history; drop duplicates
-  return { ...apply(s, a.ev), lastSeq: a.ev.seq }
+  return { ...apply(s, a.ev), lastSeq: a.ev.seq, lastEventAt: Date.now() }
 }
 
 function apply(s: RunView, ev: KavachEvent): RunView {
