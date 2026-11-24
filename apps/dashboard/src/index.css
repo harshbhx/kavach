@@ -1,29 +1,77 @@
 @import "tailwindcss";
 @import "@kavach/brand/theme.css";
 
-/* The dashboard is dark only: shadcn's dark: variants always apply. */
-@custom-variant dark (&:where(html, html *));
+/* Light only: shadcn's dark: variants never apply. */
+@custom-variant dark (&:where(.never-dark, .never-dark *));
 
-/* shadcn/ui tokens mapped onto the Kavach palette */
+/*
+ * The dashboard is the bank's ledger room: the same security paper and intaglio ink as the site.
+ * kv-* names keep their meaning (attack, defend, secure, verdict); only the material changes.
+ */
+@theme {
+  --color-kv-bg: #e6efe9;
+  --color-kv-surface: #f1f6f2;
+  --color-kv-surface-2: #e2ece6;
+  --color-kv-border: #c3d5cb;
+  --color-kv-border-strong: #94b0a3;
+  --color-kv-text: #0e231c;
+  --color-kv-muted: #3a574c;
+  --color-kv-faint: #56706a;
+  --color-kv-attack: #c8203f;
+  --color-kv-attack-soft: rgb(200 32 63 / 0.09);
+  --color-kv-defend: #0b6e7f;
+  --color-kv-defend-soft: rgb(11 110 127 / 0.09);
+  --color-kv-secure: #1f7a4d;
+  --color-kv-secure-soft: rgb(31 122 77 / 0.1);
+  --color-kv-verdict: #9a6a0e;
+  --color-kv-verdict-soft: rgb(176 125 26 / 0.12);
+  --color-kv-brand: #0e231c;
+  --color-kv-brand-hover: #0b6e7f;
+  --color-kv-brand-soft: rgb(14 35 28 / 0.07);
+  --color-kv-thread: #b07d1a;
+  --font-sans: "Anek Latin Variable", system-ui, sans-serif;
+  --font-display: "Rozha One", Georgia, serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --font-sign: "Herr Von Muellerhoff", cursive;
+  --radius-kv: 12px;
+}
+
+/* the logo, the charts and the gauge read these */
 :root {
-  --background: #0b1311;
-  --foreground: #eef4f1;
-  --card: #111c19;
-  --card-foreground: #eef4f1;
-  --popover: #172420;
-  --popover-foreground: #eef4f1;
-  --primary: #e8f0ec;
-  --primary-foreground: #0b1311;
-  --secondary: #172420;
-  --secondary-foreground: #eef4f1;
-  --muted: #172420;
-  --muted-foreground: #9fb3aa;
-  --accent: #22332d;
-  --accent-foreground: #eef4f1;
-  --destructive: #ff4d6d;
-  --border: #22332d;
-  --input: #22332d;
-  --ring: #2fd3e6;
+  color-scheme: light;
+  --kv-bg: #e6efe9;
+  --kv-surface: #f1f6f2;
+  --kv-surface-2: #e2ece6;
+  --kv-border: #c3d5cb;
+  --kv-border-strong: #94b0a3;
+  --kv-text: #0e231c;
+  --kv-muted: #3a574c;
+  --kv-faint: #56706a;
+  --kv-attack: #c8203f;
+  --kv-defend: #0b6e7f;
+  --kv-secure: #1f7a4d;
+  --kv-verdict: #9a6a0e;
+  --kv-font-wordmark: "Anek Latin Variable", system-ui, sans-serif;
+
+  /* shadcn/ui */
+  --background: #e6efe9;
+  --foreground: #0e231c;
+  --card: #f1f6f2;
+  --card-foreground: #0e231c;
+  --popover: #f8fbf9;
+  --popover-foreground: #0e231c;
+  --primary: #0e231c;
+  --primary-foreground: #f1f6f2;
+  --secondary: #e2ece6;
+  --secondary-foreground: #0e231c;
+  --muted: #e2ece6;
+  --muted-foreground: #3a574c;
+  --accent: #d6e4dc;
+  --accent-foreground: #0e231c;
+  --destructive: #c8203f;
+  --border: #c3d5cb;
+  --input: #c3d5cb;
+  --ring: #0b6e7f;
   --radius: 0.625rem;
 }
 
@@ -56,30 +104,55 @@
   * {
     border-color: var(--border);
   }
+  html {
+    background: var(--kv-bg);
+  }
   body {
     margin: 0;
     min-height: 100vh;
-    background:
-      radial-gradient(1100px 520px at 0% -12%, rgb(47 211 230 / 0.06), transparent 60%),
-      radial-gradient(800px 420px at 100% -8%, rgb(255 77 109 / 0.05), transparent 60%),
-      var(--kv-bg);
+    color: var(--kv-text);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    background-color: var(--kv-bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .05 0 0 0 0 .2 0 0 0 0 .16 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
     -webkit-font-smoothing: antialiased;
   }
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  ::selection {
+    background: rgb(11 110 127 / 0.18);
   }
-  ::-webkit-scrollbar-thumb {
-    background: var(--kv-border-strong);
-    border-radius: 8px;
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
+  * {
+    scrollbar-color: #b3c8bd transparent;
+    scrollbar-width: thin;
   }
 }
 
-.font-display {
-  font-variation-settings: "wdth" 88, "opsz" 48;
+.kv-band {
+  background-image: url("/print/band.svg");
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+}
+.kv-ruled {
+  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgb(14 35 28 / 0.06) 31px 32px);
+}
+.kv-microprint {
+  font-family: var(--font-mono);
+  font-size: 5px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #2e7d6f;
+  user-select: none;
+}
+.kv-ink {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 2.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -2.4 2.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-size: 300px 160px;
+  mask-size: 300px 160px;
 }
 
 @media (prefers-reduced-motion: reduce) {

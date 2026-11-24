@@ -1,7 +1,9 @@
+import '@fontsource/rozha-one/400.css'
+import '@fontsource-variable/anek-latin/index.css'
+import '@fontsource-variable/jetbrains-mono/index.css'
+import '@fontsource/herr-von-muellerhoff/400.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@kavach/brand/fonts.css'
-import '@kavach/brand/tokens.css'
 import './index.css'
 import App from './App.tsx'
 
