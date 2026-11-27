@@ -4,7 +4,7 @@ Post this once the site is deployed and the 1:59 film is on YouTube, so every li
 
 ## Before posting
 
-1. Deploy the site (`pnpm deploy:site`, step 9b in `LAPTOP_ROUND2.md`). Until then the `?demo=approval` link below doesn't work.
+1. Deploy the site (`pnpm deploy:site`, step 9b in `LAPTOP_ROUND2.md`). Until then the links below may show the old site.
 2. Upload `kavach-film-2.mp4` to YouTube with the copy in `film/YOUTUBE.md`, and put its link in the first comment below.
 
 ## How to post
@@ -48,7 +48,7 @@ Demo, code and the 2-minute film are in the first comment.
 ```text
 Links:
 • Live demo, no install (replays a recorded run): https://kavach.dualmindlab.tech/dashboard/?demo=demo1
-• A person rejects one fix, then approves the next: https://kavach.dualmindlab.tech/dashboard/?demo=approval
+• A real run where I reject one fix from Band, then approve the next: https://kavach.dualmindlab.tech/dashboard/?demo=demo11
 • Code: https://github.com/harshbhx/kavach
 • 2-minute film: <YouTube link>
 ```

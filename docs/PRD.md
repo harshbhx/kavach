@@ -48,7 +48,7 @@ The only judging criterion published on Devpost is **Sponsor Tool Integration**.
 
 The story beats that make judges remember it:
 - a ₹50,000-class refund executing in Round 1 (shown in the offline sample; live runs breached with refunds of ₹700 to ₹10,000), then `BLOCKED BY GUARDRAIL v2` in Round 2;
-- the Auditor **vetoing** an over-blocking patch, so Blue argues with itself in Band (shown in the offline sample; the recorded live runs approved the first candidate);
+- the Auditor **vetoing** an over-blocking patch, so Blue argues with itself in Band (shown in the offline sample; in the recorded live runs the Auditor passed the first candidate, and the one rejection, in run 11, came from a person in Band);
 - the Breach line falling while the Utility line stays flat;
 - Hinglish social-engineering attacks, an India-edition touch.
 
@@ -63,7 +63,7 @@ The story beats that make judges remember it:
 - G1. Run a full 3-round live session end-to-end in ≤ 6 minutes.
 - G2. Round 1 breach rate ≥ 50% against the naive v1 target; final round breach rate ≤ 10%.
 - G3. Utility ≥ 90% on the benign suite for every **applied** patch.
-- G4. Show the Security vs Utility tension: an Auditor veto appears in the offline sample run; the recorded live runs approved the first candidate (0 vetoes in all 8).
+- G4. Show the Security vs Utility tension: an Auditor veto appears in the offline sample run; in the recorded live runs the Auditor passed the first candidate in all 11; run 11 has a person rejecting it from Band.
 - G5. Every agent action is visible as a Band message, and as a live dashboard event.
 - G6. One-click export of the hardened prompt + guard policy + audit report (Markdown).
 - G7. A replay mode that plays back a recorded run, for a reliable video and finale.

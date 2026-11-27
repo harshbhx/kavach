@@ -32,6 +32,8 @@ https://kavach.dualmindlab.tech
 
 Watch a recorded live run with no install: https://kavach.dualmindlab.tech/dashboard/?demo=demo1
 
+A person rejecting and then approving a patch from Band (recorded run 11): https://kavach.dualmindlab.tech/dashboard/?demo=demo11
+
 ## Walkthrough video
 https://youtu.be/ZI6KTaSdtDo
 
@@ -39,7 +41,7 @@ https://youtu.be/ZI6KTaSdtDo
 
 ## How we used each sponsor
 
-**BAND.** Each of the seven agents is a Band remote agent with its own identity. Every run opens one Band room, and every handoff between agents is an @mention message in it, so people can watch the attack and the fix happen and join in. The live Referee runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run, never from a model. It ignores the agents' own handoffs. With approval on, the Referee asks in the room before each patch ships, and a person decides with `@Referee approve v2` or `@Referee reject v2 because ...`: agents and people working in the same room.
+**BAND.** Each of the seven agents is a Band remote agent with its own identity. Every run opens one Band room, and every handoff between agents is an @mention message in it, so people can watch the attack and the fix happen and join in. The live Referee runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run, never from a model. It ignores the agents' own handoffs. With approval on, the Referee asks in the room before each patch ships, and a person decides with `@Referee approve v2` or `@Referee reject v2 because ...`: agents and people working in the same room. Recorded run 11 (`runs/gallery/demo11.jsonl`) is a real one: Harsh rejected the first patch from the Band room with a reason, the Patcher tried again, and he approved the next attempt.
 
 **Lyzr.** All seven agents are Lyzr Studio agents (role, goal, instructions, structured JSON output, session memory across rounds) called through the Lyzr inference API from the Python orchestrator. `pnpm bootstrap` creates them. Every reply is validated; a bad reply falls back safely instead of stopping the run.
 

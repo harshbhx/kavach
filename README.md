@@ -73,7 +73,7 @@
   <tr>
     <td width="50%" valign="top">
       <img src="docs/assets/devpost/4-kavach-gate.gif" alt="Two audit forms: a patch that refuses refunds stops every exploit but helps only 7 of 10 real customers and is stamped VETOED; the second patch keeps 10 of 10 and is stamped APPROVED">
-      <br><b>A fix that blocks customers is not a fix.</b> <sub>The utility gate, shown with the labelled offline sample (scripted agents). In the recorded live runs, the first patch passed every time.</sub>
+      <br><b>A fix that blocks customers is not a fix.</b> <sub>The utility gate, shown with the labelled offline sample (scripted agents). In the recorded live runs the Auditor passed the first patch every time; the one rejection, in run 11, came from a person in Band.</sub>
     </td>
     <td width="50%" valign="top">
       <a href="https://kavach.dualmindlab.tech/dashboard/?demo=demo1"><img src="docs/assets/gifs/dashboard-breach-slip.gif" alt="Filtering the dashboard's intercepted tool calls to breaches and opening a slip: the sheet shows the issue_refund call, what the tool returned, the Injector's message behind it, and steps through slips 1 to 3 of 6"></a>

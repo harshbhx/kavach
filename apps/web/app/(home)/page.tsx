@@ -24,7 +24,7 @@ const SPONSORS = [
   ['Band', 'Holds the room. Every handoff is a message that @mentions the next agent, the live Referee answers people, and a person approves each patch there.'],
   ['Finch', 'Carries the playbooks. Two skill packs, an OWASP attack pack and a hardening pack, are loaded into the squads on every run.'],
   ['AdaL', 'Reads the manual. The same skill packs ship as AdaL project skills, and AGENTS.md lets AdaL extend Kavach ticket by ticket.'],
-  ['Agent37', 'Contains the blast. The target bot can run in a throwaway Agent37 sandbox; the deploy script is in the repo.'],
+  ['Agent37', 'Contains the blast. The target bot can run in a throwaway Agent37 sandbox; recorded run 10 attacked it there.'],
 ] as const;
 
 const QUICKSTART = `git clone ${links.github}.git && cd kavach
@@ -206,7 +206,8 @@ export default function HomePage() {
             <AuditForms />
             <p className="mt-4 max-w-[70ch] text-[14px] text-ink-3">
               These two forms are from the offline sample run (scripted agents), where the Auditor vetoes the first patch. In the
-              recorded live runs the first patch was approved, so no veto appears there.
+              recorded live runs the Auditor passed the first patch every time; the one rejection, in run 11, came from a person
+              in the Band room.
             </p>
           </div>
         </div>

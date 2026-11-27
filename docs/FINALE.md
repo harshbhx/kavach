@@ -42,7 +42,7 @@ Present mode follows the run on its own: each breach, patch, approval and round 
 
 1. **A model call is slow.** Keep talking; the activity bar says what the agents are doing. Each call can take up to a minute.
 2. **The internet dies.** Stop the run, then `pnpm dev:offline` (scripted agents, no keys, no network) and start again. Say so: "This is the offline mode with scripted agents, same scoring code."
-3. **The laptop dies.** On any machine with a browser: `kavach.dualmindlab.tech/dashboard/?demo=demo1` replays a recorded live run in the browser, with no backend.
+3. **The laptop dies.** On any machine with a browser: `kavach.dualmindlab.tech/dashboard/?demo=demo1` replays a recorded live run in the browser, with no backend. `?demo=demo11` replays a real run where a person rejects a patch from Band, then approves the next.
 4. **Nothing works.** Play the film: `youtu.be/ZI6KTaSdtDo`.
 
 ## Questions judges are likely to ask
