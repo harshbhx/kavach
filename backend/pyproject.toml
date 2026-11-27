@@ -1,6 +1,6 @@
 [project]
 name = "kavach"
-version = "0.1.0"
+version = "0.1.0b1"
 description = "Kavach: red-team vs blue-team AI agents that attack and harden a tool-using support bot"
 requires-python = ">=3.11"
 dependencies = [

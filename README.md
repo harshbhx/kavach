@@ -225,8 +225,8 @@ Strong models refuse simple tricks, which is good news for real products. It doe
 | **Lyzr** | The seven agents are Lyzr Studio agents (role, goal, instructions, JSON output, session memory) called through the Lyzr inference API. `pnpm bootstrap` creates them. | In use |
 | **Band** | Each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room people can watch and join. `pnpm bootstrap` registers them. The **live Referee** (`make referee`) runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run. With approval on, a person ships or rejects each patch from the room: `@Referee approve v2`. | In use, including a recorded run with a person in the loop: the Patcher's v2 was rejected in the Band room, then approved (`runs/demo_approval.jsonl`) |
 | **Agent37** | The target bot and its mock tools can run in an isolated sandbox so attacks have a safe blast radius (`scripts/deploy_target_agent37.sh`). | Deployed once: recorded run 10 attacked the bot running in an Agent37 sandbox over HTTPS (instance deleted afterwards). The other recordings used a local target |
-| **Finch** | Two skill packs in [`skills/`](skills) are the squads' playbooks: the Injector and Social Engineer get the attack pack's technique cards for their round on every call, and the Patcher gets the hardening pack's principles, guard template and prompt additions. Each run records the exact pack versions it used. | Live inputs to every run; publishing to the Finch market is next |
-| **AdaL** | The same two packs ship as AdaL project skills in `.adal/skills/`, and `AGENTS.md` and `docs/` are written so a coding agent can extend Kavach one ticket at a time. | Repo is set up for it |
+| **Finch** | Two skill packs in [`skills/`](skills) are the squads' playbooks: the Injector and Social Engineer get the attack pack's technique cards for their round on every call, and the Patcher gets the hardening pack's principles, guard template and prompt additions. Each run records the exact pack versions it used. | Live inputs to every run. Not published on the Finch market: publishing needs a signing wallet and on-chain gas, which we chose not to set up |
+| **AdaL** | The same two packs ship as AdaL project skills in `.adal/skills/`, and `AGENTS.md` and `docs/` are written so a coding agent can extend Kavach one ticket at a time. | Repo is set up for it (`.adal/skills/`, `AGENTS.md`). We did not run the AdaL app, and AdaL wrote none of this code |
 
 ## Quickstart
 
@@ -401,7 +401,7 @@ Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - [ ] **Bring your own agent:** declare your tools and policies, so the detectors and attacks are generated for your bot and tested against a sandbox copy.
 - [x] **CI mode:** `kavach ci` and a reusable GitHub Action fail a build when a prompt or policy change raises the breach rate ([CI mode](docs/CI_MODE.md)).
 - [x] **A person in the loop:** approve or reject each patch from the Band room or the dashboard.
-- [ ] **Publish the skill packs** to Finch.
+- [ ] **Publish the skill packs** to the Finch market (needs a signing wallet; the packs are in the Finch skill format and ready).
 
 ## FAQ
 

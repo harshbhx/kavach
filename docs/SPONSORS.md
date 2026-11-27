@@ -104,12 +104,16 @@ If the wallet can't be funded in time, run the target locally (`:8001`) and say 
 
 ## 4. AdaL: the coding agent that builds it
 
+**Status (28 Nov 2026):** the AdaL integration is the project skills in `.adal/skills/` plus `AGENTS.md`. We did not run the AdaL app on this repo, and AdaL wrote none of our code. AdaL is now a video agent (adalagent.ai); its terminal CLI installs only on macOS, Linux and WSL, and `@sylphai/adal-cli` on npm is a stub. Do not claim more than this.
+
 **Install:** `npm install -g @sylphai/adal-cli` (or the install script at adal.sylph.ai).
 - AdaL reads **`AGENTS.md` at the workspace root on every turn**. That's why this repo's rules live there.
 - Project skills live in `.adal/skills/`. Kavach ships both skill packs there (copies of `skills/`, kept in sync by `python scripts/sync_skills.py` and checked by a test), so AdaL working in this repo can generate red-team messages for your own bot or harden it with the same playbooks Kavach's agents use.
 - The SF edition suggested AdaL for making the demo video too. If you use it for that, say so. Don't claim AdaL built something unless it did.
 
 ## 5. Finch: the skill packs
+
+**Status (28 Nov 2026):** not published on the Finch market. Publishing signs a transaction from a wallet and costs gas on the chosen chain, and we chose not to set a wallet up. The packs stay live inputs to every run. Say exactly that.
 
 The two packs in `skills/` are the squads' playbooks and a live input to every run (`backend/kavach/skills.py`):
 - `skills/owasp-llm-attack-pack/` (`SKILL.md` + `techniques.json`): one card per technique (squad, round, OWASP risks, goals, a short how-to). The Injector and Social Engineer get the cards for their round on every call.

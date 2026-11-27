@@ -2,7 +2,7 @@
 
 The HiDevs Submit tab (Diwali Festiverse: The Agent-to-Agent Hackathon, India Edition) asks for a project description, the public repo, a demo URL, a walkthrough video, how each sponsor was used, and the problems faced. Everything below is ready to paste. Deadline: **2 Dec 2026, 10:00 PM IST**.
 
-Keep the sponsor answers honest: if Agent37 or the Finch listing changes before you submit, update those two lines first.
+Keep the sponsor answers honest: if Agent37, Finch or AdaL usage changes before you submit, update those lines first. Today: Agent37 was used once (run 10), the Finch packs are not published, and AdaL was not run.
 
 ---
 
@@ -43,9 +43,9 @@ https://youtu.be/ZI6KTaSdtDo
 
 **Lyzr.** All seven agents are Lyzr Studio agents (role, goal, instructions, structured JSON output, session memory across rounds) called through the Lyzr inference API from the Python orchestrator. `pnpm bootstrap` creates them. Every reply is validated; a bad reply falls back safely instead of stopping the run.
 
-**Finch.** Kavach's two skill packs are the squads' playbooks: an OWASP LLM attack pack with a card per technique, and an agent hardening pack with principles, a guard-policy template and system-prompt additions. The Injector and Social Engineer get the technique cards for their round on every call, the Patcher gets the hardening playbook with every patch request, and each run records the exact pack versions it used. They are agentskills-format folders, ready to publish to the Finch market. *(If you publish them before submitting, replace the last sentence with the Finch links.)*
+**Finch.** Kavach's two skill packs are the squads' playbooks: an OWASP LLM attack pack with a card per technique, and an agent hardening pack with principles, a guard-policy template and system-prompt additions. The Injector and Social Engineer get the technique cards for their round on every call, the Patcher gets the hardening playbook with every patch request, and each run records the exact pack versions it used. They are agentskills-format folders, ready for the Finch market, but we have not published them there: publishing needs a signing wallet and on-chain gas, so they are not listed on Finch.
 
-**AdaL.** The same two skill packs ship as AdaL project skills in `.adal/skills/`, so AdaL working in the repo can red-team or harden a bot with Kavach's playbooks. `AGENTS.md` and the specs in `docs/` are written for AdaL and other coding agents to extend Kavach one ticket at a time.
+**AdaL.** The same two skill packs ship as AdaL project skills in `.adal/skills/`, so AdaL working in the repo can red-team or harden a bot with Kavach's playbooks. `AGENTS.md` and the specs in `docs/` are written for AdaL and other coding agents to extend Kavach one ticket at a time. We did not run the AdaL app on this repo, and AdaL did not write any of our code.
 
 **Agent37.** The target bot and its mock tools are built to run in an isolated Agent37 sandbox (`scripts/deploy_target_agent37.sh` creates the instance, installs the bot and points Kavach at it), so attacks have a safe blast radius. We deployed it once: recorded run 10 (`runs/gallery/demo10.jsonl`) attacked the bot while it ran in an Agent37 sandbox, reached over HTTPS, and the instance was deleted afterwards. The other nine recordings used a local target.
 
