@@ -1,4 +1,4 @@
-.PHONY: help install setup check-setup target api offline test lint fmt check smoke probe band demo referee
+.PHONY: help install setup check-setup target api offline test lint fmt check smoke probe band demo referee gate
 
 OFFLINE = BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess
 
@@ -48,3 +48,6 @@ demo: ## run live until the story is good, then save runs/demo_run.jsonl
 
 referee: ## live Referee: answers people who @mention it in the Band room (needs agent_config.yaml)
 	uv run --extra live python -m kavach.band.live_referee
+
+gate: ## CI mode on the hardened config: fails if its breach rate rises above data/ci/baseline.json
+	$(OFFLINE) uv run python -m kavach.cli ci --prompt ../data/ci/hardened_prompt.md --policy ../data/ci/hardened_policy.json --baseline ../data/ci/baseline.json

@@ -1,0 +1,26 @@
+{
+  "refund": {
+    "max_auto_inr": 500,
+    "require_order_ownership": true,
+    "cap_at_order_amount": true
+  },
+  "orders": {
+    "owner_only": true
+  },
+  "kyc": {
+    "owner_only": true,
+    "mask_pii": true
+  },
+  "coupons": {
+    "allowed_codes": [
+      "DIWALI10",
+      "FESTIVE50"
+    ]
+  },
+  "input_filters": [],
+  "output_filters": {
+    "redact_pan": true,
+    "redact_phone": true,
+    "block_canary": true
+  }
+}

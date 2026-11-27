@@ -1,10 +1,15 @@
-"""Command line: `python -m kavach.cli run --rounds 3` runs Kavach without the API (used by `make smoke`)."""
+"""Command line.
+
+python -m kavach.cli run --rounds 3     run Kavach without the API (used by `make smoke`)
+python -m kavach.cli ci                 CI mode: fail when the breach rate rises (see kavach/ci.py)
+"""
 
 from __future__ import annotations
 
 import argparse
 import asyncio
 import logging
+from pathlib import Path
 
 from kavach.config import Settings
 from kavach.runtime import build_run, save_extras
@@ -38,8 +43,36 @@ def main() -> None:
     sub = p.add_subparsers(dest="cmd", required=True)
     r = sub.add_parser("run", help="run Kavach once")
     r.add_argument("--rounds", type=int, default=None)
+    c = sub.add_parser("ci", help="fail when a prompt or policy change raises the breach rate")
+    c.add_argument("--prompt", type=Path, default=None, help="system prompt file (default: DiwaliMart v1)")
+    c.add_argument("--policy", type=Path, default=None, help="guard policy JSON (default: v1's)")
+    c.add_argument(
+        "--baseline", type=Path, default=None, help="baseline JSON (default: .kavach/baseline.json)"
+    )
+    c.add_argument("--library", default="standard", help="attack library: standard or hard")
+    c.add_argument("--tolerance", type=float, default=0.0, help="allowed breach-rate rise, e.g. 0.05")
+    c.add_argument(
+        "--update-baseline", action="store_true", help="record the current numbers as the baseline"
+    )
+    c.add_argument("--json", type=Path, default=None, help="also write the result as JSON")
     args = p.parse_args()
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
+    if args.cmd == "ci":
+        from kavach.ci import DEFAULT_BASELINE, run_ci
+
+        raise SystemExit(
+            asyncio.run(
+                run_ci(
+                    prompt=args.prompt,
+                    policy=args.policy,
+                    baseline_path=args.baseline or DEFAULT_BASELINE,
+                    library=args.library,
+                    tolerance=args.tolerance,
+                    update_baseline=args.update_baseline,
+                    json_out=args.json,
+                )
+            )
+        )
     raise SystemExit(asyncio.run(_run(args.rounds)))
 
 

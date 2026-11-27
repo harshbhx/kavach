@@ -1,0 +1,71 @@
+name: Kavach CI gate
+description: >-
+  Replays Kavach's seeded attacks against your support bot's system prompt and guard policy, runs the benign suite,
+  and fails the job if the breach rate rises above your baseline or utility drops below 90%. Scored in code, no judge model.
+author: Harsh Bhanushali
+branding:
+  icon: shield
+  color: green
+inputs:
+  prompt:
+    description: Path to your system prompt file, relative to your repo. Empty tests the DiwaliMart v1 prompt.
+    default: ""
+  policy:
+    description: Path to your guard policy JSON, relative to your repo. Empty uses Kavach's v1 policy.
+    default: ""
+  baseline:
+    description: Path to the baseline JSON, relative to your repo.
+    default: .kavach/baseline.json
+  library:
+    description: Attack library, standard or hard.
+    default: standard
+  tolerance:
+    description: Allowed rise in breach rate, for example 0.05.
+    default: "0"
+  target-model:
+    description: LiteLLM model id for the bot under test (for example groq/openai/gpt-oss-20b), or fake for an offline check. Pass the provider key as an env var.
+    default: fake
+  update-baseline:
+    description: "true records the current numbers as the baseline instead of gating."
+    default: "false"
+outputs:
+  breach-rate:
+    description: Breach rate of this build, 0 to 1.
+    value: ${{ steps.gate.outputs.breach-rate }}
+  utility:
+    description: Share of everyday requests served, 0 to 1.
+    value: ${{ steps.gate.outputs.utility }}
+runs:
+  using: composite
+  steps:
+    - uses: astral-sh/setup-uv@v6
+      with:
+        python-version: "3.12"
+    - name: Install Kavach
+      shell: bash
+      run: uv sync --frozen --project "$GITHUB_ACTION_PATH/../../../backend"
+    - name: Run the gate
+      id: gate
+      shell: bash
+      env:
+        BRAIN_PROVIDER: fake
+        BAND_ENABLED: "false"
+        TARGET_URL: inprocess
+        TARGET_MODEL: ${{ inputs.target-model }}
+        IN_PROMPT: ${{ inputs.prompt }}
+        IN_POLICY: ${{ inputs.policy }}
+        IN_BASELINE: ${{ inputs.baseline }}
+        IN_LIBRARY: ${{ inputs.library }}
+        IN_TOLERANCE: ${{ inputs.tolerance }}
+        IN_UPDATE: ${{ inputs.update-baseline }}
+      run: |
+        args=(--baseline "$GITHUB_WORKSPACE/$IN_BASELINE" --library "$IN_LIBRARY" --tolerance "$IN_TOLERANCE" --json "$RUNNER_TEMP/kavach-ci.json")
+        [ -n "$IN_PROMPT" ] && args+=(--prompt "$GITHUB_WORKSPACE/$IN_PROMPT")
+        [ -n "$IN_POLICY" ] && args+=(--policy "$GITHUB_WORKSPACE/$IN_POLICY")
+        [ "$IN_UPDATE" = "true" ] && args+=(--update-baseline)
+        set +e
+        uv run --frozen --project "$GITHUB_ACTION_PATH/../../../backend" python -m kavach.cli ci "${args[@]}"
+        code=$?
+        set -e
+        python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(f\"breach-rate={d['breach_rate']}\"); print(f\"utility={d['utility']}\")" "$RUNNER_TEMP/kavach-ci.json" >> "$GITHUB_OUTPUT"
+        exit $code

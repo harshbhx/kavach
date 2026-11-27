@@ -26,6 +26,17 @@ jobs:
       - run: make check
       - run: make smoke
 
+  gate:
+    name: Kavach CI gate (the reusable action, hardened config)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/kavach-ci
+        with:
+          prompt: data/ci/hardened_prompt.md
+          policy: data/ci/hardened_policy.json
+          baseline: data/ci/baseline.json
+
   web:
     name: Web apps (lint, types, build)
     runs-on: ubuntu-latest
