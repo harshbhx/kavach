@@ -13,6 +13,7 @@
     "configuration",
     "dashboard",
     "bring-your-prompt",
+    "ci-mode",
     "deploy",
     "troubleshooting",
     "---Reference---",

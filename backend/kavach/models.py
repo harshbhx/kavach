@@ -297,6 +297,7 @@ class RunSummary(BaseModel):
     deployed_version: str = "v1"
     band_room_url: str | None = None
     report_ready: bool = False
+    awaiting_approval: str | None = None  # the patch version waiting for a person, when approval is required
 
 
 class Event(BaseModel):

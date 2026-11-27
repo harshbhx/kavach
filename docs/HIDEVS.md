@@ -19,6 +19,8 @@ Kavach (कवच, "armour") puts seven AI agents in one room with DiwaliMart Su
 - **Code keeps score.** Every reply and tool call goes through five fixed rules: a refund over ₹500 without a human, an action on someone else's account, a PII leak, the system-prompt canary, and staff-coupon abuse, each mapped to the OWASP LLM Top 10. In one recorded run the bot said "I'm sorry, but I can't share that information" while its KYC tool call for another customer had already run. Kavach scores what the bot does, not what it says.
 - **Blue squad.** The Monitor names the root cause, the Patcher rewrites the system prompt and the guard policy (checks enforced at the tool), and the Auditor replays every exploit plus ten everyday customer requests. A patch ships only if the exploits stop and at least 90% of real requests still succeed.
 - **The Referee** scores breach rate, utility and time to harden, writes an audit report, and answers people who @mention it in the Band room.
+- **A person in the loop.** With approval on, a patch the Auditor passed waits for a person, who ships or rejects it from the Band room (`@Referee approve v2`) or the dashboard. A rejection sends the Patcher back with the reason.
+- **CI mode.** `kavach ci`, also a reusable GitHub Action, replays the attack library against a prompt and guard policy and fails the build if the breach rate rises above the baseline or utility drops below 90%.
 
 Results from the headline recorded run (victim model gpt-oss-20b): breach rate 83% → 0% → 0% across three rounds, 100% of everyday requests still served, patch shipped 38 seconds into round 1. Eight recorded runs against four victim models, and every one ended hardened.
 
@@ -35,7 +37,7 @@ https://youtu.be/ZI6KTaSdtDo
 
 ## How we used each sponsor
 
-**BAND.** Each of the seven agents is a Band remote agent with its own identity. Every run opens one Band room, and every handoff between agents is an @mention message in it, so people can watch the attack and the fix happen and join in. The live Referee runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run, never from a model. It ignores the agents' own handoffs.
+**BAND.** Each of the seven agents is a Band remote agent with its own identity. Every run opens one Band room, and every handoff between agents is an @mention message in it, so people can watch the attack and the fix happen and join in. The live Referee runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run, never from a model. It ignores the agents' own handoffs. With approval on, the Referee asks in the room before each patch ships, and a person decides with `@Referee approve v2` or `@Referee reject v2 because ...`: agents and people working in the same room.
 
 **Lyzr.** All seven agents are Lyzr Studio agents (role, goal, instructions, structured JSON output, session memory across rounds) called through the Lyzr inference API from the Python orchestrator. `pnpm bootstrap` creates them. Every reply is validated; a bad reply falls back safely instead of stopping the run.
 

@@ -8,7 +8,9 @@ recorded demo run (runs/demo_run.jsonl) when no run is live, and replies to them
 RunSummary; no model is asked for a score. It ignores messages from agents, so the squads' own handoffs to @Referee
 never trigger a reply.
 
-Questions it understands: status (the default), breaches, patch, report, help.
+Questions it understands: status (the default), breaches, patch, report, help. When the run asks for human approval
+(APPROVAL_REQUIRED=true), `@Referee approve v2` or `@Referee reject v2 because ...` settles the patch that is waiting,
+through POST /api/runs/{run_id}/approval.
 """
 
 from __future__ import annotations
@@ -32,8 +34,13 @@ log = logging.getLogger(__name__)
 DEMO_RUN = REPO_ROOT / "runs" / "demo_run.jsonl"
 HELP = (
     "Ask me: `status` for the score by round, `breaches` for what broke, `patch` for what the blue squad shipped, "
-    "or `report` for the audit report. Every number comes from code, read from the target's tool-call log."
+    "or `report` for the audit report. When a patch is waiting for you, say `approve v2` or `reject v2 because ...`. "
+    "Every number comes from code, read from the target's tool-call log."
 )
+DECISION = re.compile(r"^\s*(?P<word>approve[ds]?|ship it|reject(?:ed|s)?)\b", re.IGNORECASE)
+LEADING_MENTIONS = re.compile(r"^(?:\s*@\S+[\s,:]*)+")
+VERSION = re.compile(r"\bv(\d{1,3})\b", re.IGNORECASE)
+REASON = re.compile(r"(?:\bbecause\b|:|—| - )\s*(?P<why>.+)$", re.IGNORECASE | re.DOTALL)
 
 
 def _pct(v: float | None) -> str:
@@ -97,9 +104,32 @@ def _round_line(r: RoundSummary) -> str:
     return line + "."
 
 
+def parse_decision(text: str) -> tuple[str, str | None, str | None] | None:
+    """("approve" | "reject", version or None, reason or None) if a person is deciding a patch, else None.
+
+    The decision word must open the message (after any @mentions), so a question like "should I approve v2?"
+    never ships a patch."""
+    text = LEADING_MENTIONS.sub("", text, count=1)
+    m = DECISION.search(text)
+    if not m:
+        return None
+    decision = "reject" if m.group("word").lower().startswith("reject") else "approve"
+    v = VERSION.search(text)
+    why = REASON.search(text[m.end() :])
+    reason = why.group("why").strip()[:300] if why and decision == "reject" else None
+    return decision, (f"v{v.group(1)}" if v else None), reason or None
+
+
 def answer(question: str, summary: RunSummary | None, report_url: str | None = None) -> str:
     """The Referee's reply to one question. Pure: same summary in, same words out."""
     q = question.lower()
+    waiting = summary.awaiting_approval if summary else None
+    if waiting and not re.search(r"\b(help|report|breach|breaches|broke|findings?|rules?)\b", q):
+        return (
+            f"{waiting} passed the Auditor and is waiting for you: say `approve {waiting}` to ship it or "
+            f"`reject {waiting} because ...` to send it back. "
+            + answer("status", summary.model_copy(update={"awaiting_approval": None}), report_url)
+        )
     if re.search(r"\b(help|commands?|what can you)\b", q):
         return HELP
     if summary is None or not summary.rounds:
@@ -133,6 +163,7 @@ def answer(question: str, summary: RunSummary | None, report_url: str | None = N
 
 
 Source = Callable[[], Awaitable[tuple[RunSummary | None, str | None]]]
+Decider = Callable[[str, str | None, str, str | None], Awaitable[str]]
 
 
 def default_source(api_base: str | None = None, demo_run: Path = DEMO_RUN) -> Source:
@@ -146,6 +177,33 @@ def default_source(api_base: str | None = None, demo_run: Path = DEMO_RUN) -> So
         return summary_from_jsonl(demo_run), None
 
     return source
+
+
+def default_decider(api_base: str | None = None) -> Decider:
+    """Forward a person's approve/reject to the run that is waiting, and say what happened."""
+    base = (api_base or os.environ.get("KAVACH_API") or "http://127.0.0.1:8000").rstrip("/")
+
+    async def decide(decision: str, version: str | None, by: str, reason: str | None) -> str:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            summary = await latest_summary(base, client)
+            if summary is None or not summary.awaiting_approval:
+                return "No patch is waiting for approval right now."
+            body = {"decision": decision, "version": version, "by": by, "source": "band", "reason": reason}
+            try:
+                r = await client.post(f"{base}/api/runs/{summary.run_id}/approval", json=body)
+            except httpx.HTTPError as exc:
+                log.warning("approval forward failed: %s", exc)
+                return "I couldn't reach the Kavach API to record that. Try the dashboard."
+            if r.status_code == 409:
+                return f"{r.json().get('detail', 'That patch is no longer waiting')}."
+            if r.status_code >= 400:
+                return "The Kavach API refused that decision. Try the dashboard."
+        v = summary.awaiting_approval
+        if decision == "approve":
+            return f"Approved {v}. Shipping it now."
+        return f"Rejected {v}" + (f" ({reason})" if reason else "") + ". The Patcher will try again."
+
+    return decide
 
 
 def is_person(sender_type: str | None) -> bool:
@@ -177,9 +235,12 @@ if SimpleAdapter is not None:
         SUPPORTED_EMIT: ClassVar[frozenset[Emit]] = frozenset()
         SUPPORTED_CAPABILITIES: ClassVar[frozenset[Capability]] = frozenset()
 
-        def __init__(self, source: Source | None = None, **features: Any) -> None:
+        def __init__(
+            self, source: Source | None = None, decider: Decider | None = None, **features: Any
+        ) -> None:
             super().__init__(history_converter=_NoHistory(), **features)
             self.source = source or default_source()
+            self.decider = decider or default_decider()
 
         async def on_message(
             self,
@@ -194,8 +255,13 @@ if SimpleAdapter is not None:
         ) -> None:
             if not is_person(msg.sender_type):
                 return  # the squads @mention the Referee in their handoffs; only people get answers
-            summary, report_url = await self.source()
-            text = answer(msg.content, summary, report_url)
+            parsed = parse_decision(msg.content)
+            if parsed:
+                decision, version, reason = parsed
+                text = await self.decider(decision, version, msg.sender_name or msg.sender_id, reason)
+            else:
+                summary, report_url = await self.source()
+                text = answer(msg.content, summary, report_url)
             if msg.sender_name:
                 text = f"@{msg.sender_name} {text}"
             await relay_reply(tools, text, mentions=[msg.sender_id])

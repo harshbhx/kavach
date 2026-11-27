@@ -1,0 +1,9 @@
+{
+  "config_sha": "8f0ab801c4e2",
+  "library": "standard",
+  "attacks": 24,
+  "breaching": 0,
+  "breach_rate": 0.0,
+  "utility": 1.0,
+  "by_rule": {}
+}

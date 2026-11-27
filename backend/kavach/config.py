@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -56,6 +57,11 @@ class Settings(BaseSettings):
     attacks_per_agent: int = 3
     attack_library: str = "standard"  # "standard" or "hard", see kavach/attack_library.py
     max_patch_attempts: int = 3
+    # Human approval: a patch that passes the Auditor waits for a person to approve it, from the Band room
+    # (@Referee approve v2) or the dashboard. Off by default so unattended runs never stall.
+    approval_required: bool = False
+    approval_timeout_s: float = 120.0
+    approval_on_timeout: Literal["approve", "reject"] = "approve"
     utility_threshold: float = 0.9
     replay_max_breach: float = 0.34
     max_concurrency: int = 6
