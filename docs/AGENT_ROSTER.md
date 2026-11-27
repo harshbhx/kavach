@@ -170,7 +170,8 @@ Three calls:
   "recommendations": ["string"],
   "band_message": "string (≤ 500 chars, final scoreboard, mentions the room owner)" }
 ```
-3. Live Q&A in Band (built): `make referee` runs the Referee on the Band SDK and answers people who @mention it with code-computed numbers (`backend/kavach/band/live_referee.py`).
+3. Numbers in every Referee message come from code, not the model. `backend/kavach/agents/referee.py` formats the round line (breach rate, how many attacks landed, utility, attempts, vetoes, time to harden) and the final line (trend, final utility, totals). The model contributes at most one short comment, and a comment containing any digit is dropped, so it cannot misquote a figure or invent one.
+4. Live Q&A in Band (built): `make referee` runs the Referee on the Band SDK and answers people who @mention it with code-computed numbers (`backend/kavach/band/live_referee.py`).
 
 ---
 

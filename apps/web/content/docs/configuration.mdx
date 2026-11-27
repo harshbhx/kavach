@@ -90,6 +90,8 @@ Pick any saved run on the dashboard and press **Replay**, or open `/dashboard?ru
     ATTACKS_PER_AGENT: { type: 'number', description: 'Attacks the Injector and the Social Engineer each send per round.', default: '3' },
     MAX_PATCH_ATTEMPTS: { type: 'number', description: 'Candidates the Patcher may propose per round before the round ends unhardened.', default: '3' },
     UTILITY_THRESHOLD: { type: 'number', description: 'Share of the ten everyday requests a patch must still answer.', default: '0.9' },
+    LYZR_CALL_BUDGET: { type: 'number', description: 'Cap on Lyzr calls per run, 0 for no cap. Lyzr bills credits per call. Past the cap the agents answer from their offline fallbacks and the run still finishes.', default: '0' },
+    AUTO_PDF: { type: 'boolean', description: 'Build the branded PDF audit report in the background when a live run ends, so the dashboard PDF button is instant. Needs Google Chrome; without it the build is skipped.', default: 'true' },
     APPROVAL_REQUIRED: { type: 'boolean', description: 'Ask a person before each patch ships, from the Band room (@Referee approve v2) or the dashboard banner.', default: 'false' },
     APPROVAL_TIMEOUT_S: { type: 'number', description: 'Seconds to wait for that person.', default: '120' },
     APPROVAL_ON_TIMEOUT: { type: "'approve' | 'reject'", description: 'What happens when nobody answers in time.', default: 'approve' },

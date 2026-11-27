@@ -2,7 +2,7 @@
 
 Agent37 gives the target bot an isolated sandbox, a disposable microVM, so attacks have a safe blast radius. Kavach's scoring and agents stay on your machine. Only the DiwaliMart target runs remotely, and the attackers reach it over HTTPS.
 
-Status: the deploy script works, and run 10 in [Recorded runs](RECORDED_RUNS.md) attacked a target running on a real Agent37 instance. The other nine recordings used a local target. Say exactly that.
+Status: the deploy script works, and run 10 in [Recorded runs](RECORDED_RUNS.md) attacked a target running on a real Agent37 instance. The other ten recordings used a local target. Say exactly that.
 
 ## What you need
 

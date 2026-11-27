@@ -22,7 +22,7 @@ Kavach (कवच, "armour") puts seven AI agents in one room with DiwaliMart Su
 - **A person in the loop.** With approval on, a patch the Auditor passed waits for a person, who ships or rejects it from the Band room (`@Referee approve v2`) or the dashboard. A rejection sends the Patcher back with the reason.
 - **CI mode.** `kavach ci`, also a reusable GitHub Action, replays the attack library against a prompt and guard policy and fails the build if the breach rate rises above the baseline or utility drops below 90%.
 
-Results from the headline recorded run (victim model gpt-oss-20b): breach rate 83% → 0% → 0% across three rounds, 100% of everyday requests still served, patch shipped 38 seconds into round 1. Ten recorded runs against four victim models, and every one ended hardened.
+Results from the headline recorded run (victim model gpt-oss-20b): breach rate 83% → 0% → 0% across three rounds, 100% of everyday requests still served, patch shipped 38 seconds into round 1. Eleven recorded runs against four victim models, and every one ended hardened.
 
 ## GitHub public repo
 https://github.com/harshbhx/kavach
@@ -47,7 +47,7 @@ https://youtu.be/ZI6KTaSdtDo
 
 **AdaL.** The same two skill packs ship as AdaL project skills in `.adal/skills/`, so AdaL working in the repo can red-team or harden a bot with Kavach's playbooks. `AGENTS.md` and the specs in `docs/` are written for AdaL and other coding agents to extend Kavach one ticket at a time. We did not run the AdaL app on this repo, and AdaL did not write any of our code.
 
-**Agent37.** The target bot and its mock tools are built to run in an isolated Agent37 sandbox (`scripts/deploy_target_agent37.sh` creates the instance, installs the bot and points Kavach at it), so attacks have a safe blast radius. We deployed it once: recorded run 10 (`runs/gallery/demo10.jsonl`) attacked the bot while it ran in an Agent37 sandbox, reached over HTTPS, and the instance was deleted afterwards. The other nine recordings used a local target.
+**Agent37.** The target bot and its mock tools are built to run in an isolated Agent37 sandbox (`scripts/deploy_target_agent37.sh` creates the instance, installs the bot and points Kavach at it), so attacks have a safe blast radius. We deployed it once: recorded run 10 (`runs/gallery/demo10.jsonl`) attacked the bot while it ran in an Agent37 sandbox, reached over HTTPS, and the instance was deleted afterwards. The other ten recordings used a local target.
 
 ## Problems faced
 - **Strong models are hard to break.** With the same eight seeded attacks, Claude Haiku 5.5 was breached 25% of the time and several other models 0%. We kept the victim small enough for attacks to land, and we report the numbers per model.

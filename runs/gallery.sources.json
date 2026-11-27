@@ -58,5 +58,11 @@
     "title": "Target in an Agent37 sandbox",
     "blurb": "The same bot, deployed to an Agent37 microVM and attacked over HTTPS. Round 1 is breached 50%, one patch is approved with 100% of everyday requests still served, and rounds 2 and 3 hold.",
     "source": "kv-20261128-0028-f559.jsonl"
+  },
+  {
+    "id": "demo11",
+    "title": "A person in the loop",
+    "blurb": "A person rejects the first patch from the Band room, the Patcher tries again, and the person approves the second. Round 1 is breached 50%, rounds 2 and 3 hold.",
+    "source": "kv-20261128-0008-d4b6.jsonl"
   }
 ]
