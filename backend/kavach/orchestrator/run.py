@@ -76,6 +76,16 @@ def diff_stats(old: str, new: str) -> dict[str, int]:
     return {"added": added, "removed": removed}
 
 
+def target_down(url: str) -> str:
+    """What to tell a person when the target bot isn't answering."""
+    if url == "inprocess":
+        return "The in-process target isn't answering."
+    return (
+        f"The target bot at {url} isn't answering. Start it first: `make target` from backend/ "
+        "(without make: `uv run uvicorn kavach.target.service:app --port 8001`)."
+    )
+
+
 class KavachRun:
     def __init__(
         self,
@@ -168,6 +178,24 @@ class KavachRun:
         except Exception as exc:
             return AttackResult(attack=a, error=str(exc), config_version=self.deployed.version)
 
+    async def _target_answers(self) -> bool:
+        """A run against a target that isn't answering would score 0% breaches and look hardened, so stop it."""
+        try:
+            await self.target.health()
+            return True
+        except Exception as exc:
+            self.state.summary.status = "failed"
+            self.emit(
+                "error",
+                {
+                    "where": "target",
+                    "detail": f"{target_down(self.s.target_url)} ({type(exc).__name__})",
+                    "fatal": True,
+                },
+            )
+            self.bus.close()
+            return False
+
     # ── main ──
     async def run(self) -> RunState:
         s = self.s
@@ -188,6 +216,8 @@ class KavachRun:
                 "extra_requests": len(self.options.extra_requests),
             }
         self.emit("run.started", started)
+        if not await self._target_answers():
+            return self.state
         await self.band.open()
         self.state.summary.band_room_url = self.band.room_url
         if self.band.room_url:
@@ -293,6 +323,8 @@ class KavachRun:
         )
         summary.breach_rate, summary.findings_by_rule = bs["breach_rate"], bs["findings_by_rule"]
         self.emit("round.breach_scored", bs, round=r)
+        if bs["total_attacks"] and bs["errors"] == bs["total_attacks"]:
+            raise RuntimeError(f"none of round {r}'s attacks got an answer. {target_down(self.s.target_url)}")
 
         report = MonitorReport(incident_summary="No breaches this round")
         if not findings:

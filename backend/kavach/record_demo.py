@@ -19,7 +19,9 @@ from pathlib import Path
 
 from kavach.config import Settings
 from kavach.models import RunSummary
+from kavach.orchestrator.run import target_down
 from kavach.runtime import build_run, save_extras
+from kavach.target_client import TargetClient
 
 
 def story_problems(summary: RunSummary) -> list[str]:
@@ -39,6 +41,11 @@ def story_problems(summary: RunSummary) -> list[str]:
         problems.append("no patch was vetoed (the utility-trap moment is missing)")
     if len(rounds) > 1 and last.breach_rate >= first.breach_rate:
         problems.append(f"breach rate did not fall ({first.breach_rate:.0%} -> {last.breach_rate:.0%})")
+    for r in rounds:
+        if r.total_attacks and r.errors / r.total_attacks > 0.2:
+            problems.append(
+                f"round {r.round}: {r.errors} of {r.total_attacks} attacks got no answer from the target"
+            )
     utility = next((r.utility_applied for r in reversed(rounds) if r.utility_applied is not None), None)
     if utility is None or utility < 0.9:
         problems.append(f"final utility is {utility if utility is not None else 'unknown'} (needs >= 90%)")
@@ -87,10 +94,28 @@ def fill_markers(path: Path, name: str, content: str) -> bool:
     return True
 
 
+async def target_ready(settings: Settings) -> bool:
+    """Check the target once before spending attempts on it."""
+    client = TargetClient(settings)
+    try:
+        health = await client.health()
+    except Exception as exc:
+        print(f"{target_down(settings.target_url)} ({type(exc).__name__})")
+        return False
+    finally:
+        await client.aclose()
+    print(
+        f"target ok: {health.get('model', settings.target_model)}, config {health.get('config_version', '?')}"
+    )
+    return True
+
+
 async def record(attempts: int, rounds: int | None) -> int:
     settings = Settings()
     if rounds:
         settings.rounds = rounds
+    if not await target_ready(settings):
+        return 1
     target = settings.runs_path / "demo_run.jsonl"
     for n in range(1, attempts + 1):
         print(
