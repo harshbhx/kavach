@@ -14,6 +14,7 @@ Three surfaces: (1) the Kavach API used by the dashboard, (2) the event envelope
 | GET | `/api/runs/{run_id}/events` | `?from_seq=0` | **SSE** stream of `Event` (resends from `from_seq`, then live; an EventSource reconnect resumes after its `Last-Event-ID`) |
 | GET | `/api/runs/{run_id}/configs/{version}` | – | `TargetConfig` |
 | GET | `/api/runs/{run_id}/configs` | – | `{ version: TargetConfig }` for every version so far |
+| GET | `/api/scoreboard` | – | `{ runs: [RunRow], models: [ModelRow] }`: the recordings in `runs/gallery/` summed up by victim model (`backend/kavach/scoreboard.py`) |
 | GET | `/api/replays` | – | `[{ file, size }]`: the recordings in `runs/*.jsonl` |
 | GET | `/api/runs/{run_id}/report.md` | – | `text/markdown` attachment `kavach-report-{run_id}.md` |
 | POST | `/api/runs/{run_id}/stop` | – | `{ stopped: true }` |

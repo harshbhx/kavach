@@ -55,8 +55,22 @@ def main() -> None:
         "--update-baseline", action="store_true", help="record the current numbers as the baseline"
     )
     c.add_argument("--json", type=Path, default=None, help="also write the result as JSON")
+    sb = sub.add_parser("scoreboard", help="the recorded runs in runs/gallery, summed up by victim model")
+    sb.add_argument(
+        "--dir", type=Path, default=None, help="folder of run JSONL files (default: runs/gallery)"
+    )
+    sb.add_argument("--json", action="store_true", help="print JSON instead of a markdown table")
     args = p.parse_args()
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
+    if args.cmd == "scoreboard":
+        import json
+
+        from kavach.config import REPO_ROOT
+        from kavach.scoreboard import markdown, scoreboard
+
+        board = scoreboard(args.dir or REPO_ROOT / "runs" / "gallery")
+        print(json.dumps(board, indent=2) if args.json else markdown(board))
+        raise SystemExit(0)
     if args.cmd == "ci":
         from kavach.ci import DEFAULT_BASELINE, run_ci
 
