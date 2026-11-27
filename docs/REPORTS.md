@@ -25,7 +25,7 @@ Once a run has finished, the Audit report view shows two buttons: **PDF** and **
 GET /api/runs/RUN_ID/report.pdf
 ```
 
-The first call builds the PDF from `runs/RUN_ID.jsonl` and caches it next to the recording as `runs/RUN_ID.report.pdf`. Building takes about 30 seconds the first time (it starts Chrome); later calls return the cached file at once. Cached PDFs are gitignored.
+When a live run ends, the API builds the PDF in the background from `runs/RUN_ID.jsonl` and caches it next to the recording as `runs/RUN_ID.report.pdf` (set `AUTO_PDF=false` to turn this off). The build takes about 30 seconds because it starts Chrome. If you press PDF before it is done, the button shows **Building PDF** and waits for the same build, never starting a second one. Later calls return the cached file at once. Cached PDFs are gitignored.
 
 | Response | Meaning |
 |---|---|

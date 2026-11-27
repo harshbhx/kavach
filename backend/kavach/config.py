@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     lyzr_api_key: str = ""
     lyzr_base_url: str = "https://agent-prod.studio.lyzr.ai/v3"
     lyzr_user_id: str = "kavach"
+    # Cap on Lyzr inference calls per run (0 = no cap). Lyzr bills credits per call, so a cap keeps a plan from draining:
+    # once it is reached, agents answer from their documented offline fallbacks and the run still finishes.
+    lyzr_call_budget: int = 0
+    # Build the branded PDF audit report in the background when a live run ends, so the dashboard's PDF button is
+    # instant. Needs Google Chrome; without it the build is skipped quietly and the button explains.
+    auto_pdf: bool = True
     lyzr_agent_recon: str = ""
     lyzr_agent_injection: str = ""
     lyzr_agent_social: str = ""

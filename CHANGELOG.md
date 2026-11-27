@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `LYZR_CALL_BUDGET`: a per-run cap on Lyzr calls. Lyzr bills credits per call; past the cap the agents answer from their offline fallbacks and the run still finishes. `GET /api/health` reports the cap.
+- `AUTO_PDF` (on by default): the branded PDF audit report is built in the background when a live run ends, so the dashboard PDF button is instant. Needs Chrome.
+- `run.started` carries `approval_required`; the dashboard header says whether a person approves each patch or patches ship automatically, and names an Agent37 sandbox target.
+- Gallery run 11: the recording with a person in the loop.
+- `pnpm referee` and `pnpm check:backend`; `pnpm bootstrap` and `pnpm demo` no longer need `make`.
+
+### Changed
+- Every number in a Referee message is formatted from code. The model may add one short comment, dropped if it contains digits. This fixes messages like "Final utility: 1.0%" for 100%.
+- Attack batches in more reply shapes are accepted (attacks keyed by name, or a list under an unknown key), so fewer batches fall back to the library.
+- The dashboard's PDF button shows **Building PDF** while it waits and explains a missing Chrome. The Human approval checkbox is remembered per browser.
+
 ## 0.1.0-beta.1 (28 Nov 2026)
 
 First public beta.
@@ -19,4 +33,4 @@ First public beta.
 - One run at a time; state is in memory plus JSONL.
 - The skill packs are in the Finch skill format but are not published on the Finch market (publishing needs a signing wallet).
 - AdaL was not run on this repo; the integration is `.adal/skills/` and `AGENTS.md`.
-- One of ten recordings used Agent37; the rest used a local target.
+- One of eleven recordings used Agent37; the rest used a local target.

@@ -10,6 +10,7 @@ os.environ.update(
         "TARGET_MODEL": "fake",
         "TARGET_URL": "inprocess",
         "RUNS_DIR": "/tmp/kavach-test-runs",
+        "AUTO_PDF": "false",  # never start Chrome from a test
     }
 )
 

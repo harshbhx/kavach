@@ -33,6 +33,7 @@ class LyzrBrain(Brain):
         super().__init__(settings)
         if not settings.lyzr_api_key:
             raise BrainError("LYZR_API_KEY is not set")
+        self.calls = 0  # Lyzr inference calls made by this brain (one brain per run)
         self._client = httpx.AsyncClient(
             base_url=settings.lyzr_base_url.rstrip("/"),
             headers={"x-api-key": settings.lyzr_api_key, "Content-Type": "application/json"},
@@ -43,6 +44,12 @@ class LyzrBrain(Brain):
         agent_id = self.settings.lyzr_agent_id(agent)
         if not agent_id:
             raise BrainError(f"LYZR_AGENT_{agent.upper()} is not set")
+        budget = self.settings.lyzr_call_budget
+        if budget and self.calls >= budget:
+            raise BrainError(
+                f"Lyzr call budget of {budget} reached; this agent answers from its offline fallback"
+            )
+        self.calls += 1
         body = {
             "user_id": self.settings.lyzr_user_id,
             "agent_id": agent_id,

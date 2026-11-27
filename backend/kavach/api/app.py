@@ -148,6 +148,7 @@ async def health() -> dict:
         "target_url": settings.target_url,
         "target_model": settings.target_model,
         "target_ok": target_ok,
+        "lyzr_call_budget": settings.lyzr_call_budget or None,
     }
 
 
@@ -208,6 +209,8 @@ async def start_run(body: StartRun) -> dict:
         save_extras(state, run.bus.log_path)
         handle.configs = {k: v.model_dump() for k, v in state.configs.items()}
         handle.report_md = state.report_md
+        if s.auto_pdf and state.report_md:
+            _spawn(_prebuild_pdf(Path(run.bus.log_path)))
 
     handle.task = asyncio.create_task(go_live())
     RUNS[run.run_id] = handle
@@ -306,6 +309,34 @@ def _build_pdf(recording: Path, out: Path) -> None:
         raise RuntimeError((proc.stderr or proc.stdout or "pdf build failed")[-300:])
 
 
+_PDF_LOCKS: dict[str, asyncio.Lock] = {}
+_BACKGROUND: set[asyncio.Task] = set()
+
+
+def _spawn(coro) -> None:
+    """Run a coroutine in the background and keep a reference so it is not garbage collected."""
+    task = asyncio.create_task(coro)
+    _BACKGROUND.add(task)
+    task.add_done_callback(_BACKGROUND.discard)
+
+
+async def _ensure_pdf(recording: Path, out: Path) -> None:
+    """Build the PDF once per recording, even when the auto-build and a click arrive together."""
+    lock = _PDF_LOCKS.setdefault(recording.stem, asyncio.Lock())
+    async with lock:
+        if not out.exists():
+            await asyncio.to_thread(_build_pdf, recording, out)
+
+
+async def _prebuild_pdf(recording: Path) -> None:
+    out = recording.with_suffix(".report.pdf")
+    try:
+        await _ensure_pdf(recording, out)
+        log.info("audit report PDF ready: %s", out.name)
+    except Exception as exc:  # no Chrome, a timeout, a bad recording: the PDF button explains on demand
+        log.info("audit report PDF not prebuilt for %s: %s", recording.stem, exc)
+
+
 @app.get("/api/runs/{run_id}/report.pdf")
 async def report_pdf(run_id: str) -> FileResponse:
     """The audit report as the branded PDF, built from the run's own recording and cached next to it."""
@@ -318,7 +349,7 @@ async def report_pdf(run_id: str) -> FileResponse:
     out = recording.with_suffix(".report.pdf")
     if not out.exists():
         try:
-            await asyncio.to_thread(_build_pdf, recording, out)
+            await _ensure_pdf(recording, out)
         except (RuntimeError, subprocess.SubprocessError, OSError) as e:
             log.warning("pdf report failed for %s: %s", run_id, e)
             raise HTTPException(501, "the PDF needs Google Chrome on the machine running the API") from e

@@ -19,7 +19,7 @@ uv sync --extra live
 
 ## Make targets without make
 
-Run these from `backend/`:
+These pnpm scripts work on Windows with no `make`, from the repo root: `pnpm bootstrap` (setup), `pnpm demo` (record a run), `pnpm referee` (the live Referee) and `pnpm check:backend` (lint, format check and tests). For the rest, run these from `backend/`:
 
 | Instead of | Run |
 |---|---|

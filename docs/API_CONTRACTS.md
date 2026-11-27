@@ -63,7 +63,7 @@ SSE: `event: <type>` + `data: <json envelope>`. Send a keep-alive comment every 
 
 | type | data |
 |---|---|
-| `run.started` | `{ mode, rounds, attacks_per_agent, brain_provider, target_url, target_model, skill_packs: ["name@version+digest"] }` (skill packs: see `skills/` and `backend/kavach/skills.py`) |
+| `run.started` | `{ mode, rounds, attacks_per_agent, brain_provider, target_url, target_model, skill_packs: ["name@version+digest"], approval_required: boolean }` (skill packs: see `skills/` and `backend/kavach/skills.py`; `approval_required` says whether a person approves each patch, and the dashboard shows it in the run header) |
 | `round.started` | `{ config_version }` |
 | `agent.message` | `{ agent, squad: "red"\|"blue"\|"neutral", text, mentions: [agent\|"owner"], band_message_id: string\|null }` — **the feed panel renders these** |
 | `recon.dossier` | `Dossier` |

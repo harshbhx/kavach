@@ -32,7 +32,7 @@ How it works:
 • A blue squad rewrites the bot's prompt and guard policy, then replays every attack plus everyday customer requests
 • A fix ships only if the attacks stop and real customers still get help. With approval on, a person signs off from the Band room
 
-Headline run: breach rate 83% → 0%, 100% of everyday customer requests still served, first fix shipped 38 seconds in. 10 recorded runs on 4 models, and all of them ended hardened.
+Headline run: breach rate 83% → 0%, 100% of everyday customer requests still served, first fix shipped 38 seconds in. 11 recorded runs on 4 models, and all of them ended hardened.
 
 It also runs as a GitHub Action that fails the build if a prompt change lets attacks back in.
 
