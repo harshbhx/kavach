@@ -20,6 +20,23 @@ Specs are in `docs/`. `docs/HIDEVS.md` holds every answer for the HiDevs form, `
 - Claim only what happened. Agent37 stays "deploy script included, recorded runs used a local target" unless step 7 deploys it. Label sample runs as samples.
 - **Ask Harsh first** before any login, new key, wallet, payment or anything public: a YouTube upload, the LinkedIn post, publishing on Finch, the final HiDevs submit.
 
+## On Windows (no `make`)
+
+`make` isn't installed on Windows, and `pnpm demo` and `pnpm bootstrap` call it. Run the same commands from `backend/` instead:
+
+| Instead of | Run |
+| --- | --- |
+| `make check` | `uv run ruff check . && uv run ruff format --check . && uv run pytest -q` |
+| `make target` | `uv run uvicorn kavach.target.service:app --port 8001` |
+| `pnpm demo` / `make demo` | `uv run python -m kavach.record_demo` (the target must be running: `pnpm dev` or the line above) |
+| `make referee` | `uv run --extra live python -m kavach.band.live_referee` |
+| `make gate` | `uv run python -m kavach.cli ci --prompt ../data/ci/hardened_prompt.md --policy ../data/ci/hardened_policy.json --baseline ../data/ci/baseline.json` |
+| `make setup` (`pnpm bootstrap`) | `uv sync && uv run python -m kavach.setup` |
+
+In PowerShell, set a variable for one command with `$env:APPROVAL_REQUIRED="true"; $env:APPROVAL_TIMEOUT_S="300"; pnpm dev`. Git Bash accepts the `NAME=value command` form used below.
+
+`pnpm dev` starts the target on :8001 together with the API. Since the 27 Nov update, a run stops at once with "The target bot … isn't answering" if the target is down, so it can no longer record a fake 0% run.
+
 ## Files from Harsh
 
 Harsh downloads two files from the Claude chat into `~/Downloads`: `kavach-film-2.mp4` (the 1:59 film) and `kavach-thumbnail.png`. They are not in the repo. If they are missing, ask him for them before step 10.
@@ -29,6 +46,7 @@ Harsh downloads two files from the Claude chat into `~/Downloads`: `kavach-film-
 1. **Set up.** Run `git pull`, `pnpm install`, then `cd backend && uv sync --extra live && make check`. All tests should pass. If `.env` or `agent_config.yaml` is missing, run `pnpm bootstrap` with Harsh at the keyboard: it asks for his Lyzr, Band and model keys, then creates the agents and both files.
 
 2. **Fresh live run.** Run `pnpm demo` with the real keys. If it is a good run (round 1 breached, then hardened, utility ≥ 90%), let the script fill in the README results and promote it as the dashboard demo (`uv run python -m kavach.promote_demo` if the demo script doesn't). Keep the old demo runs.
+   Since the 27 Nov update, agent replies that drift from the schema (a bare list, the list under another key, a stray backslash, JSON inside an attack) are read instead of dropped, and the repair retry shows the agent the schema. If the log still shows `agent injection task generate_attacks invalid reply` on most calls, copy three of those lines into your report.
 
 3. **Live Referee.** Run `pnpm dev` in one terminal and `make -C backend referee` in another. In the run's Band room, type `@Referee status`, then `@Referee breaches`. Screenshot the Referee's answers.
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 AgentName = Literal["recon", "injection", "social", "monitor", "patcher", "auditor", "referee"]
 SQUAD: dict[str, str] = {
@@ -145,6 +145,10 @@ class ChatResponse(BaseModel):
 # ───────────────────────── attacks & scoring ─────────────────────────
 
 
+# Other names small models use for an attack's text.
+_MESSAGE_KEYS = ("text", "prompt", "payload", "content", "attack_message", "attack")
+
+
 class Attack(BaseModel):
     id: str = "temp"
     technique: str
@@ -153,6 +157,27 @@ class Attack(BaseModel):
     why_it_might_work: str = ""
     agent: str = ""  # injection | social
     source: Literal["agent", "library"] = "agent"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_common_shapes(cls, data: Any) -> Any:
+        """Agents' replies drift from the schema in a few usual ways. Accept them instead of dropping the batch."""
+        if isinstance(data, str):
+            return {"message": data, "technique": "freeform", "goal": ""}
+        if not isinstance(data, dict):
+            return data
+        d = dict(data)
+        if not isinstance(d.get("message"), str):
+            text = next((d[k] for k in _MESSAGE_KEYS if isinstance(d.get(k), str) and d[k].strip()), None)
+            if text is not None:
+                d["message"] = text
+        if not d.get("technique"):
+            d["technique"] = d.get("technique_id") or "freeform"
+        if "goal" not in d:
+            d["goal"] = d.get("rule_id") or d.get("target_rule") or ""
+        if "id" in d and not isinstance(d["id"], str):
+            d["id"] = str(d["id"])
+        return d
 
 
 class AttackResult(BaseModel):
@@ -191,6 +216,11 @@ class UtilityReport(BaseModel):
 class ProbePlan(BaseModel):
     probes: list[str]
 
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_a_bare_list(cls, data: Any) -> Any:
+        return {"probes": data} if isinstance(data, list) else data
+
 
 class WeakPoint(BaseModel):
     hypothesis: str
@@ -208,6 +238,24 @@ class Dossier(BaseModel):
 class AttackBatch(BaseModel):
     attacks: list[Attack]
     band_message: str = ""
+
+    @model_validator(mode="before")
+    @classmethod
+    def _accept_common_shapes(cls, data: Any) -> Any:
+        """A bare list of attacks, the list under another key, or one attack on its own."""
+        if isinstance(data, list):
+            return {"attacks": data}
+        if not isinstance(data, dict) or isinstance(data.get("attacks"), list):
+            return data
+        for key in ("attack_batch", "batch", "items", "results", "messages", "data", "output"):
+            value = data.get(key)
+            if isinstance(value, list):
+                return {**data, "attacks": value}
+            if isinstance(value, dict) and isinstance(value.get("attacks"), list):
+                return value
+        if isinstance(data.get("message"), str):
+            return {"attacks": [data]}
+        return data
 
 
 class RootCause(BaseModel):
