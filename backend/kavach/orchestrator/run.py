@@ -8,6 +8,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 
+from kavach import skills
 from kavach.agents import AgentCtx, blue, red, referee
 from kavach.band.room import BandRoom
 from kavach.brains import Brain
@@ -175,6 +176,7 @@ class KavachRun:
             "brain_provider": s.brain_provider,
             "target_url": s.target_url,
             "target_model": s.target_model,
+            "skill_packs": skills.loaded_refs(),
         }
         if self.options:  # never the prompt text itself: only that one was supplied, and the rules
             started["custom"] = {

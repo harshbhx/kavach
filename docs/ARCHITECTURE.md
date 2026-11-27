@@ -120,7 +120,7 @@ After the last round: `Referee.final_report` → `report.md` → `run.completed`
 |---|---|---|
 | Backend | Python 3.11+, `uv`, FastAPI, `sse-starlette`, `httpx`, `pydantic` v2, `pydantic-settings` | Band's Python SDK requires 3.11+ and uv; async-friendly. |
 | LLM calls | `litellm` (target + direct brain); `httpx` for Lyzr | Any tool-calling model; one interface. |
-| Band | REST (`httpx`) using the documented Agent API. Optional `band-sdk` for stretch C1. | Simple, no extra processes. |
+| Band | REST (`httpx`) using the documented Agent API. Optional `band-sdk` (the `live` extra) for the live Referee. | Simple, no extra processes. |
 | Tests | `pytest`, `pytest-asyncio`, `respx` (HTTP mocking) | Offline CI with `FakeBrain`. |
 | Lint | `ruff` (lint + format) | Fast. |
 | Frontend | Vite + React 19 + TypeScript (strict) + Tailwind + Recharts + `diff` (jsdiff) | Quick to build, looks good dark. |

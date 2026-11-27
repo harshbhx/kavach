@@ -59,7 +59,7 @@ SSE: `event: <type>` + `data: <json envelope>`. Send a keep-alive comment every 
 
 | type | data |
 |---|---|
-| `run.started` | `{ mode, rounds, attacks_per_agent, brain_provider, target_url, band_room_url }` |
+| `run.started` | `{ mode, rounds, attacks_per_agent, brain_provider, target_url, target_model, skill_packs: ["name@version+digest"] }` (skill packs: see `skills/` and `backend/kavach/skills.py`) |
 | `round.started` | `{ config_version }` |
 | `agent.message` | `{ agent, squad: "red"\|"blue"\|"neutral", text, mentions: [agent\|"owner"], band_message_id: string\|null }` — **the feed panel renders these** |
 | `recon.dossier` | `Dossier` |
@@ -126,4 +126,4 @@ auditor:    { agent_id: "...", api_key: "..." }
 referee:    { agent_id: "...", api_key: "..." }
 ```
 
-The same format as the Band SDK's `Agent.from_config(<key>)`, so stretch C1 can reuse it. The keys are the internal agent names used everywhere in code and events: `recon, injection, social, monitor, patcher, auditor, referee`. Band display names (`Injector`, `Social Engineer`, …) are only labels in the Band UI.
+The same format as the Band SDK's `Agent.from_config(<key>)`, so the live Referee (`make referee`) reuses it. The keys are the internal agent names used everywhere in code and events: `recon, injection, social, monitor, patcher, auditor, referee`. Band display names (`Injector`, `Social Engineer`, …) are only labels in the Band UI.

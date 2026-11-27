@@ -51,19 +51,22 @@ Content-Type: application/json
 - Endpoints and templates: `docs/API_CONTRACTS.md §3`.
 - Base URL: **VERIFY**. The reference pages use `https://api.band.ai/api/v1`; the overview uses `https://app.band.ai/api/v1`. Set `BAND_API_BASE`.
 
-### Stretch C1: a live agent in the room
-Run the Referee as a real Band SDK agent, so judges can ask `@Referee` questions during the live demo:
-```python
-from band import Agent
-from band.adapters import LangGraphAdapter   # or the Anthropic / Pydantic AI adapter
-agent = Agent.from_config("referee", adapter=adapter)
-await agent.run()   # replies via the band_send_message tool when mentioned
+### The live Referee (built)
+`backend/kavach/band/live_referee.py` runs the Referee's Band identity on the Band SDK (`band-sdk`, the `live` extra), next to the Kavach API:
+
+```bash
+cd backend && make referee        # = uv run --extra live python -m kavach.band.live_referee
 ```
-Give it a custom tool that reads the latest `RunSummary` from our API.
+
+- It answers **people** who @mention it: `status` (the default), `breaches`, `patch`, `report` and `help`. Messages from agents are ignored, so the squads' own handoffs to @Referee never trigger it.
+- It reads the newest run from the API (`KAVACH_API`, default `http://127.0.0.1:8000`), or the recorded demo run when no run is live. Every number comes from the run's `RunSummary`; no model is asked for a score.
+- It is a custom `SimpleAdapter` with no LLM behind it: `answer()` is a pure function, unit-tested in `backend/tests/test_live_referee.py` against the real SDK classes.
+- Credentials: the `referee` entry in `agent_config.yaml` (override the path with `BAND_AGENT_CONFIG`).
+- Not done yet: approval gating (stretch C2), where a person approves a patch from the room.
 
 ### What to show judges
 - The Band room in a split screen next to the dashboard during the video.
-- Humans can read and post in the room, but no agent reacts to a human message yet. A live Referee that answers questions and approval gating (stretch C1 and C2) are not built.
+- People can read and post in the room. Writing `@Referee status` (or `breaches`, `patch`, `report`) gets an answer from the live Referee when `make referee` is running. Approval gating from the room (stretch C2) is not built.
 
 ---
 
@@ -98,16 +101,25 @@ If the wallet can't be funded in time, run the target locally (`:8001`) and say 
 
 **Install:** `npm install -g @sylphai/adal-cli` (or the install script at adal.sylph.ai).
 - AdaL reads **`AGENTS.md` at the workspace root on every turn**. That's why this repo's rules live there.
-- Project skills go in `.adal/skills/` (optional).
-- Use AdaL for the build tasks in `docs/BUILD_PLAN.md`, and mention it in the README ("Built with AdaL"). The SF edition suggested AdaL for making the demo video too. If you use it for that, say so.
+- Project skills live in `.adal/skills/`. Kavach ships both skill packs there (copies of `skills/`, kept in sync by `python scripts/sync_skills.py` and checked by a test), so AdaL working in this repo can generate red-team messages for your own bot or harden it with the same playbooks Kavach's agents use.
+- The SF edition suggested AdaL for making the demo video too. If you use it for that, say so. Don't claim AdaL built something unless it did.
 
----
+## 5. Finch: the skill packs
 
-## 5. Finch: stretch only (no listed prize)
+The two packs in `skills/` are the squads' playbooks and a live input to every run (`backend/kavach/skills.py`):
+- `skills/owasp-llm-attack-pack/` (`SKILL.md` + `techniques.json`): one card per technique (squad, round, OWASP risks, goals, a short how-to). The Injector and Social Engineer get the cards for their round on every call.
+- `skills/agent-hardening-pack/` (`SKILL.md` + `playbook.json`): five principles, a guard policy template and system prompt additions. The Patcher gets it with every patch request.
+- Each run records the packs it used (`name@version+digest`) in `run.started` and in the audit report.
 
-Finch (finchtech.ai) runs Agent / Task / Skill markets. Using it needs `@finchtech/cli` (0.5.6+ to publish skills), a local wallet, OAuth through its Remote MCP (`https://www.finchtech.ai/mcp`), and on-chain publication. That's too slow for a one-day build.
-
-Plan:
-- Write the skill packs as plain folders first: `skills/owasp-llm-attack-pack/SKILL.md` and `skills/agent-hardening-pack/SKILL.md` (agentskills-style: name, description, instructions).
-- Only if everything else is done by 5 PM, publish them to Finch and link them in the README.
-- In the README, describe Finch as "skill packs are Finch-ready". Don't claim Finch integration unless they're published.
+### Publishing to the Finch market (needs the owner's wallet)
+From the Finch CLI guide (finchtech.ai/en/story/cli-mcp, checked 27 Nov 2026; CLI 0.5.7+, Node 20+):
+```bash
+pnpm add --global @finchtech/cli@latest
+finch wallet create            # or: finch wallet use --file <PATH>  (never paste a key into a command)
+finch login --help             # pick a supported chain, then:
+finch login --chain-id <SUPPORTED_AUTH_CHAIN_ID>
+finch status
+finch skill publish-submit --path skills/owasp-llm-attack-pack --intent <INTENT_ID>
+finch skill publish-submit --path skills/agent-hardening-pack --intent <INTENT_ID>
+```
+The guide does not say where the `<INTENT_ID>` comes from; the Finch website or its Remote MCP (`https://www.finchtech.ai/mcp`) shows it. Publishing signs on-chain with a local CLI wallet, so only the owner can do it. Until then, describe the packs as "Kavach's playbooks, ready for Finch", not as published.
