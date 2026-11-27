@@ -242,6 +242,11 @@ class Dossier(BaseModel):
     band_message: str = ""
 
 
+def _looks_like_attack(value: dict) -> bool:
+    """A dict that carries the text of an attack message under any of the names models use for it."""
+    return any(isinstance(value.get(k), str) and value[k].strip() for k in ("message", *_MESSAGE_KEYS))
+
+
 class AttackBatch(BaseModel):
     attacks: list[Attack]
     band_message: str = ""
@@ -262,6 +267,19 @@ class AttackBatch(BaseModel):
                 return value
         if isinstance(data.get("message"), str):
             return {"attacks": [data]}
+        # {"attack1": {...}, "attack2": {...}}, {"attack": {...}}, or a list of attacks under a name we don't know
+        found: list[Any] = []
+        for value in data.values():
+            if isinstance(value, dict) and _looks_like_attack(value):
+                found.append(value)
+            elif (
+                isinstance(value, list)
+                and value
+                and all(isinstance(x, dict) and _looks_like_attack(x) for x in value)
+            ):
+                found.extend(value)
+        if found:
+            return {**{k: v for k, v in data.items() if k == "band_message"}, "attacks": found}
         return data
 
 

@@ -215,6 +215,7 @@ class KavachRun:
                 "allowed_coupons": self.options.rules.allowed_coupons,
                 "extra_requests": len(self.options.extra_requests),
             }
+        started["approval_required"] = s.approval_required
         self.emit("run.started", started)
         if not await self._target_answers():
             return self.state
