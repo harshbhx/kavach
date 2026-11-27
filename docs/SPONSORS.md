@@ -90,7 +90,9 @@ cd backend && make referee        # = uv run --extra live python -m kavach.band.
 5. In `.env`: `TARGET_URL=https://$INSTANCE_ID-8000.agent37.app`, `TARGET_EXTRA_HEADERS={"X-Agent37-Key":"..."}`.
 6. After the hackathon: `DELETE` the instance.
 
-Recorded: run 10 (`runs/gallery/demo10.jsonl`, 50% → 0% → 0%, utility 100%) used an Agent37 instance as the target, with every reply coming back over HTTPS. The script starts the server with `setsid` and frees the port with `fuser -k`; an earlier `pkill -f` matched its own shell and killed the start command, and `/health` alone is not proof (the proxy answers it even when nothing runs), so check a real `/chat` call.
+Recorded: run 10 used an Agent37 instance as the target, and every reply came back over HTTPS. Its recording is runs/gallery/demo10.jsonl. Round 1 breach rate was 50 percent, then 0 and 0, with utility at 100 percent.
+
+Deploy lessons: the script starts the server with setsid and frees the port with fuser. An earlier pkill matched its own shell and killed the start command. A plain health check is not proof, because the proxy answers it even when nothing runs, so test a real chat call.
 
 If the wallet can't be funded in time, run the target locally (`:8001`) and say "Agent37-ready deploy script included" in the README. Don't claim a deployment that didn't happen.
 
