@@ -214,7 +214,7 @@ export function SiteFooter() {
 
       <div className="relative border-t border-dashed border-ink/25">
         <div className="mx-auto flex max-w-[1200px] flex-col gap-2 px-5 py-6 text-[13.5px] text-ink-3 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 Harsh Bhanushali, DualMind Labs. Kavach is Hindi for armour.</p>
+          <p>© 2026 Harsh Bhanushali. Kavach is Hindi for armour.</p>
           <p>Every customer, order and PAN in Kavach is invented. No money moves.</p>
         </div>
       </div>

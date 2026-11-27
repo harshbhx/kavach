@@ -8,4 +8,4 @@ Kavach is an attack tool pointed at **its own** target. Keep it that way.
 
 ## Reporting a vulnerability
 
-If you find a way for Kavach itself to leak keys, reach the network from the target sandbox, or execute anything outside the mock tools, email harsh@dualmindlab.tech instead of opening a public issue. You will get a reply within a few days.
+If you find a way for Kavach itself to leak keys, reach the network from the target sandbox, or execute anything outside the mock tools, email bhanushaliharsh434@gmail.com instead of opening a public issue. You will get a reply within a few days.

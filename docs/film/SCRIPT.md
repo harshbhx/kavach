@@ -97,8 +97,8 @@
 ## Act 4. Close (1:46–1:55)
 
 ### 10. Built with, and the end card (1:46–1:55)
-- **Picture:** four sponsor tiles set like a colophon, each with what it does here: **Lyzr**, the seven agents · **Band**, the room they talk in · **Agent37**, the sandbox (include this tile only if the target was deployed there) · **Cloudflare**, the site. (AdaL only if you used it on the project.) Then the end card: the Kavach mark, *github.com/harshbhx/kavach*, the live site link, and *Built by Harsh Bhanushali, DualMind Labs*.
-- **VO (Narrator):** "Kavach. Built for the Agent-to-Agent Hackathon by DualMind Labs."
+- **Picture:** four sponsor tiles set like a colophon, each with what it does here: **Lyzr**, the seven agents · **Band**, the room they talk in · **Agent37**, the sandbox (include this tile only if the target was deployed there) · **Cloudflare**, the site. (AdaL only if you used it on the project.) Then the end card: the Kavach mark, *github.com/harshbhx/kavach*, the live site link, and *Built by Harsh Bhanushali*.
+- **VO (Narrator):** "Kavach. Built for the Agent-to-Agent Hackathon."
 - **Sound:** the score resolves on the end card; a last soft stamp as the URL settles.
 
 ---

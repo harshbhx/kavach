@@ -468,5 +468,5 @@ All customer data is fake. The target's tools are pure functions over a local mo
   <a href="https://kavach.dualmindlab.tech"><img src="docs/assets/devpost/6-kavach-outro.gif" width="100%" alt="Kavach end card: the mark, github.com/harshbhx/kavach, kavach.dualmindlab.tech, the seven agents and a HARDENED stamp"></a>
 </p>
 
-Built by **Harsh Bhanushali** ([DualMind Labs](https://dualmindlab.tech)). MIT licensed.
+Built by **Harsh Bhanushali**. MIT licensed.
 HiDevs account: harshbhx@gmail.com (same person as Devpost bhanushaliharsh434@gmail.com).

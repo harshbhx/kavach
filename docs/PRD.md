@@ -2,7 +2,7 @@
 
 **Hackathon:** Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition) · HiDevs / Devpost
 **Track:** Security — Attack & Defend
-**Builder:** Harsh Bhanushali (DualMind Labs)
+**Builder:** Harsh Bhanushali
 **Submission deadline:** 24 Nov 2026, 10:00 PM IST. Internal target: **submitted by 9:30 PM IST**.
 **Status:** v1.0 (final for build)
 

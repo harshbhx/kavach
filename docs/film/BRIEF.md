@@ -29,7 +29,7 @@ A 1:55 product film for the Kavach hackathon submission, in Kavach's own securit
 - Stamps land on the beat, rotate −4° to −7°, and bleed ink over 0.2 s. Nothing flashes more than three times a second; no scene under a second.
 - Cuts land on bar lines of the 104 BPM score where the script allows; scene changes are motion (a slip becoming a column, a rosette becoming the mark, a ring becoming the dashboard), not hard cuts.
 - The cursor, where it appears, travels on arcs, settles 200–300 ms, then clicks.
-- Closing card: the mark, the repo URL, the live site URL, "Built by Harsh Bhanushali, DualMind Labs".
+- Closing card: the mark, the repo URL, the live site URL, "Built by Harsh Bhanushali".
 
 ## After the film
 
