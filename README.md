@@ -223,10 +223,10 @@ Strong models refuse simple tricks, which is good news for real products. It doe
 | Sponsor | What it does here | Status |
 |---|---|---|
 | **Lyzr** | The seven agents are Lyzr Studio agents (role, goal, instructions, JSON output, session memory) called through the Lyzr inference API. `pnpm bootstrap` creates them. | In use |
-| **Band** | Each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room people can watch and join. `pnpm bootstrap` registers them. | In use |
+| **Band** | Each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room people can watch and join. `pnpm bootstrap` registers them. The **live Referee** (`make referee`) runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run. | In use; the live Referee is new and not yet in a recorded run |
 | **Agent37** | The target bot and its mock tools can run in an isolated sandbox so attacks have a safe blast radius (`scripts/deploy_target_agent37.sh`). | Deploy script included; the recorded runs used a local target |
-| **AdaL** | `AGENTS.md` and `docs/` are written so a coding agent can extend Kavach one ticket at a time. | Repo is set up for it |
-| **Finch** | The attack and hardening skill packs in [`skills/`](skills) are written as plain `SKILL.md` folders. | Finch-ready, not published |
+| **Finch** | Two skill packs in [`skills/`](skills) are the squads' playbooks: the Injector and Social Engineer get the attack pack's technique cards for their round on every call, and the Patcher gets the hardening pack's principles, guard template and prompt additions. Each run records the exact pack versions it used. | Live inputs to every run; publishing to the Finch market is next |
+| **AdaL** | The same two packs ship as AdaL project skills in `.adal/skills/`, and `AGENTS.md` and `docs/` are written so a coding agent can extend Kavach one ticket at a time. | Repo is set up for it |
 
 ## Quickstart
 
@@ -311,7 +311,7 @@ backend           Orchestrator, scoring, target bot, Lyzr and Band clients, setu
 prompts           The seven agent prompts and the target's v1 system prompt
 data              Attack library, benign suite, mock store
 docs              PRD, architecture, scoring, agent roster, API contracts; synced into the docs site
-skills            Attack and hardening skill packs (Finch-ready)
+skills            Attack and hardening skill packs: the squads' playbooks, loaded every run
 scripts           Probe, report PDF, brand and deploy helpers
 runs              Recorded runs; sample_simulated_run.jsonl powers the browser demo
 ```

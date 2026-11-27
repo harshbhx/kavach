@@ -35,7 +35,7 @@ What it shows, in order:
 ## 2. Live finale plan (28 Nov, if shortlisted)
 
 - Run live with `ROUNDS=2` for speed; keep the replay ready as backup (one click).
-- Humans can read and post in the Kavach room in Band, but no agent reacts to them yet: a live Referee that answers questions (stretch C1) is not built.
+- Humans can read and post in the Kavach room in Band. With `make referee` running, the live Referee answers `@Referee status`, `breaches`, `patch` and `report` with numbers read from the run.
 - Mobile hotspot as a network backup. Have the run already open in a second tab.
 
 ## 3. Devpost submission text (draft; edit the numbers to match your recorded run)
