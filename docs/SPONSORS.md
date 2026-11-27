@@ -74,9 +74,10 @@ cd backend && make referee        # = uv run --extra live python -m kavach.band.
 
 **Docs:** https://www.agent37.com/docs (index: https://www.agent37.com/docs/llms.txt, quickstart: `/docs/quickstart.md`)
 
-### Facts from the docs (checked 24 Nov 2026)
+### Facts from the docs (checked 28 Nov 2026)
+- API key: https://www.agent37.com/dashboard/cloud/api-keys. Compute is paid from the workspace wallet.
 - Create/delete: `https://api.agent37.com/v1/instances` with `Authorization: Bearer $AGENT37_API_KEY`.
-- Exec: `POST https://api.agent37.com/v1/instances/{id}/exec` with `Authorization: Bearer $AGENT37_API_KEY`, body `{"command": "..."}` → `{exit_code, stdout, stderr, truncated}`. One call runs for at most 280 s, so long-running servers start with `nohup … &`. Files persist between commands.
+- Exec: `POST https://sandbox.agent37.app/v1/instances/{id}/exec` with `X-Agent37-Key: $AGENT37_API_KEY`, body `{"command": "..."}` → `{exit_code, stdout, stderr, truncated}`. (On 24 Nov the docs had exec on `api.agent37.com` with `Authorization: Bearer`; the script falls back to that if the sandbox host answers 404.) One call runs for at most 280 s, so long-running servers start with `nohup … &`. Files persist between commands.
 - HTTP services are reachable at `https://{instanceId}-{port}.agent37.app` (no port registration). Requests need `X-Agent37-Key` (or a signed URL / public port for browsers).
 - New workspaces include credit for one instance; more need a funded wallet. Deleting an instance stops billing; stopped instances still bill for disk.
 - The default template (no body on create) is a Linux machine with Python, Node, git and build tools.

@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 # Deploy the DiwaliMart target bot into an Agent37 sandbox (disposable microVM).
 #
-#   AGENT37_API_KEY=...  ANTHROPIC_API_KEY=...  ./scripts/deploy_target_agent37.sh
+#   AGENT37_API_KEY=...  GROQ_API_KEY=...  ./scripts/deploy_target_agent37.sh
 #   ./scripts/deploy_target_agent37.sh delete <instance_id>     # stop billing after the demo
 #
-# Optional env: REPO_URL (default the public GitHub repo), TARGET_MODEL, PORT (8000), INSTANCE_ID (reuse one),
-# TARGET_ENV (extra KEY=VALUE pairs for the target, e.g. "TARGET_CONCURRENCY=8 TARGET_TEMPERATURE=0.2").
-# New Agent37 workspaces include credit for one instance. Endpoints per https://www.agent37.com/docs (checked
-# 24 Nov 2026): the hosting API takes `Authorization: Bearer`, instance and preview URLs take `X-Agent37-Key`,
-# and one exec call may run for up to 280 s, so the server is started in the background.
+# Optional env: REPO_URL (default the public GitHub repo), TARGET_MODEL (default groq/openai/gpt-oss-20b, the
+# headline runs' victim), PORT (8000), INSTANCE_ID (reuse one), TARGET_ENV (extra KEY=VALUE pairs for the target,
+# e.g. "TARGET_CONCURRENCY=8 TARGET_TEMPERATURE=0.2"). The API key is at
+# https://www.agent37.com/dashboard/cloud/api-keys. Endpoints per https://www.agent37.com/docs/quickstart.md
+# (checked 28 Nov 2026): create and delete on api.agent37.com with `Authorization: Bearer`; exec on
+# sandbox.agent37.app and preview URLs with `X-Agent37-Key`. One exec call may run for up to 280 s, so the server is
+# started in the background. On Windows, run this in Git Bash.
 set -euo pipefail
 
 API=https://api.agent37.com/v1
+SANDBOX=https://sandbox.agent37.app/v1
 REPO_URL=${REPO_URL:-https://github.com/harshbhx/kavach.git}
-TARGET_MODEL=${TARGET_MODEL:-anthropic/claude-haiku-5-5}
+TARGET_MODEL=${TARGET_MODEL:-groq/openai/gpt-oss-20b}
 PORT=${PORT:-8000}
 
 : "${AGENT37_API_KEY:?set AGENT37_API_KEY}"
@@ -61,16 +64,27 @@ if [[ -n "$KEY_ENV" ]]; then
 fi
 
 exec_cmd() { # exec_cmd "<shell command>" -> prints stdout, fails on non-zero exit
-  local out
-  out=$(curl -fsS -X POST "$API/instances/$INSTANCE_ID/exec" \
-    -H "Authorization: Bearer $AGENT37_API_KEY" -H "Content-Type: application/json" \
-    -d "$(json_body "$1")")
+  local reply status out code
+  # Exec lives on sandbox.agent37.app (X-Agent37-Key). Older workspaces took it on the hosting API, so fall back once.
+  reply=$(curl -sS -w $'\n%{http_code}' -X POST "$SANDBOX/instances/$INSTANCE_ID/exec" \
+    -H "X-Agent37-Key: $AGENT37_API_KEY" -H "Content-Type: application/json" -d "$(json_body "$1")")
+  status=${reply##*$'\n'}
+  if [[ "$status" == "404" || "$status" == "405" ]]; then
+    reply=$(curl -sS -w $'\n%{http_code}' -X POST "$API/instances/$INSTANCE_ID/exec" \
+      -H "Authorization: Bearer $AGENT37_API_KEY" -H "Content-Type: application/json" -d "$(json_body "$1")")
+    status=${reply##*$'\n'}
+  fi
+  out=${reply%$'\n'*}
+  if [[ "$status" != 2* ]]; then
+    # Only the error message: the raw body could echo the command, which carries the provider key.
+    echo "Agent37 exec failed (HTTP $status): $(echo "$out" | json_get error.message message 2>/dev/null || echo 'no message')" >&2
+    return 1
+  fi
   echo "$out" | json_get stdout
-  local code
   code=$(echo "$out" | json_get exit_code); code=${code:-0}
   if [[ "$code" != "0" ]]; then
     echo "$out" | json_get stderr >&2
-    echo "command failed ($code): $1" >&2
+    echo "command failed ($code)" >&2
     return 1
   fi
 }

@@ -17,7 +17,7 @@ Specs are in `docs/`. `docs/HIDEVS.md` holds every answer for the HiDevs form, `
 - Commits are authored as Harsh Bhanushali <bhanushaliharsh434@gmail.com>, with no AI co-author trailers. Group related changes into one commit.
 - Work through an issue → branch → PR. Wait for CI (backend, CI gate, web) to pass, then squash merge. Leave no PR open.
 - Keys live only in `.env` and `agent_config.yaml`, which are gitignored. Never print, paste or commit them. Never commit `apps/web/scripts/*.tmp.mjs`.
-- Claim only what happened. Agent37 stays "deploy script included, recorded runs used a local target" unless step 7 deploys it. Label sample runs as samples.
+- Claim only what happened. Agent37 stays "deploy script included, recorded runs used a local target" until step 7b records a run on it. Label sample runs as samples.
 - **Ask Harsh first** before any login, new key, wallet, payment or anything public: a YouTube upload, the LinkedIn post, publishing on Finch, the final HiDevs submit.
 
 ## On Windows (no `make`)
@@ -41,11 +41,32 @@ In PowerShell, set a variable for one command with `$env:APPROVAL_REQUIRED="true
 
 Harsh downloads two files from the Claude chat into `~/Downloads`: `kavach-film-2.mp4` (the 1:59 film) and `kavach-thumbnail.png`. They are not in the repo. If they are missing, ask him for them before step 10.
 
+## Accounts Harsh signs in to
+
+Harsh signs in himself; the agent asks him when a step needs one.
+
+| Account | For | Step |
+| --- | --- | --- |
+| GitHub (`gh auth login`) | push, PRs, merging, deleting branches | 1, 8, 14 |
+| Band | typing `@Referee` messages in the run's room | 3, 4 |
+| Lyzr Studio | screenshots of the seven agents | 5 |
+| AdaL | the CLI, if it asks on first run | 6 |
+| Finch | publishing the packs with his wallet | 7 |
+| Agent37 | the API key, and balance if the deploy says 402 | 7b |
+| Cloudflare (`npx wrangler login`, if not signed in) | deploying the site | 9 |
+| YouTube | uploading the film | 10 |
+| HiDevs | the submission form | 11 |
+| LinkedIn | the post | 12 |
+| Devpost | checking the entry | 13 |
+
 ## Steps
 
 1. **Set up.** Run `git pull`, `pnpm install`, then `cd backend && uv sync --extra live && make check`. All tests should pass. If `.env` or `agent_config.yaml` is missing, run `pnpm bootstrap` with Harsh at the keyboard: it asks for his Lyzr, Band and model keys, then creates the agents and both files.
 
-2. **Fresh live run.** Run `pnpm demo` with the real keys. If it is a good run (round 1 breached, then hardened, utility ≥ 90%), let the script fill in the README results and promote it as the dashboard demo (`uv run python -m kavach.promote_demo` if the demo script doesn't). Keep the old demo runs.
+2. **Fresh live run.** Run `pnpm demo` with the real keys (on Windows: the recorder line in the table above).
+   - **Keep the headline run.** The film, Devpost, HiDevs and LinkedIn quote the current headline (83% → 0% → 0%, fixed in 38 s, `runs/gallery/demo1.jsonl`). If an attempt passes, the recorder overwrites `runs/demo_run.jsonl`, `runs/demo_run.report.md`, the README results table and `docs/DEMO_AND_SUBMISSION.md`: undo those with `git checkout`, and delete `runs/demo_run.previous.jsonl`.
+   - **Add the new run to the gallery** as `demo9`, but only if it ended hardened, so "every run ended hardened" stays true. Add `{"id": "demo9", "title": ..., "blurb": ..., "source": "kv-....jsonl"}` to `runs/gallery.sources.json`, with a title like "Latest run: Finch playbooks in use" and a blurb that says only what the run shows. Then run `python scripts/build_gallery.py`. It writes `runs/gallery.json` and the README gallery table from the recording itself. A round 1 breach rate under 50% is fine here; demos 5, 6 and 8 are like that.
+   - **Update the run count** ("8 recorded runs", "Eight recorded live runs", and the model count if it changes) in `apps/web/app/(home)/page.tsx`, `docs/HIDEVS.md`, `docs/LINKEDIN.md` and `docs/film/YOUTUBE.md`. Leave `docs/DEVPOST.md` as it is: it was true when it was submitted.
    Since the 27 Nov update, agent replies that drift from the schema (a bare list, the list under another key, a stray backslash, JSON inside an attack) are read instead of dropped, and the repair retry shows the agent the schema. If the log still shows `agent injection task generate_attacks invalid reply` on most calls, copy three of those lines into your report.
 
 3. **Live Referee.** Run `pnpm dev` in one terminal and `make -C backend referee` in another. In the run's Band room, type `@Referee status`, then `@Referee breaches`. Screenshot the Referee's answers.
@@ -57,7 +78,15 @@ Harsh downloads two files from the Claude chat into `~/Downloads`: `kavach-film-
 6. **AdaL, for real.** Install the AdaL CLI (`npm install -g @sylphai/adal-cli`) and open it in the repo. Ask it to use the `owasp-llm-attack-pack` skill in `.adal/skills` to write five new Hinglish attack messages for `data/attack_library_hard.json` (round 2, social), following the existing format. Review its output and run `make check`. Commit it as "Five Hinglish attacks written by AdaL with the attack skill pack", and note in `docs/SPONSORS.md` §4 exactly what AdaL did.
 
 7. **Finch (ask Harsh: his wallet).** Publish both skill packs with the commands in `docs/SPONSORS.md` §5. Put the two Finch links in the README sponsor table, the Finch answer in `docs/HIDEVS.md`, and `docs/LINKEDIN.md` (see its note on the Finch line).
-   **Agent37, only if Harsh says yes:** `AGENT37_API_KEY=... ./scripts/deploy_target_agent37.sh`, set `TARGET_URL` and `TARGET_EXTRA_HEADERS` as it prints, record one live run, and update the Agent37 lines in the README, `docs/SPONSORS.md` and `docs/HIDEVS.md`. Delete the instance afterwards (`./scripts/deploy_target_agent37.sh delete <id>`).
+
+7b. **Agent37.** Harsh has an account. He creates a key at https://www.agent37.com/dashboard/cloud/api-keys and adds it to `.env` himself as `AGENT37_API_KEY=...`. The target also needs `GROQ_API_KEY` (the headline model runs on Groq); if `.env` doesn't have it, ask Harsh to add it.
+   - In Git Bash, from the repo root, load both keys without printing them, then deploy:
+     `export AGENT37_API_KEY="$(grep '^AGENT37_API_KEY=' .env | cut -d= -f2-)" GROQ_API_KEY="$(grep '^GROQ_API_KEY=' .env | cut -d= -f2-)"` and then `./scripts/deploy_target_agent37.sh`.
+     It starts the target in an Agent37 sandbox with `groq/openai/gpt-oss-20b`, the headline runs' victim. If it says HTTP 402, Harsh adds balance in the Agent37 dashboard.
+   - Set `TARGET_URL` and `TARGET_EXTRA_HEADERS` in `.env` as the script prints. Keep the local values as comments so you can switch back. Stop the local target, then check that the dashboard header says "Agent37 sandbox".
+   - Record a run: `uv run python -m kavach.record_demo --attempts 3`. Keep the headline run as in step 2. If the run ended hardened, add it to the gallery as `demo10` ("Target in an Agent37 sandbox") the same way, and count it in the run totals.
+   - Update the Agent37 lines to say it was deployed and recorded, with the gallery link: the README sponsor table, `docs/SPONSORS.md` §3, the Agent37 answer in `docs/HIDEVS.md`, and the "Built with" line in `docs/LINKEDIN.md`. Then the Architecture Copilot diagram on HiDevs (step 11) can keep its Agent37 sandbox.
+   - Ask Harsh whether to keep the instance running for the 5 Dec finale. Otherwise delete it: `./scripts/deploy_target_agent37.sh delete <id>`.
 
 8. **Ship.** One PR with the new runs, screenshots, attacks and doc updates. Wait for CI, then squash merge.
 
@@ -68,7 +97,7 @@ Harsh downloads two files from the Claude chat into `~/Downloads`: `kavach-film-
 
 11. **HiDevs (in the browser, Harsh signed in).** Open the Diwali Festiverse hackathon on the HiDevs platform (app.hidevs.xyz) and go to its Submit tab.
     - Fill in every field from `docs/HIDEVS.md`, word for word, with the new video link.
-    - Architecture Copilot: its diagram claims an Agent37 sandbox. Change it to match the README: Agent37 as "deploy script included", or leave it out, unless step 7 deployed it.
+    - Architecture Copilot: its diagram claims an Agent37 sandbox. Change it to match the README: Agent37 as "deploy script included", or leave it out, unless step 7b recorded a run on it.
     - Run the Dr. Agent repo check if the page offers it. Fix anything real it finds through a PR.
     - **Stop before the final submit.** Show Harsh the filled form and submit only when he says "yes, submit". Screenshot the confirmation.
 
