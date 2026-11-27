@@ -1,4 +1,4 @@
-import { Download, FileText } from 'lucide-react'
+import { Download, FileText, LoaderCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Empty, Panel, Stamp } from '@/components/panel'
 import { api } from '@/lib/api'
@@ -59,6 +59,53 @@ function Coverage({ run }: { run: RunView }) {
   )
 }
 
+/** The branded PDF. The first request builds it (about 30 seconds), so the button says so and stays disabled until it is done. */
+function PdfButton({ runId }: { runId: string }) {
+  const [state, setState] = useState<'idle' | 'building' | 'error'>('idle')
+  const [message, setMessage] = useState('')
+
+  async function download() {
+    setState('building')
+    setMessage('')
+    try {
+      const res = await fetch(api.reportPdfUrl(runId))
+      if (!res.ok) {
+        setMessage(res.status === 501 ? 'The PDF needs Google Chrome on the machine running the API.' : `The PDF could not be built (${res.status}).`)
+        setState('error')
+        return
+      }
+      const url = URL.createObjectURL(await res.blob())
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `kavach-audit-report-${runId}.pdf`
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 10_000)
+      setState('idle')
+    } catch {
+      setMessage('The PDF could not be reached. Is the API running?')
+      setState('error')
+    }
+  }
+
+  return (
+    <span className="inline-flex items-center gap-2">
+      <button
+        type="button"
+        onClick={download}
+        disabled={state === 'building'}
+        title="The branded four-page audit report. The first one takes about 30 seconds to build."
+        className="inline-flex items-center gap-1.5 rounded-lg bg-kv-brand px-3 py-1.5 text-[13px] font-semibold text-kv-surface hover:bg-kv-brand-hover disabled:cursor-wait disabled:opacity-80"
+      >
+        {state === 'building' ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : <Download className="size-4" aria-hidden />}
+        {state === 'building' ? 'Building PDF…' : 'PDF'}
+      </button>
+      <span role="status" aria-live="polite" className="text-[12.5px] text-kv-attack empty:hidden">
+        {state === 'error' ? message : ''}
+      </span>
+    </span>
+  )
+}
+
 /** The audit report, rendered as a document, with the coverage beside it. */
 export function ReportView({ run, demoData }: { run: RunView; demoData?: DemoData }) {
   const [fetched, setFetched] = useState<{ runId: string; md: string | null; error: string | null } | null>(null)
@@ -90,11 +137,7 @@ export function ReportView({ run, demoData }: { run: RunView; demoData?: DemoDat
         <div className="flex flex-wrap items-center gap-3 border-b border-kv-border px-6 py-3">
           <FileText className="size-4 text-kv-faint" />
           <h2 className="flex-1 font-display text-[17px] text-kv-text">Audit report</h2>
-          {run.mode !== 'demo' && run.runId && md && (
-            <a href={api.reportPdfUrl(run.runId)} download title="The branded audit report. Takes about 20 seconds the first time." className="inline-flex items-center gap-1.5 rounded-lg bg-kv-brand px-3 py-1.5 text-[13px] font-semibold text-kv-surface hover:bg-kv-brand-hover">
-              <Download className="size-4" /> PDF
-            </a>
-          )}
+          {run.mode !== 'demo' && run.runId && md && <PdfButton runId={run.runId} />}
           {href && (
             <a href={href} download={`kavach-report-${run.runId ?? 'run'}.md`} className="inline-flex items-center gap-1.5 rounded-lg bg-kv-text px-3 py-1.5 text-[13px] font-semibold text-kv-surface hover:bg-kv-defend">
               <Download className="size-4" /> Markdown

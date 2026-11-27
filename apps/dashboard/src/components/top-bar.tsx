@@ -71,13 +71,32 @@ function SpeedSelect({ value, onChange }: { value: string; onChange: (v: string)
   )
 }
 
+const APPROVAL_KEY = 'kavach.humanApproval'
+
+/** The Human approval checkbox is remembered per browser. Off (automated) unless the person turned it on. */
+function readApprovalChoice(): boolean {
+  try {
+    return localStorage.getItem(APPROVAL_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 export function TopBar({ run, logoState, demo, starting = false, gallery = [], demoKey = null, onPickDemo, onReplayDemo, onLive, onCustom, onReplay, onStop }: Props) {
   const [health, setHealth] = useState<Health | null>(null)
   const [apiDown, setApiDown] = useState(false)
   const [replays, setReplays] = useState<string[]>([])
   const [file, setFile] = useState('')
   const [speed, setSpeed] = useState('1.5')
-  const [humanApproval, setHumanApproval] = useState(false)
+  const [humanApproval, setHumanApproval] = useState(readApprovalChoice)
+  const chooseApproval = (on: boolean) => {
+    setHumanApproval(on)
+    try {
+      localStorage.setItem(APPROVAL_KEY, on ? '1' : '0')
+    } catch {
+      /* private window or blocked storage: the choice just is not remembered */
+    }
+  }
   const running = run.status === 'running'
 
   // While the backend is down, check again every few seconds so the page recovers on its own.
@@ -126,6 +145,11 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
     return `${name.includes('attack') ? 'attack' : name.includes('hardening') ? 'hardening' : name} pack ${rest.split('+')[0]}`
   })
   if (playbooks.length) facts.push(`playbooks: ${playbooks.join(' and ')}`)
+  // Where the bot ran, and who decides patches: shown for live runs and for recordings that carry the fields.
+  const sandbox = run.targetUrl?.match(/^https?:\/\/([a-z0-9]+)-\d+\.agent37\.app/i)?.[1]
+  if (sandbox) facts.push(`target: Agent37 sandbox ${sandbox}`)
+  const approvalMode = run.approvalRequired ?? (run.approvals.length > 0 ? true : null)
+  if (approvalMode !== null) facts.push(approvalMode ? 'a person approves each patch' : 'patches ship automatically')
 
   return (
     <header data-film="header" className="relative">
@@ -164,7 +188,7 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
           </span>
         )}
 
-        <div className="ml-auto flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
           {demo ? (
             <>
               {gallery.length > 0 && onPickDemo && (
@@ -217,10 +241,10 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
               </Button>
               {onCustom && <TryPromptSheet disabled={apiDown || starting} onRun={onCustom} />}
               <label
-                className="flex cursor-pointer items-center gap-2 rounded-lg border border-kv-border-strong px-3 py-2 text-[13px] text-kv-muted has-[:checked]:border-kv-brand has-[:checked]:text-kv-text"
+                className="flex min-h-9 cursor-pointer items-center gap-2 rounded-lg border border-kv-border-strong px-3 py-1.5 text-[13px] whitespace-nowrap text-kv-muted has-[:checked]:border-kv-brand has-[:checked]:text-kv-text has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60"
                 title="Off: patches ship automatically once the Auditor passes them. On: a person approves each patch from the Band room or the banner."
               >
-                <input type="checkbox" checked={humanApproval} onChange={(e) => setHumanApproval(e.target.checked)} disabled={apiDown || starting} className="size-3.5 accent-[var(--kv-brand)]" />
+                <input type="checkbox" checked={humanApproval} onChange={(e) => chooseApproval(e.target.checked)} disabled={apiDown || starting} className="size-3.5 accent-[var(--kv-brand)]" />
                 Human approval
               </label>
               <Button onClick={() => onLive(humanApproval)} disabled={apiDown || starting} className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">

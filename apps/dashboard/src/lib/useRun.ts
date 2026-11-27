@@ -101,6 +101,10 @@ export interface RunView {
   /** victim model and brain, from run.started */
   targetModel: string | null
   brain: string | null
+  /** whether a person approves each patch, from run.started (older recordings do not say) */
+  approvalRequired: boolean | null
+  /** where the target bot ran, from run.started */
+  targetUrl: string | null
 }
 
 export const emptyRun: RunView = {
@@ -128,6 +132,8 @@ export const emptyRun: RunView = {
   startedAt: null,
   speaker: null,
   skillPacks: [],
+  approvalRequired: null,
+  targetUrl: null,
   approval: null,
   approvals: [],
   moments: [],
@@ -234,6 +240,8 @@ function apply(s: RunView, ev: KavachEvent): RunView {
         skillPacks: Array.isArray(d.skill_packs) ? (d.skill_packs as string[]) : [],
         targetModel: typeof d.target_model === 'string' ? d.target_model : null,
         brain: typeof d.brain_provider === 'string' ? d.brain_provider : null,
+        approvalRequired: typeof d.approval_required === 'boolean' ? d.approval_required : null,
+        targetUrl: typeof d.target_url === 'string' ? d.target_url : null,
       }
     case 'approval.requested':
       return {
