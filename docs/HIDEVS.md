@@ -35,6 +35,8 @@ Watch a recorded live run with no install: https://kavach.dualmindlab.tech/dashb
 ## Walkthrough video
 https://youtu.be/ZI6KTaSdtDo
 
+*(A 1:59 film with the new features, `kavach-film-2.mp4`, fits the 2-minute demo rule. Upload it and put its link here; the YouTube copy is in `docs/film/YOUTUBE.md`.)*
+
 ## How we used each sponsor
 
 **BAND.** Each of the seven agents is a Band remote agent with its own identity. Every run opens one Band room, and every handoff between agents is an @mention message in it, so people can watch the attack and the fix happen and join in. The live Referee runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run, never from a model. It ignores the agents' own handoffs. With approval on, the Referee asks in the room before each patch ships, and a person decides with `@Referee approve v2` or `@Referee reject v2 because ...`: agents and people working in the same room.
