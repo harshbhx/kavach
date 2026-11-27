@@ -23,7 +23,9 @@ Rules: commits as Harsh Bhanushali <bhanushaliharsh434@gmail.com>, no AI trailer
 
 8. Only if Harsh says yes to Agent37: AGENT37_API_KEY=... ./scripts/deploy_target_agent37.sh, set TARGET_URL and TARGET_EXTRA_HEADERS as it prints, record one live run, then update the Agent37 lines in README.md, docs/SPONSORS.md and docs/HIDEVS.md to say it was deployed and recorded. Delete the instance afterwards (./scripts/deploy_target_agent37.sh delete <id>).
 
-9. Ship: one PR with the new runs, screenshots, attacks and doc updates; wait for CI (backend, CI gate, web) to pass; squash merge. The site redeploys on its own.
+9. Ship: one PR with the new runs, screenshots, attacks and doc updates; wait for CI (backend, CI gate, web) to pass; squash merge.
+
+9b. Deploy the site: `pnpm deploy:site`. The GitHub "Deploy site" job builds but skips the upload because the repo has no Cloudflare secrets, so the live site is still the 24 Nov build until you do this. Check that https://kavach.dualmindlab.tech/docs/ci-mode loads. To make deploys automatic from now on (ask Harsh first, it creates a key): create a Cloudflare API token with Workers edit rights for this account, then `gh secret set CLOUDFLARE_API_TOKEN` and `gh secret set CLOUDFLARE_ACCOUNT_ID` on harshbhx/kavach.
 
 10. Send Harsh the log: run IDs and their numbers, screenshot paths, what AdaL wrote, Finch links if any, Agent37 status, and anything that failed.
 ```
