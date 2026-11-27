@@ -269,6 +269,7 @@ Record the two-minute video from the site (Chrome needed): `pnpm --filter @kavac
 | `pnpm deploy:site` | Build and deploy the site to Cloudflare |
 | `pnpm lint` / `pnpm test` | Lint and test every package (Python and TypeScript) |
 | `make -C backend referee` | The live Referee: answers `@Referee` in the Band room and forwards `approve` / `reject` |
+| `cd backend && uv run python -m kavach.cli scoreboard` | The recorded runs summed up by victim model, as a markdown table |
 | `make -C backend gate` | CI mode on the hardened config: fails if its breach rate rises ([CI mode](docs/CI_MODE.md)) |
 | `make -C backend help` | Backend targets: `setup`, `check-setup`, `api`, `target`, `probe`, `band`, `smoke`, `referee`, `gate` |
 
@@ -301,6 +302,7 @@ The dashboard talks to the API like any client could. A few of the endpoints ([f
 | `GET` | `/api/runs/{id}/events` | The run as a server-sent event stream, resumable from any sequence number |
 | `GET` | `/api/runs/{id}/configs` | Every guardrail version so far, prompt and policy |
 | `GET` | `/api/runs/{id}/report.md` | The audit report |
+| `GET` | `/api/scoreboard` | Every recorded run, summed up by victim model |
 | `POST` | `/api/runs/{id}/approval` | Approve or reject the patch waiting for a person |
 | `POST` | `/api/runs/{id}/stop` | Stop a run |
 
@@ -320,6 +322,22 @@ skills            Attack and hardening skill packs: the squads' playbooks, loade
 scripts           Probe, report PDF, brand and deploy helpers
 runs              Recorded runs; sample_simulated_run.jsonl powers the browser demo
 ```
+
+## The dashboard
+
+One app with a view for each question, instead of one crowded page:
+
+| View | What it answers |
+|---|---|
+| **Overview** | The verdict, the breach rate round by round, and the run's story as a ledger of moments: each breach, patch, veto, approval and round result |
+| **Agent room** | The conversation at reading size, with how to talk to the live Referee in Band |
+| **Attacks** | Every intercepted tool call, with what landed by breach rule and by technique |
+| **Patches** | Each candidate, what the Auditor and a person decided, and the guard-policy diff |
+| **Audit report** | The report as a document, with OWASP LLM Top 10 coverage |
+| **Model scoreboard** | Every recorded live run, side by side by victim model, each one playable |
+| **Present** | Full-screen slides that follow the run as it happens, for a projector. Press **P** |
+
+Approval decisions, the playbook versions a run loaded and a labelled sample where a person rejects a patch (`?demo=approval`) all show up here too.
 
 ## Results
 
