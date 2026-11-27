@@ -57,6 +57,26 @@ Use a recent checkout. The scripts use `cross-env` so environment variables work
 Kavach uses 8000 (API), 8001 (bot), 5173 (dashboard) and 3000 (site). Stop whatever holds the port, or start the pieces one at a time with `make -C backend api`, `make -C backend target`, `pnpm dev:dashboard` and `pnpm dev:web`.
 
 </Accordion>
+<Accordion title="Human approval never asks, or the run goes straight through">
+
+Tick the **Human approval** checkbox next to Start live run, or send `require_approval` as true on the API. If you rely on `APPROVAL_REQUIRED=true` under `pnpm dev`, make sure `turbo.json` lists `APPROVAL_REQUIRED` and `APPROVAL_TIMEOUT_S` in `globalPassThroughEnv` (they are since 0.1.0-beta.1). Turbo drops variables that are not on that list, so older checkouts never saw them. An unticked checkbox sends an explicit off, which beats the environment. See [Human approval](/docs/approval).
+
+</Accordion>
+<Accordion title="Every attack fails with All connection attempts failed">
+
+The bot under test is not running. Start `pnpm dev` (which starts it when `TARGET_URL` is local), or on its own: from `backend/`, run `uv run python -m uvicorn kavach.target.service:app --port 8001`. A run now stops at once when the target is down instead of scoring empty replies. See [Setup on Windows](/docs/windows).
+
+</Accordion>
+<Accordion title="The PDF button says it needs Chrome">
+
+The PDF is printed by headless Google Chrome on the machine running the API, so the API answers 501 when Chrome is missing. Install Chrome, or build the PDF where Chrome is with `python scripts/build_report_pdf.py runs/RUN_ID.jsonl out.pdf`. The Markdown report always works. See [Audit reports](/docs/reports).
+
+</Accordion>
+<Accordion title="The Agent37 target answers /health but chat fails">
+
+The Agent37 proxy answers the health check even when nothing is running behind it. Send a real chat call and read `/tmp/target.log` on the instance. A 502 or container_unreachable means the server is not up. The deploy script now frees the port with `fuser -k` and starts the server with `setsid`. See [Agent37](/docs/agent37).
+
+</Accordion>
 </Accordions>
 
 ## Questions

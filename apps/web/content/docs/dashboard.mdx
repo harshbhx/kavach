@@ -17,13 +17,14 @@ The dashboard is one app with a view for each question. The left rail (a tab row
 - **Agent room**: the Kavach room at reading size, and how to ask the live Referee or approve a patch from Band.
 - **Attacks**: every intercepted tool call, beside what landed by breach rule and by technique.
 - **Patches**: each candidate with its audit and any person's decision, next to the diff against v1.
-- **Audit report**: the report rendered as a document, with OWASP LLM Top 10 coverage (tried, landed, fixed).
+- **Audit report**: the report rendered as a document, with OWASP LLM Top 10 coverage (tried, landed, fixed). Two buttons download it: **PDF** (the branded four-page report, built on first use and cached; it needs Chrome on the machine running the API) and **Markdown**. See [Audit reports](/docs/reports).
 - **Model scoreboard**: every recorded live run by victim model, with a Play button for each.
 - **Present** (press **P**): full-screen slides that follow the run as it happens: each breach with its tool call, each patch, the approval question with Approve and Reject buttons, each round and the verdict. Arrow keys step, Space follows the run, F goes full screen, Esc leaves.
 
 ## Top bar
 
 - **Start live run** starts a run with the settings in `.env`. It shows *Starting* and ignores repeat clicks while the API answers.
+- **Human approval** (a checkbox beside Start live run) decides whether a person approves each patch. Off, the default, runs fully automated and overrides `APPROVAL_REQUIRED`. On, each patch waits for you. See [Human approval](/docs/approval).
 - **Replay** plays a saved run from `runs/`, chosen in the *Recorded run* menu, at the speed you pick.
 - **Stop** ends the run or replay that is playing.
 - If the API is not running, a notice says so and the dashboard checks again every few seconds. Recordings still play.

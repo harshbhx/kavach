@@ -19,6 +19,7 @@
   <img src="https://img.shields.io/badge/agents-Lyzr-1f7a4d" alt="Agents on Lyzr">
   <img src="https://img.shields.io/badge/room-Band-1f7a4d" alt="Room on Band">
   <img src="https://img.shields.io/badge/site-Cloudflare%20Workers-3a574c" alt="Site on Cloudflare Workers">
+  <img src="https://img.shields.io/badge/release-v0.1.0--beta.1-b8860b" alt="Beta release v0.1.0-beta.1">
   <img src="https://img.shields.io/badge/license-MIT-3a574c" alt="MIT">
 </p>
 
@@ -47,6 +48,8 @@
 </sub></p>
 
 *Kavach (कवच) means armour in Hindi.* Built for **Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition)**, Security track.
+
+> **Beta (v0.1.0-beta.1).** Kavach works end to end and has ten recorded live runs, but expect rough edges: one run at a time, state in memory plus JSONL. What is new in this release: an optional **Human approval** checkbox (runs stay fully automated by default), a branded **PDF audit report** from the dashboard and API, and a recorded run on an **Agent37** sandbox. See the [changelog](CHANGELOG.md) and the [release notes](https://github.com/harshbhx/kavach/releases/tag/v0.1.0-beta.1). Sponsor status in one line each: Lyzr, Band and Agent37 are used in recorded runs; the Finch packs are live inputs to every run but are not published on the Finch market; AdaL was not run (the repo ships AdaL project skills).
 
 ## See it work
 
@@ -254,6 +257,8 @@ pnpm demo            # keeps recording until round 1 is breached, utility holds 
 
 > **Windows:** `make` is not installed by default, and `pnpm bootstrap` and `pnpm demo` call it. Without it, run the same steps from `backend/`: `uv sync && uv run python -m kavach.setup` (setup), `uv run python ../scripts/probe_v1.py` (probe), `uv run python -m kavach.record_demo` (demo). Free-tier model providers cap tokens per minute; the target queues and retries, and `TARGET_CONCURRENCY` raises the parallelism on a paid tier.
 
+More on Windows (ports, environment variables, keeping the machine light): [Setup on Windows](docs/WINDOWS.md).
+
 Record the two-minute video from the site (Chrome needed): `pnpm --filter @kavach/web video` → `runs/video/kavach-demo.mp4`.
 
 ## Commands
@@ -270,12 +275,17 @@ Record the two-minute video from the site (Chrome needed): `pnpm --filter @kavac
 | `pnpm lint` / `pnpm test` | Lint and test every package (Python and TypeScript) |
 | `make -C backend referee` | The live Referee: answers `@Referee` in the Band room and forwards `approve` / `reject` |
 | `cd backend && uv run python -m kavach.cli scoreboard` | The recorded runs summed up by victim model, as a markdown table |
+| `python scripts/build_report_pdf.py runs/<id>.jsonl out.pdf` | The branded PDF audit report for a recording ([Audit reports](docs/REPORTS.md)) |
+| `python scripts/build_gallery.py` | Rebuild the recorded-runs gallery and its README table from `runs/gallery.sources.json` ([Recorded runs](docs/RECORDED_RUNS.md)) |
+| `./scripts/deploy_target_agent37.sh` | Run the target bot in an Agent37 sandbox; `... delete <id>` removes it ([Agent37](docs/AGENT37.md)) |
 | `make -C backend gate` | CI mode on the hardened config: fails if its breach rate rises ([CI mode](docs/CI_MODE.md)) |
 | `make -C backend help` | Backend targets: `setup`, `check-setup`, `api`, `target`, `probe`, `band`, `smoke`, `referee`, `gate` |
 
 Headless run: `cd backend && uv run python -m kavach.cli run --rounds 3` writes events to `runs/<id>.jsonl` and the report to `runs/<id>.report.md`.
 
-A person in the loop: `APPROVAL_REQUIRED=true pnpm dev` makes every patch that passes the Auditor wait for a person, who approves or rejects it from the dashboard banner or from the Band room (`@Referee approve v2`, with `make -C backend referee` running). A rejection sends the Patcher back with the reason.
+**A person in the loop (optional).** Runs are fully automated by default: a patch that passes the Auditor ships. To make a person decide, tick **Human approval** next to **Start live run** in the dashboard, send `"require_approval": true` to `POST /api/runs`, or start the backend with `APPROVAL_REQUIRED=true`. Each patch then waits for an answer from the dashboard banner or from the Band room: `@Referee approve v2` or `@Referee reject v2 because ...`, with the live Referee running (`make -C backend referee`). A rejection sends the Patcher back with the reason. With no answer in `APPROVAL_TIMEOUT_S` seconds the run follows `APPROVAL_ON_TIMEOUT` (approve by default). The recorded example is `runs/demo_approval.jsonl`. Full guide: [Human approval](docs/APPROVAL.md).
+
+**Audit reports.** Every run has a Markdown report, and a branded four-page PDF built from the same recording with one template: press **PDF** on the Audit report view, call `GET /api/runs/{id}/report.pdf`, or run `python scripts/build_report_pdf.py runs/<id>.jsonl out.pdf` (needs Chrome). Full guide: [Audit reports](docs/REPORTS.md).
 
 ## Tech stack
 
@@ -333,11 +343,11 @@ One app with a view for each question, instead of one crowded page:
 | **Agent room** | The conversation at reading size, with how to talk to the live Referee in Band |
 | **Attacks** | Every intercepted tool call, with what landed by breach rule and by technique |
 | **Patches** | Each candidate, what the Auditor and a person decided, and the guard-policy diff |
-| **Audit report** | The report as a document, with OWASP LLM Top 10 coverage |
+| **Audit report** | The report as a document, with OWASP LLM Top 10 coverage, and **PDF** and **Markdown** download buttons |
 | **Model scoreboard** | Every recorded live run, side by side by victim model, each one playable |
 | **Present** | Full-screen slides that follow the run as it happens, for a projector. Press **P** |
 
-Approval decisions, the playbook versions a run loaded and a labelled sample where a person rejects a patch (`?demo=approval`) all show up here too.
+Next to **Start live run** sits a **Human approval** checkbox: off (the default) runs fully automated, on pauses each patch for a person. Approval decisions, the playbook versions a run loaded and a labelled sample where a person rejects a patch (`?demo=approval`) all show up here too.
 
 ## Results
 
@@ -447,7 +457,7 @@ All customer data is fake. The target's tools are pure functions over a local mo
 
 ## Docs
 
-[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [CI mode](docs/CI_MODE.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Finale kit](docs/FINALE.md) · [Devpost story](docs/DEVPOST.md) · [Film kit](docs/film/README.md) · [Contributing](CONTRIBUTING.md)
+[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [CI mode](docs/CI_MODE.md) · [Human approval](docs/APPROVAL.md) · [Audit reports](docs/REPORTS.md) · [Agent37](docs/AGENT37.md) · [Recorded runs](docs/RECORDED_RUNS.md) · [Setup on Windows](docs/WINDOWS.md) · [Changelog](CHANGELOG.md) · [Round 2 log](docs/ROUND2_LOG.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Finale kit](docs/FINALE.md) · [Devpost story](docs/DEVPOST.md) · [Film kit](docs/film/README.md) · [Contributing](CONTRIBUTING.md)
 
 ---
 

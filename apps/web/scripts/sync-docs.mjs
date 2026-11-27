@@ -19,6 +19,11 @@ const PAGES = [
   ['SPONSORS.md', 'sponsors', 'Sponsor integrations', 'How Kavach uses Lyzr, Band, Agent37 and AdaL, with setup steps.'],
   ['CI_MODE.md', 'ci-mode', 'CI mode', 'Fail a build when a prompt or guard-policy change raises the breach rate, from the command line or as a GitHub Action.'],
   ['bring-your-prompt.md', 'bring-your-prompt', 'Bring your own prompt', 'Paste your system prompt, set your rules, and get it attacked, patched and reported inside the DiwaliMart sandbox.'],
+  ['APPROVAL.md', 'approval', 'Human approval', 'Switch on a person in the loop: the dashboard checkbox, the Band commands, the API and the settings.'],
+  ['REPORTS.md', 'reports', 'Audit reports', 'The Markdown and branded PDF audit reports, how to get them and how they are built.'],
+  ['AGENT37.md', 'agent37', 'Agent37 sandbox', 'Deploy the target bot to an Agent37 microVM, verify it, record a run and delete it.'],
+  ['RECORDED_RUNS.md', 'recorded-runs', 'Recorded runs', 'The ten gallery recordings, the human-approval run, and how to add your own.'],
+  ['WINDOWS.md', 'windows', 'Setup on Windows', 'Run Kavach on Windows without make: commands, ports and environment variables.'],
   ['PRD.md', 'product', 'Product spec', 'The problem, the users, the scope and what success looks like.'],
 ];
 const slugOf = Object.fromEntries(PAGES.map(([f, s]) => [f, s]));
