@@ -18,6 +18,7 @@ Three surfaces: (1) the Kavach API used by the dashboard, (2) the event envelope
 | GET | `/api/replays` | – | `[{ file, size }]`: the recordings in `runs/*.jsonl` |
 | GET | `/api/runs/{run_id}/report.md` | – | `text/markdown` attachment `kavach-report-{run_id}.md` |
 | POST | `/api/runs/{run_id}/stop` | – | `{ stopped: true }` |
+| GET | `/api/runs/{run_id}/report.pdf` | none | the branded audit report as a PDF, built once from `runs/{run_id}.jsonl` and cached beside it (see [Audit reports](REPORTS.md)) · `404` report not ready or recording missing · `501` Chrome not found on the API machine |
 | POST | `/api/runs/{run_id}/approval` | `{ "decision": "approve" \| "reject", "version"?: "v2", "by"?: "Harsh", "source"?: "dashboard" \| "band" \| "api", "reason"?: "..." }` | `{ ok, version, decision }` · `409` if no patch is waiting or `version` doesn't match |
 | GET | `/api/runs` | – | `[{ run_id, mode, started_at, status }]` |
 
