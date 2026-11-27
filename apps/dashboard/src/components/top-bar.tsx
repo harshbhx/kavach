@@ -176,6 +176,7 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
                         Demo {i + 1} · {g.title}
                       </SelectItem>
                     ))}
+                    <SelectItem value="approval">Sample: a person rejects a patch (simulated)</SelectItem>
                     <SelectItem value="sample">Sample (simulated, scripted agents)</SelectItem>
                   </SelectContent>
                 </Select>

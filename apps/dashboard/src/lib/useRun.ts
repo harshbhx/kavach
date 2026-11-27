@@ -19,6 +19,32 @@ import type {
 
 export type LogoSignal = { state: 'attack' | 'breach' | 'secured'; at: number }
 
+/** One line of the run's story: what a person would point at when telling it. Derived from events, in order. */
+export interface Moment {
+  seq: number
+  /** ms since the run started */
+  t: number
+  round: number | null
+  kind: 'start' | 'breach' | 'patch' | 'veto' | 'passed' | 'ask' | 'decided' | 'deployed' | 'round' | 'verdict' | 'report'
+  tone: 'attack' | 'defend' | 'secure' | 'verdict' | 'neutral'
+  title: string
+  detail?: string
+  /** attack id, config key or version, so a view can open the thing itself */
+  ref?: string
+  /** approve | reject for decided moments */
+  decision?: 'approve' | 'reject'
+}
+
+const RULE_WORDS: Record<string, string> = {
+  REFUND_LIMIT_EXCEEDED: 'a refund over ₹500 with no human',
+  CROSS_ACCOUNT_ACTION: "an action on another customer's account",
+  PII_LEAK: "another customer's PAN or phone in the reply",
+  SYSTEM_PROMPT_EXFIL: 'the system prompt leaked',
+  COUPON_ABUSE: 'the staff-only coupon applied',
+}
+const SOURCE_WORDS: Record<string, string> = { band: 'in the Band room', dashboard: 'from the dashboard', api: 'through the API' }
+const pctOf = (v: unknown) => (typeof v === 'number' ? `${Math.round(v * 100)}%` : '–')
+
 /** Phases of one round, in order. Probe only happens in round 1 (Recon's dossier is reused after that). */
 export const PHASES = ['probe', 'attack', 'detect', 'patch', 'audit'] as const
 export type Phase = (typeof PHASES)[number] | 'done'
@@ -68,6 +94,13 @@ export interface RunView {
   skillPacks: string[]
   /** the patch waiting for a person, or the last decision */
   approval: (ApprovalRequested & { round: number; requestedAt: number; decided?: ApprovalDecided }) | null
+  /** every approval this run, oldest first */
+  approvals: (ApprovalRequested & { round: number; decided?: ApprovalDecided })[]
+  /** the run's story, in order */
+  moments: Moment[]
+  /** victim model and brain, from run.started */
+  targetModel: string | null
+  brain: string | null
 }
 
 export const emptyRun: RunView = {
@@ -96,6 +129,10 @@ export const emptyRun: RunView = {
   speaker: null,
   skillPacks: [],
   approval: null,
+  approvals: [],
+  moments: [],
+  targetModel: null,
+  brain: null,
 }
 
 type Action = { type: 'reset'; runId: string; mode: 'live' | 'replay' | 'demo' } | { type: 'event'; ev: KavachEvent } | { type: 'closed' }
@@ -115,7 +152,74 @@ function reduce(s: RunView, a: Action): RunView {
   if (a.type === 'reset') return { ...emptyRun, runId: a.runId, mode: a.mode, status: 'running', startedAt: Date.now() }
   if (a.type === 'closed') return s.status === 'running' ? { ...s, status: s.final ? 'completed' : s.status } : s
   if (a.ev.seq <= s.lastSeq) return s // EventSource reconnects replay history; drop duplicates
-  return { ...apply(s, a.ev), lastSeq: a.ev.seq, lastEventAt: Date.now() }
+  const next = apply(s, a.ev)
+  const m = momentOf(s, a.ev)
+  return { ...next, moments: m ? [...next.moments, m] : next.moments, lastSeq: a.ev.seq, lastEventAt: Date.now() }
+}
+
+/** The story line an event adds, if any. Pure, so the same recording always tells the same story. */
+export function momentOf(s: RunView, ev: KavachEvent): Moment | null {
+  const d = ev.data as Record<string, any>
+  const base = { seq: ev.seq, t: ev.t_rel_ms, round: ev.round }
+  switch (ev.type) {
+    case 'run.started': {
+      const model = typeof d.target_model === 'string' ? d.target_model.split('/').pop() : null
+      const agents = d.brain_provider === 'fake' ? 'scripted agents' : d.brain_provider === 'lyzr' ? 'agents on Lyzr' : `agents on ${d.brain_provider ?? '?'}`
+      return { ...base, kind: 'start', tone: 'neutral', title: 'Seven agents enter the room', detail: [model && `Victim model ${model}`, agents].filter(Boolean).join(', ') }
+    }
+    case 'breach.detected': {
+      if (s.moments.some((m) => m.kind === 'breach' && m.round === ev.round)) return null // the first breach tells the round
+      const words = RULE_WORDS[d.rule_id] ?? d.rule_id
+      return { ...base, kind: 'breach', tone: 'attack', title: `First breach of round ${ev.round}: ${words}`, detail: d.evidence, ref: d.attack_id }
+    }
+    case 'patch.proposed':
+      return {
+        ...base,
+        kind: 'patch',
+        tone: 'defend',
+        title: `The Patcher proposes ${d.candidate_version}, attempt ${d.attempt}`,
+        detail: ((d.policy_changes as string[] | undefined)?.length ? (d.policy_changes as string[]) : ((d.changelog as string[]) ?? [])).slice(0, 3).join('; '),
+        ref: d.config_key,
+      }
+    case 'audit.result':
+      return d.decision === 'veto'
+        ? { ...base, kind: 'veto', tone: 'attack', title: `The Auditor vetoes ${d.candidate_version}`, detail: d.reasons?.[0], ref: `${d.candidate_version}-a${d.attempt}` }
+        : {
+            ...base,
+            kind: 'passed',
+            tone: 'secure',
+            title: `${d.candidate_version} passes the Auditor`,
+            detail: `${d.replay?.still_breaching ?? 0} of ${d.replay?.total ?? 0} exploits still land on replay, utility ${pctOf(d.utility?.score)}`,
+            ref: `${d.candidate_version}-a${d.attempt}`,
+          }
+    case 'approval.requested':
+      return { ...base, kind: 'ask', tone: 'verdict', title: `${d.version} waits for a person`, detail: `No answer in ${Math.round(d.timeout_s)} s means ${d.on_timeout}`, ref: d.version }
+    case 'approval.decided': {
+      const approve = d.decision === 'approve'
+      const who = d.source === 'timeout' ? `No answer, so ${approve ? 'approved' : 'rejected'} by policy` : `${d.by} ${approve ? 'approves' : 'rejects'} ${d.version} ${SOURCE_WORDS[d.source] ?? ''}`.trim()
+      return { ...base, kind: 'decided', tone: approve ? 'secure' : 'attack', title: who, detail: d.reason ?? undefined, ref: d.version, decision: approve ? 'approve' : 'reject' }
+    }
+    case 'patch.applied':
+      return { ...base, kind: 'deployed', tone: 'secure', title: `${d.version} deployed`, detail: d.tth_seconds != null ? `Hardened ${Math.round(d.tth_seconds)} s into round ${ev.round}` : undefined, ref: d.version }
+    case 'round.scored': {
+      const held = d.breaching === 0
+      return {
+        ...base,
+        kind: 'round',
+        tone: held ? 'defend' : d.status === 'hardened' ? 'secure' : 'attack',
+        title: `Round ${d.round} closes: ${d.breaching} of ${d.total_attacks} attacks landed`,
+        detail: held ? `${d.config_attacked} held` : d.status === 'hardened' ? `Hardened to ${d.applied_version}` : 'No patch passed',
+      }
+    }
+    case 'run.completed': {
+      const trend = Object.values(s.rounds).sort((a, b) => a.round - b.round).map((r) => pctOf(r.breach_rate)).join(' → ')
+      return { ...base, kind: 'verdict', tone: (d.final_breach_rate ?? 0) > 0 ? 'attack' : 'secure', title: `Verdict: breach rate ${trend}`, detail: `Everyday requests still served: ${pctOf(d.final_utility)}. Deployed ${d.deployed_version}.` }
+    }
+    case 'report.ready':
+      return { ...base, kind: 'report', tone: 'neutral', title: 'The audit report is ready' }
+    default:
+      return null
+  }
 }
 
 function apply(s: RunView, ev: KavachEvent): RunView {
@@ -124,11 +228,24 @@ function apply(s: RunView, ev: KavachEvent): RunView {
   const now = Date.now()
   switch (ev.type) {
     case 'run.started':
-      return { ...s, status: 'running', skillPacks: Array.isArray(d.skill_packs) ? (d.skill_packs as string[]) : [] }
+      return {
+        ...s,
+        status: 'running',
+        skillPacks: Array.isArray(d.skill_packs) ? (d.skill_packs as string[]) : [],
+        targetModel: typeof d.target_model === 'string' ? d.target_model : null,
+        brain: typeof d.brain_provider === 'string' ? d.brain_provider : null,
+      }
     case 'approval.requested':
-      return { ...s, approval: { ...(d as ApprovalRequested), round: r, requestedAt: now } }
-    case 'approval.decided':
-      return s.approval && s.approval.version === d.version ? { ...s, approval: { ...s.approval, decided: d as ApprovalDecided } } : s
+      return {
+        ...s,
+        approval: { ...(d as ApprovalRequested), round: r, requestedAt: now },
+        approvals: [...s.approvals, { ...(d as ApprovalRequested), round: r }],
+      }
+    case 'approval.decided': {
+      const decided = d as ApprovalDecided
+      const approvals = s.approvals.map((x, i) => (i === s.approvals.length - 1 && x.version === decided.version && !x.decided ? { ...x, decided } : x))
+      return s.approval && s.approval.version === d.version ? { ...s, approvals, approval: { ...s.approval, decided } } : { ...s, approvals }
+    }
     case 'band.room':
       return { ...s, bandUrl: d.url ?? null }
     case 'round.started':

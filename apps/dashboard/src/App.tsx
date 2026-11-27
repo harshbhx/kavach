@@ -1,19 +1,21 @@
 import type { KavachLogoState } from '@kavach/brand'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { ArenaPanel } from '@/components/arena-panel'
-import { KpiStrip } from '@/components/kpi-strip'
-import { Narration, narrationFor } from '@/components/narration'
-import { PatchPanel } from '@/components/patch-panel'
-import { RoomPanel } from '@/components/room-panel'
-import { RoundRail } from '@/components/round-rail'
 import { ActivityBar } from '@/components/activity-bar'
+import { AppNav } from '@/components/app-nav'
 import { ApprovalBanner } from '@/components/approval-card'
+import { Narration, narrationFor } from '@/components/narration'
+import { PresentMode } from '@/components/present'
 import { TopBar } from '@/components/top-bar'
-import { TrendPanel } from '@/components/trend-panel'
 import { Toaster } from '@/components/ui/sonner'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { useView } from '@/lib/route'
+import { AttacksView } from '@/views/attacks'
+import { ModelsView } from '@/views/models'
+import { OverviewView } from '@/views/overview'
+import { PatchesView } from '@/views/patches'
+import { ReportView } from '@/views/report'
+import { RoomView } from '@/views/room'
 import { api } from '@/lib/api'
 import { demoLabel as labelOfDemo, demoParam, loadGallery, type GalleryEntry } from '@/lib/demo'
 import { RULE_LABEL } from '@/lib/format'
@@ -21,7 +23,6 @@ import type { KavachEvent } from '@/lib/types'
 import { useRun } from '@/lib/useRun'
 
 const HOLD_MS = { breach: 1500, secured: 2200 }
-const ROUNDS = 3
 
 /** Toasts answer what just happened: a breach, a veto, a deployed patch. Old events (a page refresh) stay quiet. */
 function useRunToasts() {
@@ -41,19 +42,6 @@ function useRunToasts() {
   }, [])
 }
 
-/** True at and above the given width, kept in sync with resizes. */
-function useMinWidth(px: number) {
-  const query = `(min-width: ${px}px)`
-  const [match, setMatch] = useState(() => window.matchMedia(query).matches)
-  useEffect(() => {
-    const mq = window.matchMedia(query)
-    const on = () => setMatch(mq.matches)
-    mq.addEventListener('change', on)
-    return () => mq.removeEventListener('change', on)
-  }, [query])
-  return match
-}
-
 const ANNOUNCED = new Set(['breach.detected', 'audit.result', 'patch.applied', 'round.started', 'run.completed'])
 
 const params = new URLSearchParams(window.location.search)
@@ -64,7 +52,7 @@ export default function App() {
   const toasts = useRunToasts()
   const [caption, setCaption] = useState<{ text: string; key: number } | null>(null)
   const [announcement, setAnnouncement] = useState('')
-  const wide = useMinWidth(1280)
+  const [view, setView] = useView()
   // Which recording actually played: ?demo=live falls back to the sample until a live run is recorded.
   const played = useRef<string | null>(null)
   const onEvent = useCallback(
@@ -91,9 +79,21 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const pickDemo = (key: string, speed: number) => {
-    window.history.replaceState(null, '', `?demo=${key}`)
+    window.history.replaceState(null, '', `?demo=${key}${window.location.hash}`)
+    loadGallery().then(setGallery)
     attachDemo(key, speed).catch((e) => toast.error('Could not load that recording', { description: String(e) }))
   }
+
+  // P opens present mode from anywhere except a text field
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null
+      if (t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName))) return
+      if (e.key.toLowerCase() === 'p' && !e.metaKey && !e.ctrlKey && !e.altKey && view !== 'present') setView('present')
+    }
+    window.addEventListener('keydown', on)
+    return () => window.removeEventListener('keydown', on)
+  }, [view, setView])
   const [logo, setLogo] = useState<KavachLogoState>('idle')
   const [starting, setStarting] = useState(false)
 
@@ -152,7 +152,7 @@ export default function App() {
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="flex min-h-screen flex-col gap-3 pb-4 xl:h-screen">
+      <div className="flex min-h-screen flex-col gap-3 pb-6">
         <TopBar
           run={run}
           logoState={logo}
@@ -167,70 +167,38 @@ export default function App() {
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}
           onStop={() => run.runId && api.stop(run.runId)}
         />
-        {run.approval && !run.approval.decided ? (
-          <ApprovalBanner key={`${run.approval.version}-${run.approval.attempt}`} run={run} />
-        ) : (
-          <ActivityBar run={run} starting={starting} />
-        )}
-        <div className="grid gap-3 px-4 min-[2200px]:grid-cols-[1.5fr_1fr]">
-          <RoundRail run={run} total={ROUNDS} />
-          <KpiStrip run={run} />
-        </div>
-        {run.errors.length > 0 && (
-          <p className="mx-4 rounded-xl border border-kv-verdict/40 bg-kv-verdict-soft px-4 py-2 text-xs text-kv-verdict">{run.errors[run.errors.length - 1]}</p>
-        )}
-        {wide ? (
-          <main className="grid min-h-0 flex-1 grid-cols-12 gap-3 px-4">
-            <div className="col-span-4 min-h-0 min-w-0">
-              <RoomPanel run={run} />
-            </div>
-            <div className="col-span-5 min-h-0 min-w-0">
-              <ArenaPanel run={run} />
-            </div>
-            <div className="col-span-3 flex min-h-0 min-w-0 flex-col gap-3">
-              <TrendPanel run={run} rounds={ROUNDS} />
-              <div className="min-h-0 flex-1">
-                <PatchPanel run={run} demoData={demoData} />
-              </div>
-            </div>
+        <div className="flex gap-4 px-4 max-lg:flex-col">
+          <AppNav run={run} view={view} onView={setView} />
+          <main className="min-w-0 flex-1 space-y-3">
+            {run.approval && !run.approval.decided ? (
+              <ApprovalBanner key={`${run.approval.version}-${run.approval.attempt}`} run={run} />
+            ) : view === 'overview' && run.status === 'completed' ? null : (
+              <ActivityBar run={run} starting={starting} />
+            )}
+            {run.errors.length > 0 && (
+              <p className="rounded-xl border border-kv-verdict/40 bg-kv-verdict-soft px-4 py-2 text-xs text-kv-verdict">{run.errors[run.errors.length - 1]}</p>
+            )}
+            {(view === 'overview' || view === 'present') && <OverviewView run={run} onView={setView} onPickDemo={(k) => pickDemo(k, DEMO_SPEED)} />}
+            {view === 'room' && <RoomView run={run} />}
+            {view === 'attacks' && <AttacksView run={run} />}
+            {view === 'patches' && <PatchesView run={run} demoData={demoData} />}
+            {view === 'report' && <ReportView run={run} demoData={demoData} />}
+            {view === 'models' && (
+              <ModelsView
+                onPlay={(id) => {
+                  pickDemo(id, DEMO_SPEED)
+                  setView('overview')
+                }}
+              />
+            )}
           </main>
-        ) : (
-          <Tabs defaultValue="calls" className="px-4">
-            <TabsList className="grid h-10 w-full grid-cols-3 rounded-xl border border-kv-border-strong/60 bg-kv-surface-2 p-1">
-              {[
-                ['room', 'Room', run.messages.length],
-                ['calls', 'Tool calls', run.toolCards.length],
-                ['scores', 'Scores', null],
-              ].map(([value, label, count]) => (
-                <TabsTrigger
-                  key={value as string}
-                  value={value as string}
-                  className="rounded-lg text-[13.5px] text-kv-muted data-[state=active]:bg-kv-surface data-[state=active]:text-kv-text data-[state=active]:shadow-sm"
-                >
-                  {label}
-                  {count ? <span className="ml-1 font-mono text-[11.5px] text-kv-faint">{count}</span> : null}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            <TabsContent value="room" forceMount className="h-[75vh] data-[state=inactive]:hidden">
-              <RoomPanel run={run} />
-            </TabsContent>
-            <TabsContent value="calls" forceMount className="h-[75vh] data-[state=inactive]:hidden">
-              <ArenaPanel run={run} />
-            </TabsContent>
-            <TabsContent value="scores" forceMount className="space-y-3 data-[state=inactive]:hidden">
-              <TrendPanel run={run} rounds={ROUNDS} />
-              <div className="h-[70vh]">
-                <PatchPanel run={run} demoData={demoData} />
-              </div>
-            </TabsContent>
-          </Tabs>
-        )}
+        </div>
         <p aria-live="polite" className="sr-only">
           {announcement}
         </p>
       </div>
-      {NARRATE ? <Narration latest={caption} /> : <Toaster position="bottom-right" richColors closeButton />}
+      {view === 'present' && <PresentMode run={run} onExit={() => setView('overview')} />}
+      {NARRATE ? <Narration latest={caption} /> : view !== 'present' && <Toaster position="bottom-right" richColors closeButton />}
     </TooltipProvider>
   )
 }
