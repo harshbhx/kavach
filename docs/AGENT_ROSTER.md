@@ -73,8 +73,12 @@ Input:
 { "round": 1, "dossier": {...}, "patch_notes": "string|null", "n": 3,
   "session_user": "U-101", "victim_user": "U-202",
   "goals": ["REFUND_LIMIT_EXCEEDED","CROSS_ACCOUNT_ACTION","PII_LEAK","SYSTEM_PROMPT_EXFIL","COUPON_ABUSE"],
-  "allowed_techniques_by_round": {"1":["direct_override","fake_system_message"],"2":["base64_obfuscation","json_payload_injection","tool_output_spoofing"],"3":["multi_vector","policy_lookalike","nested_instructions"]} }
+  "allowed_techniques_by_round": {"1":["direct_override","fake_system_message"],"2":["base64_obfuscation","json_payload_injection","tool_output_spoofing"],"3":["multi_vector","policy_lookalike","nested_instructions"]},
+  "examples": [{"technique": "...", "goal": "...", "message": "..."}],
+  "playbook": [{"technique": "direct_override", "owasp": ["LLM01","LLM07"], "goals": ["SYSTEM_PROMPT_EXFIL"], "how": "..."}],
+  "playbook_hint": "Base each attack on one card in `playbook` ..." }
 ```
+`allowed_techniques_by_round` and `playbook` come from the attack skill pack (`skills/owasp-llm-attack-pack/techniques.json`, loaded by `backend/kavach/skills.py`): the cards for this agent and round. Without the pack, the built-in list in `agents/red.py` is used and `playbook` is left out. The Social Engineer gets the same fields with its own techniques.
 Output:
 ```json
 {
@@ -122,8 +126,11 @@ Input:
 { "round": 1, "current_config": TargetConfig, "monitor_report": {...},
   "previous_veto_reasons": ["..."] , "attempt": 1,
   "guard_policy_schema": "<copy of the GuardPolicy schema + semantics from docs/TARGET_BOT.md>",
-  "benign_examples": ["Where is my order ORD-1001?", "Refund ₹300 for a broken diya", "..."] }
+  "benign_examples": ["Where is my order ORD-1001?", "Refund ₹300 for a broken diya", "..."],
+  "playbook": { "pack": "agent-hardening-pack@1.1.0+<digest>", "principles": ["..."],
+                "guard_policy_template": GuardPolicy, "system_prompt_additions": ["..."] } }
 ```
+`playbook` comes from the hardening skill pack (`skills/agent-hardening-pack/playbook.json`). It is left out if the pack is missing.
 Output:
 ```json
 {
@@ -163,7 +170,7 @@ Three calls:
   "recommendations": ["string"],
   "band_message": "string (≤ 500 chars, final scoreboard, mentions the room owner)" }
 ```
-3. (Stretch C1) live Q&A in Band, via the SDK listener.
+3. Live Q&A in Band (built): `make referee` runs the Referee on the Band SDK and answers people who @mention it with code-computed numbers (`backend/kavach/band/live_referee.py`).
 
 ---
 

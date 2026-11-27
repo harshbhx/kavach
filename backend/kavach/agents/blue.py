@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from kavach import skills
 from kavach.agents import TEMPERATURE, AgentCtx
 from kavach.brains import BrainError, run_agent
 from kavach.models import (
@@ -116,6 +117,9 @@ async def propose_patch(
         "guard_policy_schema": GUARD_POLICY_SCHEMA,
         "benign_examples": BENIGN_EXAMPLES,
     }
+    brief = skills.hardening_brief()
+    if brief:  # the hardening skill pack's playbook
+        payload["playbook"] = brief
     options = ctx.options
     if options is not None and options.custom:
         # A bring-your-own-prompt run: the Patcher must fix to THIS run's rules, and keep the visitor's own requests working.

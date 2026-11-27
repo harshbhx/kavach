@@ -6,6 +6,7 @@ import json
 from collections import Counter
 from typing import TYPE_CHECKING
 
+from kavach import skills
 from kavach.models import FinalReport, TargetConfig
 from kavach.scoring.metrics import owasp_breakdown
 
@@ -42,6 +43,7 @@ def build_report(state: RunState, final: TargetConfig, fr: FinalReport) -> str:
         "",
         "Target: **DiwaliMart Support** (tool-using support bot, fake data). Scores are computed in code from the target's tool-call log.",
         "",
+        *([f"Playbooks: {', '.join(f'`{r}`' for r in refs)}", ""] if (refs := skills.loaded_refs()) else []),
         *_custom_header(state),
         "## Executive summary",
         "",
