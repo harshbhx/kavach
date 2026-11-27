@@ -1,4 +1,4 @@
-.PHONY: help install setup check-setup target api offline test lint fmt check smoke probe band demo
+.PHONY: help install setup check-setup target api offline test lint fmt check smoke probe band demo referee
 
 OFFLINE = BRAIN_PROVIDER=fake BAND_ENABLED=false TARGET_MODEL=fake TARGET_URL=inprocess
 
@@ -45,3 +45,6 @@ band: ## verify the 7 Band identities and post a test message
 
 demo: ## run live until the story is good, then save runs/demo_run.jsonl
 	uv run python -m kavach.record_demo $(ARGS)
+
+referee: ## live Referee: answers people who @mention it in the Band room (needs agent_config.yaml)
+	uv run --extra live python -m kavach.band.live_referee
