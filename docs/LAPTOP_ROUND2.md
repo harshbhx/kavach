@@ -1,31 +1,63 @@
-# Laptop prompt: round 2 (before 2 Dec 2026)
+# Laptop runbook: round 2 (before 2 Dec 2026)
 
-Paste the block below into Harsh's laptop agent as one message. It covers only what needs his machine, keys or accounts; everything else is already in the repo.
+Everything here needs Harsh's machine, keys, accounts or browser. Everything else is already in the repo. Give the agent this one message:
 
 ```text
-Kavach round 2. The HiDevs deadline is now 2 Dec 2026, 10 PM IST. Repo: github.com/harshbhx/kavach. Read AGENTS.md, then do these in order and keep a short log of every number and link you see.
-
-Rules: commits as Harsh Bhanushali <bhanushaliharsh434@gmail.com>, no AI trailers, work through an issue → branch → PR → squash merge, leave no PR open. Never print or commit keys (.env, agent_config.yaml). Ask Harsh before any login, key, wallet, payment or anything public.
-
-1. Update: git pull, pnpm install, cd backend && uv sync --extra live && make check. Expect all tests to pass.
-
-2. Fresh live run with the new features: run `pnpm demo` with the real keys. The new run records which skill packs it used. If it is a good run (round 1 breached, then hardened, utility ≥ 90%), let the script fill the README results as before and promote it as the dashboard demo (`uv run python -m kavach.promote_demo` if the demo script doesn't). Keep the old demo runs.
-
-3. Live Referee: in one terminal `pnpm dev`, in another `make -C backend referee`. In the run's Band room, type `@Referee status`, then `@Referee breaches`. Screenshot the Referee's answers.
-
-4. Patch approval: stop, then `APPROVAL_REQUIRED=true APPROVAL_TIMEOUT_S=300 pnpm dev` and keep `make -C backend referee` running. Start a live run from the dashboard. When the Referee asks in Band, type `@Referee reject v2 because it needs a human check`, then approve the next attempt with `@Referee approve v2`. Screenshot the Band exchange and the dashboard's yellow approval banner. Save this run's JSONL as runs/demo_approval.jsonl (it is the first recorded run with a person in the loop).
-
-5. Screenshots (3:2, light UI, no keys or emails visible): the seven agents in Lyzr Studio, the Band room from step 3, the approval exchange from step 4, the dashboard header showing "playbooks: attack pack 1.1.0 and hardening pack 1.1.0". Save them in docs/assets/gallery/ with clear names.
-
-6. AdaL, for real: install the AdaL CLI (npm install -g @sylphai/adal-cli), open it in the repo, and ask it to use the owasp-llm-attack-pack skill in .adal/skills to write five new Hinglish attack messages for data/attack_library_hard.json (round 2, social), following the existing format. Review its output, run make check, and commit it as "feat(attacks): five Hinglish attacks written by AdaL with the attack skill pack". Note in docs/SPONSORS.md §4 exactly what AdaL did.
-
-7. With Harsh only (his wallet): publish both skill packs to Finch using the commands in docs/SPONSORS.md §5. Put the two Finch links in README.md (sponsor table) and docs/HIDEVS.md (Finch answer).
-
-8. Only if Harsh says yes to Agent37: AGENT37_API_KEY=... ./scripts/deploy_target_agent37.sh, set TARGET_URL and TARGET_EXTRA_HEADERS as it prints, record one live run, then update the Agent37 lines in README.md, docs/SPONSORS.md and docs/HIDEVS.md to say it was deployed and recorded. Delete the instance afterwards (./scripts/deploy_target_agent37.sh delete <id>).
-
-9. Ship: one PR with the new runs, screenshots, attacks and doc updates; wait for CI (backend, CI gate, web) to pass; squash merge.
-
-9b. Deploy the site: `pnpm deploy:site`. The GitHub "Deploy site" job builds but skips the upload because the repo has no Cloudflare secrets, so the live site is still the 24 Nov build until you do this. Check that https://kavach.dualmindlab.tech/docs/ci-mode loads. To make deploys automatic from now on (ask Harsh first, it creates a key): create a Cloudflare API token with Workers edit rights for this account, then `gh secret set CLOUDFLARE_API_TOKEN` and `gh secret set CLOUDFLARE_ACCOUNT_ID` on harshbhx/kavach.
-
-10. Send Harsh the log: run IDs and their numbers, screenshot paths, what AdaL wrote, Finch links if any, Agent37 status, and anything that failed.
+Clone or pull github.com/harshbhx/kavach, read AGENTS.md, then carry out docs/LAPTOP_ROUND2.md from top to bottom. Follow its rules exactly, keep a log of every number and link, and ask me before anything it marks "ask Harsh".
 ```
+
+## What Kavach is (for a new agent)
+
+Kavach is Harsh's entry in HiDevs' Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition), Security track. Seven agents (Lyzr Studio agents talking in a Band room) attack a support bot, patch it, and prove the patch with a replay and a utility check. The deadline is **2 Dec 2026, 10:00 PM IST**. Judging is on sponsor tool integration only: Lyzr, Band, Finch, AdaL and Agent37. The finale is 5 Dec in Bengaluru, top 10 only (`docs/FINALE.md` is the script).
+
+Specs are in `docs/`. `docs/HIDEVS.md` holds every answer for the HiDevs form, `docs/film/YOUTUBE.md` the film's YouTube copy, and `docs/LINKEDIN.md` the LinkedIn post.
+
+## Rules
+
+- Commits are authored as Harsh Bhanushali <bhanushaliharsh434@gmail.com>, with no AI co-author trailers. Group related changes into one commit.
+- Work through an issue → branch → PR. Wait for CI (backend, CI gate, web) to pass, then squash merge. Leave no PR open.
+- Keys live only in `.env` and `agent_config.yaml`, which are gitignored. Never print, paste or commit them. Never commit `apps/web/scripts/*.tmp.mjs`.
+- Claim only what happened. Agent37 stays "deploy script included, recorded runs used a local target" unless step 7 deploys it. Label sample runs as samples.
+- **Ask Harsh first** before any login, new key, wallet, payment or anything public: a YouTube upload, the LinkedIn post, publishing on Finch, the final HiDevs submit.
+
+## Files from Harsh
+
+Harsh downloads two files from the Claude chat into `~/Downloads`: `kavach-film-2.mp4` (the 1:59 film) and `kavach-thumbnail.png`. They are not in the repo. If they are missing, ask him for them before step 10.
+
+## Steps
+
+1. **Set up.** Run `git pull`, `pnpm install`, then `cd backend && uv sync --extra live && make check`. All tests should pass. If `.env` or `agent_config.yaml` is missing, run `pnpm bootstrap` with Harsh at the keyboard: it asks for his Lyzr, Band and model keys, then creates the agents and both files.
+
+2. **Fresh live run.** Run `pnpm demo` with the real keys. If it is a good run (round 1 breached, then hardened, utility ≥ 90%), let the script fill in the README results and promote it as the dashboard demo (`uv run python -m kavach.promote_demo` if the demo script doesn't). Keep the old demo runs.
+
+3. **Live Referee.** Run `pnpm dev` in one terminal and `make -C backend referee` in another. In the run's Band room, type `@Referee status`, then `@Referee breaches`. Screenshot the Referee's answers.
+
+4. **Patch approval in Band.** Stop `pnpm dev`. Run `APPROVAL_REQUIRED=true APPROVAL_TIMEOUT_S=300 pnpm dev`, keep the Referee running, and start a live run from the dashboard. When the Referee asks in Band, type `@Referee reject v2 because it needs a human check`, then approve the next attempt with `@Referee approve v2`. Screenshot the Band exchange and the dashboard's approval banner. Save the run's JSONL as `runs/demo_approval.jsonl`: it is the first recorded run with a person in the loop. Then change the Band row in the README's sponsor table from "not yet in a recorded run" to say it is in one.
+
+5. **Screenshots.** 3:2, light UI, no keys or emails visible: the seven agents in Lyzr Studio, the Band room from step 3, the approval from step 4, and the dashboard's Overview and Present mode (press P). Save them in `docs/assets/gallery/` with clear names.
+
+6. **AdaL, for real.** Install the AdaL CLI (`npm install -g @sylphai/adal-cli`) and open it in the repo. Ask it to use the `owasp-llm-attack-pack` skill in `.adal/skills` to write five new Hinglish attack messages for `data/attack_library_hard.json` (round 2, social), following the existing format. Review its output and run `make check`. Commit it as "Five Hinglish attacks written by AdaL with the attack skill pack", and note in `docs/SPONSORS.md` §4 exactly what AdaL did.
+
+7. **Finch (ask Harsh: his wallet).** Publish both skill packs with the commands in `docs/SPONSORS.md` §5. Put the two Finch links in the README sponsor table, the Finch answer in `docs/HIDEVS.md`, and `docs/LINKEDIN.md` (see its note on the Finch line).
+   **Agent37, only if Harsh says yes:** `AGENT37_API_KEY=... ./scripts/deploy_target_agent37.sh`, set `TARGET_URL` and `TARGET_EXTRA_HEADERS` as it prints, record one live run, and update the Agent37 lines in the README, `docs/SPONSORS.md` and `docs/HIDEVS.md`. Delete the instance afterwards (`./scripts/deploy_target_agent37.sh delete <id>`).
+
+8. **Ship.** One PR with the new runs, screenshots, attacks and doc updates. Wait for CI, then squash merge.
+
+9. **Deploy the site.** Run `pnpm deploy:site`. The GitHub "Deploy site" job skips the upload because the repo has no Cloudflare secrets, so the live site stays on the 24 Nov build until you do this. Check that these load: https://kavach.dualmindlab.tech, https://kavach.dualmindlab.tech/dashboard/?demo=approval and https://kavach.dualmindlab.tech/docs/ci-mode.
+   To make deploys automatic (ask Harsh, it creates a key): make a Cloudflare API token with Workers edit rights, then run `gh secret set CLOUDFLARE_API_TOKEN` and `gh secret set CLOUDFLARE_ACCOUNT_ID` on harshbhx/kavach.
+
+10. **YouTube (ask Harsh).** Upload `~/Downloads/kavach-film-2.mp4` with the title, description, chapters and tags in `docs/film/YOUTUBE.md`, and `kavach-thumbnail.png` as the thumbnail. Ask Harsh whether it should be public or unlisted. Then replace the old link `https://youtu.be/ZI6KTaSdtDo` with the new one in `docs/HIDEVS.md` (and delete the italic note under it), `docs/FINALE.md` and `docs/film/YOUTUBE.md`, and fill the `<YouTube link>` in `docs/LINKEDIN.md`. PR, merge, then run `pnpm deploy:site` again.
+
+11. **HiDevs (in the browser, Harsh signed in).** Open the Diwali Festiverse hackathon on the HiDevs platform (app.hidevs.xyz) and go to its Submit tab.
+    - Fill in every field from `docs/HIDEVS.md`, word for word, with the new video link.
+    - Architecture Copilot: its diagram claims an Agent37 sandbox. Change it to match the README: Agent37 as "deploy script included", or leave it out, unless step 7 deployed it.
+    - Run the Dr. Agent repo check if the page offers it. Fix anything real it finds through a PR.
+    - **Stop before the final submit.** Show Harsh the filled form and submit only when he says "yes, submit". Screenshot the confirmation.
+
+12. **LinkedIn (ask Harsh).** Post `docs/LINKEDIN.md` exactly as its steps say: upload the MP4 itself, type each @ tag again so it links, and add the links as the first comment. Harsh may prefer to post it himself; then hand him the text.
+
+13. **Devpost.** Open Harsh's Devpost portfolio and check whether the Kavach entry for the Diwali Festiverse hackathon shows as submitted. The hackathon has ended, so change nothing; just report what it shows.
+
+14. **GitHub cleanup.** These branches are merged; delete them: `docs/film-2`, `docs/laptop-deploy`, `docs/linkedin-post`, `docs/laptop-runbook`, `feat/approval-ci-finale`, `feat/dashboard-redesign`, `feat/playbooks-live-referee`, plus any branch this run merged (`git push origin --delete <branch>`). Confirm no PR is open.
+
+15. **Report to Harsh:** run IDs and their numbers, screenshot paths, what AdaL wrote, Finch links, Agent37 status, the new YouTube link, the HiDevs state (filled, waiting for his yes, or submitted), the LinkedIn post link, the Devpost status, and anything that failed.
