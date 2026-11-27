@@ -118,6 +118,12 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
     : health
       ? [brainLabel(health.brain_provider), `target ${targetLabel(health)}`]
       : []
+  // The skill packs the run loaded: "owasp-llm-attack-pack@1.1.0+51a3e31d" → "attack pack 1.1.0"
+  const playbooks = run.skillPacks.map((ref) => {
+    const [name, rest = ''] = ref.split('@')
+    return `${name.includes('attack') ? 'attack' : name.includes('hardening') ? 'hardening' : name} pack ${rest.split('+')[0]}`
+  })
+  if (playbooks.length) facts.push(`playbooks: ${playbooks.join(' and ')}`)
 
   return (
     <header data-film="header" className="relative">

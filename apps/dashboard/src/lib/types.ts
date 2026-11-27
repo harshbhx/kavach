@@ -71,6 +71,26 @@ export interface AuditResult {
   reasons: string[]
 }
 
+/** approval.requested: a patch the Auditor passed, waiting for a person (APPROVAL_REQUIRED or require_approval). */
+export interface ApprovalRequested {
+  version: string
+  attempt: number
+  replay: { total: number; still_breaching: number }
+  utility: number
+  timeout_s: number
+  on_timeout: 'approve' | 'reject'
+}
+
+/** approval.decided: who settled it, from where ('band' | 'dashboard' | 'api' | 'timeout'). */
+export interface ApprovalDecided {
+  version: string
+  decision: 'approve' | 'reject'
+  by: string
+  source: string
+  reason: string | null
+  waited_s: number
+}
+
 export interface PatchProposed {
   attempt: number
   candidate_version: string

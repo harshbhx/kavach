@@ -7,6 +7,8 @@ export interface CustomRun {
   system_prompt?: string
   rules?: { refund_limit_inr?: number; allowed_coupons?: string[] }
   extra_requests?: string[]
+  /** Ask a person (Band room or dashboard) before each patch ships. Omitted: the backend's APPROVAL_REQUIRED. */
+  require_approval?: boolean
 }
 
 async function json<T>(path: string, init?: RequestInit): Promise<T> {
@@ -29,6 +31,12 @@ export const api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode: 'replay', replay_file: file, speed }),
+    }),
+  decideApproval: (runId: string, version: string, decision: 'approve' | 'reject', reason?: string) =>
+    json<{ ok: boolean; version: string; decision: string }>(`/api/runs/${runId}/approval`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ decision, version, by: 'dashboard', source: 'dashboard', reason }),
     }),
   stop: (runId: string) => json<{ stopped: boolean }>(`/api/runs/${runId}/stop`, { method: 'POST' }),
   configs: (runId: string) => json<Record<string, TargetConfig>>(`/api/runs/${runId}/configs`),

@@ -8,6 +8,7 @@ import { PatchPanel } from '@/components/patch-panel'
 import { RoomPanel } from '@/components/room-panel'
 import { RoundRail } from '@/components/round-rail'
 import { ActivityBar } from '@/components/activity-bar'
+import { ApprovalBanner } from '@/components/approval-card'
 import { TopBar } from '@/components/top-bar'
 import { TrendPanel } from '@/components/trend-panel'
 import { Toaster } from '@/components/ui/sonner'
@@ -166,7 +167,11 @@ export default function App() {
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}
           onStop={() => run.runId && api.stop(run.runId)}
         />
-        <ActivityBar run={run} starting={starting} />
+        {run.approval && !run.approval.decided ? (
+          <ApprovalBanner key={`${run.approval.version}-${run.approval.attempt}`} run={run} />
+        ) : (
+          <ActivityBar run={run} starting={starting} />
+        )}
         <div className="grid gap-3 px-4 min-[2200px]:grid-cols-[1.5fr_1fr]">
           <RoundRail run={run} total={ROUNDS} />
           <KpiStrip run={run} />

@@ -8,6 +8,7 @@ import { api } from '@/lib/api'
 import type { TargetConfig } from '@/lib/types'
 import type { RunView } from '@/lib/useRun'
 import { cn } from '@/lib/utils'
+import { ApprovalNote } from './approval-card'
 import { Empty, Panel } from './panel'
 
 type View = 'policy' | 'prompt'
@@ -160,6 +161,7 @@ export function PatchPanel({ run, demoData }: { run: RunView; demoData?: () => D
           </pre>
         </>
       )}
+      <ApprovalNote run={run} />
       <div className="relative border-t border-kv-border/80 p-3">
         <a
           href={reportHref}

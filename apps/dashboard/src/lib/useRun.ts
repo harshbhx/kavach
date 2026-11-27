@@ -3,6 +3,8 @@ import { api } from './api'
 import { configsSoFar, loadDemo, playDemo, type DemoRun } from './demo'
 import type {
   AgentMessage,
+  ApprovalDecided,
+  ApprovalRequested,
   AgentName,
   AttackInfo,
   AuditResult,
@@ -62,6 +64,10 @@ export interface RunView {
   lastEventAt: number | null
   startedAt: number | null
   speaker: { agent: AgentName; at: number } | null
+  /** skill packs the run loaded (name@version+digest), from run.started */
+  skillPacks: string[]
+  /** the patch waiting for a person, or the last decision */
+  approval: (ApprovalRequested & { round: number; requestedAt: number; decided?: ApprovalDecided }) | null
 }
 
 export const emptyRun: RunView = {
@@ -88,6 +94,8 @@ export const emptyRun: RunView = {
   lastEventAt: null,
   startedAt: null,
   speaker: null,
+  skillPacks: [],
+  approval: null,
 }
 
 type Action = { type: 'reset'; runId: string; mode: 'live' | 'replay' | 'demo' } | { type: 'event'; ev: KavachEvent } | { type: 'closed' }
@@ -116,7 +124,11 @@ function apply(s: RunView, ev: KavachEvent): RunView {
   const now = Date.now()
   switch (ev.type) {
     case 'run.started':
-      return { ...s, status: 'running' }
+      return { ...s, status: 'running', skillPacks: Array.isArray(d.skill_packs) ? (d.skill_packs as string[]) : [] }
+    case 'approval.requested':
+      return { ...s, approval: { ...(d as ApprovalRequested), round: r, requestedAt: now } }
+    case 'approval.decided':
+      return s.approval && s.approval.version === d.version ? { ...s, approval: { ...s.approval, decided: d as ApprovalDecided } } : s
     case 'band.room':
       return { ...s, bandUrl: d.url ?? null }
     case 'round.started':
@@ -242,7 +254,8 @@ export function useRun(onEvent?: (ev: KavachEvent) => void) {
     const types = [
       'run.started', 'band.room', 'round.started', 'agent.message', 'recon.dossier', 'attack.launched', 'target.response',
       'toolcall.intercepted', 'breach.detected', 'round.breach_scored', 'monitor.report', 'patch.proposed', 'audit.result',
-      'patch.applied', 'round.scored', 'report.ready', 'run.completed', 'band.error', 'error',
+      'patch.applied', 'round.scored', 'report.ready', 'run.completed', 'band.error', 'error', 'approval.requested',
+      'approval.decided',
     ]
     types.forEach((t) => es.addEventListener(t, onMessage as EventListener))
     es.onerror = () => {
