@@ -16,6 +16,7 @@ export interface DemoRun {
 export const DEMO_RUNS: Record<string, { file: string; label: string }> = {
   live: { file: 'demo_run.jsonl', label: 'Recorded live run' },
   sample: { file: 'sample_simulated_run.jsonl', label: 'Sample run (simulated, scripted agents)' },
+  approval: { file: 'sample_approval_run.jsonl', label: 'Sample: a person rejects a patch (simulated)' },
 }
 
 /** One recorded run in the gallery (runs/gallery.json, built by scripts/build_gallery.py from the recordings themselves). */

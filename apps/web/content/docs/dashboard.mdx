@@ -9,6 +9,18 @@ The dashboard is where you watch a run. It listens to the API's event stream, so
 
 *The headline run (<a href="/dashboard/?demo=demo1">Demo 1</a>), a recorded live run with `gpt-oss-20b` as the victim bot, replayed in the browser and sped up.*
 
+## Views
+
+The dashboard is one app with a view for each question. The left rail (a tab row on phones) switches between them, and the address keeps the view, so a link or a refresh lands in the same place (`#/attacks`).
+
+- **Overview**: the verdict stamp, the breach rate round by round, the round rail, the score strip and **What happened**, a ledger of the run's moments (first breach of each round, every candidate, veto, approval, deployment and round result). Select a moment to open it in its own view.
+- **Agent room**: the Kavach room at reading size, and how to ask the live Referee or approve a patch from Band.
+- **Attacks**: every intercepted tool call, beside what landed by breach rule and by technique.
+- **Patches**: each candidate with its audit and any person's decision, next to the diff against v1.
+- **Audit report**: the report rendered as a document, with OWASP LLM Top 10 coverage (tried, landed, fixed).
+- **Model scoreboard**: every recorded live run by victim model, with a Play button for each.
+- **Present** (press **P**): full-screen slides that follow the run as it happens: each breach with its tool call, each patch, the approval question with Approve and Reject buttons, each round and the verdict. Arrow keys step, Space follows the run, F goes full screen, Esc leaves.
+
 ## Top bar
 
 - **Start live run** starts a run with the settings in `.env`. It shows *Starting* and ignores repeat clicks while the API answers.

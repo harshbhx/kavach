@@ -8,7 +8,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const runs = path.resolve(here, '../../../runs');
 const out = path.resolve(here, '../public/runs');
 await mkdir(out, { recursive: true });
-for (const f of ['sample_simulated_run.jsonl', 'demo_run.jsonl']) {
+for (const f of ['sample_simulated_run.jsonl', 'sample_approval_run.jsonl', 'demo_run.jsonl']) {
   if (existsSync(path.join(runs, f))) {
     await copyFile(path.join(runs, f), path.join(out, f));
     console.log(`bundled ${f}`);

@@ -156,6 +156,14 @@ async def list_replays() -> list[dict]:
     return [{"file": p.name, "size": p.stat().st_size} for p in files]
 
 
+@app.get("/api/scoreboard")
+async def get_scoreboard() -> dict:
+    """The recorded runs in runs/gallery/, summed up by victim model (kavach/scoreboard.py)."""
+    from kavach.scoreboard import scoreboard
+
+    return scoreboard(settings.runs_path / "gallery")
+
+
 @app.post("/api/runs", status_code=201)
 async def start_run(body: StartRun) -> dict:
     if _active():

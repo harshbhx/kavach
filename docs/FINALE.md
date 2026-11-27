@@ -26,7 +26,7 @@ Start the run from the dashboard as you begin talking. Round 1 takes about a min
 
 | Time | Show | Say |
 |---|---|---|
-| 0:00 | The dashboard, run starting | "Support bots in India now issue refunds and look up KYC records. Anyone who talks to them can try to make them do it. Kavach puts seven AI agents in one room with a bot like that." |
+| 0:00 | Press **P** for Present mode as the run starts | "Support bots in India now issue refunds and look up KYC records. Anyone who talks to them can try to make them do it. Kavach puts seven AI agents in one room with a bot like that." |
 | 0:20 | The Kavach room panel, then the Band room tab | "Red squad attacks, blue squad hardens, and every handoff is a message in a Band room you can join. The agents run on Lyzr." |
 | 0:40 | Intercepted tool calls, a red BREACH slip | "This is what matters: the bot's actual tool calls. Here it refunded money on someone else's order. Code catches it from the log. No model grades another model." |
 | 1:10 | The patch panel diff | "The Patcher writes a fix: a ₹500 limit and ownership checks, enforced at the tool, not just in the prompt." |
@@ -36,7 +36,7 @@ Start the run from the dashboard as you begin talking. Round 1 takes about a min
 | 2:35 | The audit report download | "Every run ends with an audit report your team can read, mapped to the OWASP LLM Top 10." |
 | 2:50 | Back to the dashboard header | "Kavach: armour for agents that can act. Thank you." |
 
-If round 1 is slow, talk through the recorded run's first breach while the live one catches up (open the recorded-run tab).
+Present mode follows the run on its own: each breach, patch, approval and round becomes a full-screen slide, and the approval slide has Approve and Reject buttons. Press Esc to drop back to the dashboard views (Attacks for the slips, Patches for the diff). If round 1 is slow, talk through the recorded run's first breach while the live one catches up (open the recorded-run tab).
 
 ## When something breaks
 

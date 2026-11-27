@@ -8,6 +8,7 @@ agent_config.yaml
 runs/*.jsonl
 !runs/demo_run.jsonl
 !runs/sample_simulated_run.jsonl
+!runs/sample_approval_run.jsonl
 
 # python
 __pycache__/

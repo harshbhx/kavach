@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { AttackConsole } from '@/components/landing/attack-console';
 import { AttackThread } from '@/components/landing/attack-thread';
+import { ApprovalThread } from '@/components/landing/approval-thread';
 import { AuditForms } from '@/components/landing/audit-forms';
+import { CiGate } from '@/components/landing/ci-gate';
 import { DemoGallery } from '@/components/landing/demo-gallery';
+import { ModelScoreboard } from '@/components/landing/model-scoreboard';
 import { Passbook } from '@/components/landing/passbook';
 import { RefundSlip } from '@/components/landing/refund-slip';
 import { RoundTimeline } from '@/components/landing/round-timeline';
@@ -18,9 +21,10 @@ import { links } from '@/lib/shared';
 
 const SPONSORS = [
   ['Lyzr', 'Writes the agents’ minds. Each of the seven runs as a Lyzr Studio agent with its own role, instructions and memory.'],
-  ['Band', 'Holds the room. Every agent is a Band remote agent, and every handoff is a message that @mentions the next one.'],
+  ['Band', 'Holds the room. Every handoff is a message that @mentions the next agent, the live Referee answers people, and a person approves each patch there.'],
+  ['Finch', 'Carries the playbooks. Two skill packs, an OWASP attack pack and a hardening pack, are loaded into the squads on every run.'],
+  ['AdaL', 'Reads the manual. The same skill packs ship as AdaL project skills, and AGENTS.md lets AdaL extend Kavach ticket by ticket.'],
   ['Agent37', 'Contains the blast. The target bot can run in a throwaway Agent37 sandbox; the deploy script is in the repo.'],
-  ['AdaL', 'Reads the manual. AGENTS.md and ticketed specs let a coding agent like AdaL extend Kavach one ticket at a time.'],
 ] as const;
 
 const QUICKSTART = `git clone ${links.github}.git && cd kavach
@@ -158,6 +162,21 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Model scoreboard */}
+      <section className="border-t border-ink/15">
+        <div className="mx-auto max-w-[1200px] px-5 py-24">
+          <Heading id="models" title="Bigger models refuse more. None of them is safe on its own.">
+            <p>
+              Eight recorded live runs against four victim models. The bigger the model, the fewer tricks land in round one, but
+              every one of them broke at least once, and every run ended hardened with real customers still served.
+            </p>
+          </Heading>
+          <div className="mt-12">
+            <ModelScoreboard />
+          </div>
+        </div>
+      </section>
+
       {/* Detectors as security features */}
       <section className="border-t border-ink/15 bg-paper-2/60">
         <div className="mx-auto max-w-[1200px] px-5 py-24">
@@ -193,6 +212,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* A person in the loop */}
+      <section className="border-t border-ink/15 bg-paper-2/60">
+        <div className="mx-auto max-w-[1200px] px-5 py-24">
+          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+            <Heading id="approval" title="A person signs off before a patch ships.">
+              <p>
+                Code decides whether a patch is good enough to ask about. A person decides whether it ships. Turn approval on and
+                the Referee asks in the Band room, with the replay and utility numbers.
+              </p>
+              <p>
+                Reply <code className="font-mono text-[16px] text-ink">@Referee approve v2</code>, or reject it with a reason. The
+                reason goes back to the Patcher, and its next attempt has to answer it. The dashboard has the same two buttons.
+              </p>
+            </Heading>
+            <ApprovalThread />
+          </div>
+        </div>
+      </section>
+
       {/* Agents */}
       <section className="border-t border-ink/15 bg-paper-2/60">
         <div className="mx-auto max-w-[1200px] px-5 py-24">
@@ -202,6 +240,22 @@ export default function HomePage() {
           <div className="mt-12 space-y-8">
             <RoomCast />
             <Signatories />
+          </div>
+        </div>
+      </section>
+
+      {/* CI gate */}
+      <section className="border-t border-ink/15 bg-paper-2/60">
+        <div className="mx-auto max-w-[1200px] px-5 py-24">
+          <Heading id="ci" title="Keep it fixed: a gate on every prompt change.">
+            <p>
+              A harmless-looking prompt edit can reopen a hole the last patch closed. The CI gate replays the attack library
+              against your prompt and guard policy, runs the everyday requests, and fails the build if the breach rate rises or
+              utility drops below 90%. It is a command, and a GitHub Action.
+            </p>
+          </Heading>
+          <div className="mt-12">
+            <CiGate />
           </div>
         </div>
       </section>
@@ -223,12 +277,12 @@ export default function HomePage() {
         <div className="kv-band h-5 opacity-60" aria-hidden />
         <div className="mx-auto max-w-[1200px] px-5 py-20">
           <h2 className="max-w-[50rem] font-display text-[2.4rem] leading-[1.05] text-paper-2 text-balance md:text-[3rem]">
-            Built on Lyzr and Band, with Agent37 and AdaL support in the repo.
+            Built on Lyzr and Band, with Finch, AdaL and Agent37 support in the repo.
           </h2>
           <div className="mt-12">
             <RunMap />
           </div>
-          <dl className="mt-10 grid gap-px overflow-hidden rounded-xl border border-paper/15 bg-paper/15 md:grid-cols-4">
+          <dl className="mt-10 grid gap-px overflow-hidden rounded-xl border border-paper/15 bg-paper/15 md:grid-cols-3 lg:grid-cols-5">
             {SPONSORS.map(([name, text]) => (
               <div key={name} className="bg-ink p-6">
                 <dt className="font-display text-[2rem] leading-none text-paper-2">{name}</dt>

@@ -7,6 +7,7 @@ const COLUMNS = [
       'The guard policy. Refunds, KYC lookups and coupons are checked at the tool, not in the prompt.',
       'The ten everyday requests and the 90% utility gate. A patch below it never ships.',
       'The audit report, built from the same events the dashboard shows.',
+      'The two skill packs, loaded into the squads every run and recorded in the report, and the CI gate.',
     ],
   },
   {
@@ -16,6 +17,7 @@ const COLUMNS = [
       'Seven Lyzr agents write the attacks, the root-cause reports and the patches.',
       'Every handoff is posted to a Band room, where you can read the run as a chat.',
       'The target bot calls a real model, on your machine or in an Agent37 sandbox.',
+      'The live Referee answers people in the Band room, and with approval on, a person ships or rejects each patch there.',
     ],
   },
   {
@@ -23,7 +25,7 @@ const COLUMNS = [
     tone: 'border-stamp',
     items: [
       'pnpm dev:offline swaps in scripted agents and a scripted bot, so the loop runs without keys.',
-      'The sample run quoted on this page is one of those offline runs. Its file is named sample_simulated_run.',
+      'The sample runs quoted on this page are offline runs: sample_simulated_run, and sample_approval_run, where the reviewer is a script.',
       'DiwaliMart, its customers, PANs and phone numbers are invented. No money moves.',
     ],
   },
