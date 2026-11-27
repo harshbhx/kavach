@@ -84,7 +84,7 @@
   5. Patch amendments: the guard-policy diff, `"max_auto_inr": null` → `500`, `"require_order_ownership": true`. (1:32–1:36)
 - **Label (small, top-left, whole scene):** *Recorded live run, target gpt-4o-mini* or *Simulated run, scripted agents*.
 - **VO (Narrator):** "This is a recorded run. Round one: breached. The first patch, vetoed. The second, approved. Every handoff is a message in Band, every agent runs on Lyzr, and the bot under attack is a sandboxed copy with fake data."
-  - *The veto and the 70% counter exist only in the offline sample run (scripted agents). The recorded live runs approved the first patch. If the film shows a live run instead, use: "This is a real run. Round one: breached. One patch, approved. Every later round, held." Never call the sample footage a real run. The target has not been deployed on Agent37, so the last clause must not claim it.*
+  - *The veto and the 70% counter exist only in the offline sample run (scripted agents). In the recorded live runs the Auditor passed the first patch every time. If the film shows a live run instead, use: "This is a real run. Round one: breached. One patch, approved. Every later round, held." Never call the sample footage a real run. The target has not been deployed on Agent37, so the last clause must not claim it.*
 
 ### 9. Results (1:36–1:46)
 - **Picture:** three figures set large on paper, each counted up by a numbering-machine roll:
