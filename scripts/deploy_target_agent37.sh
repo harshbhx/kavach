@@ -99,8 +99,8 @@ echo "3/4 starting the target on :$PORT…"
 ENV_LINE="TARGET_MODEL=$TARGET_MODEL"
 [[ -n "${TARGET_ENV:-}" ]] && ENV_LINE="$ENV_LINE $TARGET_ENV"
 [[ -n "$KEY_ENV" ]] && ENV_LINE="$ENV_LINE $KEY_ENV=$KEY_VAL"
-exec_cmd "export PATH=\$HOME/.local/bin:\$PATH; cd kavach/backend; pkill -f 'kavach.target.service' || true; \
-  $ENV_LINE nohup uv run uvicorn kavach.target.service:app --host 0.0.0.0 --port $PORT > /tmp/target.log 2>&1 & sleep 1; echo started" \
+exec_cmd "export PATH=\$HOME/.local/bin:\$PATH; cd kavach/backend; fuser -k $PORT/tcp >/dev/null 2>&1 || true; \
+  $ENV_LINE setsid nohup uv run uvicorn kavach.target.service:app --host 0.0.0.0 --port $PORT > /tmp/target.log 2>&1 < /dev/null & sleep 2; echo started" \
   | grep -v "$KEY_VAL" || true
 
 URL="https://$INSTANCE_ID-$PORT.agent37.app"
