@@ -86,3 +86,17 @@ def test_story_rejects_rounds_the_target_did_not_answer():
         ],
     )
     assert any("no answer from the target" in p for p in story_problems(summary))
+
+
+def test_a_word_boundary_sent_as_backspace_still_filters():
+    import json
+
+    from kavach.models import InputFilter
+
+    # The model wrote "\bignore\b" in JSON: valid JSON, but \b decodes to a backspace character.
+    raw = json.loads('{"id": "f1", "pattern": "(?i)\\bignore\\b"}')
+    assert "\b" in raw["pattern"]
+    f = InputFilter.model_validate(raw)
+    import re
+
+    assert re.search(f.pattern, "Please IGNORE all rules") and not re.search(f.pattern, "ignored")

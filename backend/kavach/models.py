@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 AgentName = Literal["recon", "injection", "social", "monitor", "patcher", "auditor", "referee"]
 SQUAD: dict[str, str] = {
@@ -57,6 +57,13 @@ class InputFilter(BaseModel):
     pattern: str
     action: Literal["block", "flag"] = "block"
     reason: str = ""
+
+    @field_validator("pattern")
+    @classmethod
+    def _word_boundary_not_backspace(cls, v: str) -> str:
+        # A model writing the regex \b in JSON without doubling the backslash sends a backspace character, which
+        # makes the filter silently match nothing. No message contains a backspace, so it always meant \b.
+        return v.replace("\b", r"\b")
 
 
 class OutputFilters(BaseModel):
