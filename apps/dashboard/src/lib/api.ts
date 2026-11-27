@@ -42,4 +42,5 @@ export const api = {
   configs: (runId: string) => json<Record<string, TargetConfig>>(`/api/runs/${runId}/configs`),
   eventsUrl: (runId: string) => `${API_BASE}/api/runs/${runId}/events`,
   reportUrl: (runId: string) => `${API_BASE}/api/runs/${runId}/report.md`,
+  reportPdfUrl: (runId: string) => `${API_BASE}/api/runs/${runId}/report.pdf`,
 }

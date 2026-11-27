@@ -46,5 +46,17 @@
     "title": "Hard mode vs the bigger model",
     "blurb": "The same hard pack against gpt-oss-120b: the larger model resists almost all of it, and the one that lands is patched.",
     "source": "kv-20261124-1752-c4a8.jsonl"
+  },
+  {
+    "id": "demo9",
+    "title": "Latest run: Finch playbooks in use",
+    "blurb": "The victim gpt-oss-20b is breached 67% in round 1 with both skill packs loaded. One patch is approved with 100% of everyday requests still served, and rounds 2 and 3 hold. No patch was vetoed in this run.",
+    "source": "kv-20261127-2331-f480.jsonl"
+  },
+  {
+    "id": "demo10",
+    "title": "Target in an Agent37 sandbox",
+    "blurb": "The same bot, deployed to an Agent37 microVM and attacked over HTTPS. Round 1 is breached 50%, one patch is approved with 100% of everyday requests still served, and rounds 2 and 3 hold.",
+    "source": "kv-20261128-0028-f559.jsonl"
   }
 ]

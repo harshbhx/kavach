@@ -27,11 +27,11 @@
     <td align="center"><b>83% → 0%</b><br><sub>breach rate, round 1 to 3</sub></td>
     <td align="center"><b>100%</b><br><sub>everyday requests still served</sub></td>
     <td align="center"><b>38 s</b><br><sub>time to harden, round start to shipped patch</sub></td>
-    <td align="center"><b>8 of 8</b><br><sub>recorded live runs hardened, 4 victim models</sub></td>
+    <td align="center"><b>10 of 10</b><br><sub>recorded live runs hardened, 4 victim models</sub></td>
   </tr>
 </table>
 
-<p align="center"><sub>Numbers from the headline run (a recorded live run, victim model <code>gpt-oss-20b</code>) and the eight recordings under <a href="#recorded-runs">Recorded runs</a>.</sub></p>
+<p align="center"><sub>Numbers from the headline run (a recorded live run, victim model <code>gpt-oss-20b</code>) and the ten recordings under <a href="#recorded-runs">Recorded runs</a>.</sub></p>
 
 <p align="center"><sub>
   <a href="#try-it-in-60-seconds">Try it</a> ·
@@ -54,7 +54,7 @@
   <a href="https://kavach.dualmindlab.tech/dashboard/?demo=demo1"><img src="docs/assets/gifs/dashboard-headline-run.gif" width="100%" alt="The Kavach dashboard replaying the headline run: the seven agents hand off in the room, round 1 breach slips land at 83%, the Patcher's guardrail v2 is deployed, rounds 2 and 3 hold at 0%, and the header turns to COMPLETE with a HARDENED verdict and 100% utility"></a>
 </p>
 
-<sub>The headline run replaying in the dashboard: a recorded live run with `gpt-oss-20b` as the victim bot. Round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Open it yourself at https://kavach.dualmindlab.tech/dashboard/?demo=demo1 (no install), or pick any of the eight recordings with the Demo picker.</sub>
+<sub>The headline run replaying in the dashboard: a recorded live run with `gpt-oss-20b` as the victim bot. Round 1 is breached 83%, one patch is approved and deployed in 38 seconds, utility stays at 100%, and rounds 2 and 3 hold. Open it yourself at https://kavach.dualmindlab.tech/dashboard/?demo=demo1 (no install), or pick any of the ten recordings with the Demo picker.</sub>
 
 <table>
   <tr>
@@ -162,7 +162,7 @@ A refused tool call never counts: only calls that actually ran. Full definitions
 
 ## The attack playbook
 
-Across the eight recordings the red squad sent **212 attacks using 17 techniques**, each chosen from what Recon found and adapted to whatever the last patch changed:
+Across the ten recordings the red squad sent **244 attacks using 17 techniques**, each chosen from what Recon found and adapted to whatever the last patch changed:
 
 `multi_vector` 33 · `policy_lookalike` 25 · `vip_authority` 19 · `direct_override` 16 · `fake_system_message` 15 · `urgency_pressure` 15 · `hinglish_codeswitch` 15 · `fake_support_agent` 14 · `nested_instructions` 11 · `base64_obfuscation` 10 · `slow_trust_build_single_turn` 10 · `emotional_story` 9 · `tool_output_spoofing` 8 · `json_payload_injection` 6 · `fake_json_tool_call` 2 · `homoglyph_staff_code` 2 · `leetspeak_exfil` 2
 
@@ -223,8 +223,8 @@ Strong models refuse simple tricks, which is good news for real products. It doe
 | Sponsor | What it does here | Status |
 |---|---|---|
 | **Lyzr** | The seven agents are Lyzr Studio agents (role, goal, instructions, JSON output, session memory) called through the Lyzr inference API. `pnpm bootstrap` creates them. | In use |
-| **Band** | Each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room people can watch and join. `pnpm bootstrap` registers them. The **live Referee** (`make referee`) runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run. With approval on, a person ships or rejects each patch from the room: `@Referee approve v2`. | In use; the live Referee and approval are new and not yet in a recorded run |
-| **Agent37** | The target bot and its mock tools can run in an isolated sandbox so attacks have a safe blast radius (`scripts/deploy_target_agent37.sh`). | Deploy script included; the recorded runs used a local target |
+| **Band** | Each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room people can watch and join. `pnpm bootstrap` registers them. The **live Referee** (`make referee`) runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run. With approval on, a person ships or rejects each patch from the room: `@Referee approve v2`. | In use, including a recorded run with a person in the loop: the Patcher's v2 was rejected in the Band room, then approved (`runs/demo_approval.jsonl`) |
+| **Agent37** | The target bot and its mock tools can run in an isolated sandbox so attacks have a safe blast radius (`scripts/deploy_target_agent37.sh`). | Deployed once: recorded run 10 attacked the bot running in an Agent37 sandbox over HTTPS (instance deleted afterwards). The other recordings used a local target |
 | **Finch** | Two skill packs in [`skills/`](skills) are the squads' playbooks: the Injector and Social Engineer get the attack pack's technique cards for their round on every call, and the Patcher gets the hardening pack's principles, guard template and prompt additions. Each run records the exact pack versions it used. | Live inputs to every run; publishing to the Finch market is next |
 | **AdaL** | The same two packs ship as AdaL project skills in `.adal/skills/`, and `AGENTS.md` and `docs/` are written so a coding agent can extend Kavach one ticket at a time. | Repo is set up for it |
 
@@ -368,6 +368,8 @@ Every run below is a real recording (Lyzr agents, a Band room, a live model as t
 | 6 · [Frontier victim: Claude Haiku 5.5](https://kavach.dualmindlab.tech/dashboard/?demo=demo6) | `anthropic/claude-haiku-5-5` | 17% → 0% → 0% | 90% | 82s |
 | 7 · [Hard mode: escalating attacks](https://kavach.dualmindlab.tech/dashboard/?demo=demo7) | `groq/openai/gpt-oss-20b` | 60% → 0% → 0% | 100% | 58s |
 | 8 · [Hard mode vs the bigger model](https://kavach.dualmindlab.tech/dashboard/?demo=demo8) | `groq/openai/gpt-oss-120b` | 10% → 0% → 0% | 100% | 53s |
+| 9 · [Latest run: Finch playbooks in use](https://kavach.dualmindlab.tech/dashboard/?demo=demo9) | `groq/openai/gpt-oss-20b` | 67% → 0% → 0% | 100% | 49s |
+| 10 · [Target in an Agent37 sandbox](https://kavach.dualmindlab.tech/dashboard/?demo=demo10) | `groq/openai/gpt-oss-20b` | 50% → 0% → 0% | 100% | 44s |
 <!-- gallery:end -->
 
 ## Where it runs
@@ -430,7 +432,7 @@ Your own prompt and rules, yes: *Test your own prompt* in the dashboard's live m
 <details>
 <summary><b>What is real and what is scripted?</b></summary>
 
-The eight recordings are live runs: Lyzr agents, a Band room and a real model as the victim. `pnpm dev:offline` and the sample run use scripted agents and a scripted bot, and they are labelled that way everywhere. The breach rules, the guard policy and the utility suite are the same in both.
+The ten recordings are live runs: Lyzr agents, a Band room and a real model as the victim. `pnpm dev:offline` and the sample run use scripted agents and a scripted bot, and they are labelled that way everywhere. The breach rules, the guard policy and the utility suite are the same in both.
 </details>
 
 <details>

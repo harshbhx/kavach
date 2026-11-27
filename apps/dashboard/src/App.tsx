@@ -162,7 +162,7 @@ export default function App() {
           demoKey={playedName}
           onPickDemo={pickDemo}
           onReplayDemo={(speed) => demo && attachDemo(demo, speed)}
-          onLive={() => start(() => api.startLive(), 'live')}
+          onLive={(requireApproval) => start(() => api.startLive(undefined, { require_approval: requireApproval }), 'live')}
           onCustom={(custom) => start(() => api.startLive(undefined, custom), 'live')}
           onReplay={(file, speed) => start(() => api.startReplay(file, speed), 'replay')}
           onStop={() => run.runId && api.stop(run.runId)}

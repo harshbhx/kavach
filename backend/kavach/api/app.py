@@ -4,14 +4,17 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import re
+import subprocess
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel, Field, field_validator
 from sse_starlette.sse import EventSourceResponse
 
@@ -285,6 +288,41 @@ async def report(run_id: str) -> PlainTextResponse:
         media_type="text/markdown",
         headers={"Content-Disposition": f'attachment; filename="kavach-report-{run_id}.md"'},
     )
+
+
+REPORT_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "build_report_pdf.py"
+
+
+def _build_pdf(recording: Path, out: Path) -> None:
+    """The one branded audit-report template (scripts/build_report_pdf.py). Needs Chrome for the print step."""
+    proc = subprocess.run(
+        [sys.executable, str(REPORT_SCRIPT), str(recording), str(out)],
+        capture_output=True,
+        text=True,
+        timeout=150,
+        env={**os.environ, "PYTHONIOENCODING": "utf8"},
+    )
+    if proc.returncode != 0 or not out.exists():
+        raise RuntimeError((proc.stderr or proc.stdout or "pdf build failed")[-300:])
+
+
+@app.get("/api/runs/{run_id}/report.pdf")
+async def report_pdf(run_id: str) -> FileResponse:
+    """The audit report as the branded PDF, built from the run's own recording and cached next to it."""
+    h = _get(run_id)
+    if not h.report_md:
+        raise HTTPException(404, "report not ready")
+    recording = (settings.runs_path / f"{Path(run_id).name}.jsonl").resolve()
+    if not recording.exists():
+        raise HTTPException(404, "recording not found")
+    out = recording.with_suffix(".report.pdf")
+    if not out.exists():
+        try:
+            await asyncio.to_thread(_build_pdf, recording, out)
+        except (RuntimeError, subprocess.SubprocessError, OSError) as e:
+            log.warning("pdf report failed for %s: %s", run_id, e)
+            raise HTTPException(501, "the PDF needs Google Chrome on the machine running the API") from e
+    return FileResponse(out, media_type="application/pdf", filename=f"kavach-audit-report-{run_id}.pdf")
 
 
 @app.post("/api/runs/{run_id}/stop")

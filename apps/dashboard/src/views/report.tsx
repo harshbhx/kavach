@@ -90,9 +90,14 @@ export function ReportView({ run, demoData }: { run: RunView; demoData?: DemoDat
         <div className="flex flex-wrap items-center gap-3 border-b border-kv-border px-6 py-3">
           <FileText className="size-4 text-kv-faint" />
           <h2 className="flex-1 font-display text-[17px] text-kv-text">Audit report</h2>
+          {run.mode !== 'demo' && run.runId && md && (
+            <a href={api.reportPdfUrl(run.runId)} download title="The branded audit report. Takes about 20 seconds the first time." className="inline-flex items-center gap-1.5 rounded-lg bg-kv-brand px-3 py-1.5 text-[13px] font-semibold text-kv-surface hover:bg-kv-brand-hover">
+              <Download className="size-4" /> PDF
+            </a>
+          )}
           {href && (
             <a href={href} download={`kavach-report-${run.runId ?? 'run'}.md`} className="inline-flex items-center gap-1.5 rounded-lg bg-kv-text px-3 py-1.5 text-[13px] font-semibold text-kv-surface hover:bg-kv-defend">
-              <Download className="size-4" /> Download
+              <Download className="size-4" /> Markdown
             </a>
           )}
         </div>

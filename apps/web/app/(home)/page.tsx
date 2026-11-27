@@ -167,7 +167,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1200px] px-5 py-24">
           <Heading id="models" title="Bigger models refuse more. None of them is safe on its own.">
             <p>
-              Eight recorded live runs against four victim models. The bigger the model, the fewer tricks land in round one, but
+              Ten recorded live runs against four victim models. The bigger the model, the fewer tricks land in round one, but
               every one of them broke at least once, and every run ended hardened with real customers still served.
             </p>
           </Heading>

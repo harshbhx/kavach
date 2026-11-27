@@ -9,6 +9,7 @@ runs/*.jsonl
 !runs/demo_run.jsonl
 !runs/sample_simulated_run.jsonl
 !runs/sample_approval_run.jsonl
+!runs/demo_approval.jsonl
 
 # python
 __pycache__/
@@ -32,4 +33,6 @@ frontend/dist/
 runs/video/
 runs/film/
 runs/*.report.md
+runs/*.report.pdf
 !runs/demo_run.report.md
+!runs/demo_approval.report.md

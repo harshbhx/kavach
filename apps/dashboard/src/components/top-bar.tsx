@@ -24,7 +24,8 @@ interface Props {
   demoKey?: string | null
   onPickDemo?: (key: string, speed: number) => void
   onReplayDemo: (speed: number) => void
-  onLive: () => void
+  /** requireApproval: pause each patch for a person (Band room or the banner); off = the run is fully automated */
+  onLive: (requireApproval: boolean) => void
   /** run on the visitor's own prompt, rules and requests (live mode only) */
   onCustom?: (c: CustomRun) => void
   onReplay: (file: string, speed: number) => void
@@ -76,6 +77,7 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
   const [replays, setReplays] = useState<string[]>([])
   const [file, setFile] = useState('')
   const [speed, setSpeed] = useState('1.5')
+  const [humanApproval, setHumanApproval] = useState(false)
   const running = run.status === 'running'
 
   // While the backend is down, check again every few seconds so the page recovers on its own.
@@ -214,7 +216,14 @@ export function TopBar({ run, logoState, demo, starting = false, gallery = [], d
                 <RotateCcw className="size-3.5" /> Replay
               </Button>
               {onCustom && <TryPromptSheet disabled={apiDown || starting} onRun={onCustom} />}
-              <Button onClick={onLive} disabled={apiDown || starting} className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
+              <label
+                className="flex cursor-pointer items-center gap-2 rounded-lg border border-kv-border-strong px-3 py-2 text-[13px] text-kv-muted has-[:checked]:border-kv-brand has-[:checked]:text-kv-text"
+                title="Off: patches ship automatically once the Auditor passes them. On: a person approves each patch from the Band room or the banner."
+              >
+                <input type="checkbox" checked={humanApproval} onChange={(e) => setHumanApproval(e.target.checked)} disabled={apiDown || starting} className="size-3.5 accent-[var(--kv-brand)]" />
+                Human approval
+              </label>
+              <Button onClick={() => onLive(humanApproval)} disabled={apiDown || starting} className="bg-kv-brand font-semibold text-kv-surface hover:bg-kv-brand-hover">
                 {starting ? <LoaderCircle className="size-3.5 animate-spin" /> : <Play className="size-3.5 fill-current" />}
                 {starting ? 'Starting…' : 'Start live run'}
               </Button>
