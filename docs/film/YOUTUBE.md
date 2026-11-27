@@ -1,46 +1,69 @@
-# YouTube and Devpost copy for the film
+# YouTube copy for the film
 
-## Title (pick one)
+The current film is 1:59 (`kavach-film-2.mp4`): it fits HiDevs' 2-minute demo rule. The first upload (2:24) is https://youtu.be/ZI6KTaSdtDo.
 
-1. Kavach: seven AI agents attack and harden a support bot that can issue refunds
-2. Kavach: red vs blue AI agents that keep your support bot safe and useful
-3. Your support bot can issue refunds. So can anyone who talks to it. (Kavach demo)
+## Title
+
+```
+Kavach: 7 AI agents attack and harden a support bot | Agent-to-Agent Hackathon
+```
 
 ## Description
 
-Your support bot can issue refunds. So can anyone who talks to it.
+```
+Kavach (कवच, "armour") is a red-team and blue-team arena for AI agents that can act. Seven AI agents attack a customer support bot, catch every breach from its tool calls, patch it, and prove the patch still helps real customers. A person signs off before a patch ships.
 
-Kavach puts seven AI agents in one room to attack and harden DiwaliMart Support, a tool-using support bot with fake data. Red (Recon, Injector, Social Engineer) attacks it with prompt injection, fake authority and Hinglish pressure. Blue (Monitor, Patcher, Auditor) explains each breach, rewrites the prompt and the guard policy, and replays every exploit. The Referee keeps score.
+THE PROBLEM
+Support bots now call real tools like refunds and KYC lookups. In a recorded run, one prompt injection made DiwaliMart's bot refund ₹1,000 on another customer's order, above the ₹500 limit that needs a human. In another, the bot said "I can't share that information" while its KYC tool call ran anyway. Kavach scores what the bot does, not what it says.
 
-Two things make it different:
-- Breaches are read from the bot's real tool calls by code. No model grades itself.
-- A patch ships only if the exploits stop and at least 90% of normal customer requests still work. Patches that block real customers are vetoed.
+HOW IT WORKS
+Seven agents run on Lyzr and talk in a Band room:
+• Red squad: Recon maps the bot, the Injector injects, the Social Engineer persuades, using the attack skill pack's technique cards
+• The Referee keeps score and answers people in the room
+• Blue squad: the Monitor explains each breach, the Patcher writes the fix from the hardening skill pack, the Auditor tests it
 
-Built for Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition), Security track, with Lyzr (the agents), Band (the room they talk in), Agent37 (the sandbox) and Cloudflare (the site).
+Every round: Attack → Detect → Patch → Audit
+• Code catches breaches by reading the tool-call log. No model gets a say.
+• A patch ships only if the exploits stop and at least 90% of everyday requests are still served.
+• With approval on, a person ships or rejects each patch from the Band room (@Referee approve v2) or the dashboard.
 
-Code: https://github.com/harshbhx/kavach
-Live site and recorded run: https://kavach.dualmindlab.tech/dashboard/?demo=live
+RESULTS (headline run, recorded live, victim model gpt-oss-20b)
+• Breach rate, rounds 1 to 3: 83% → 0% → 0%
+• Everyday requests still served: 100%
+• Time to harden: 38 s
+• 8 recorded runs against 4 victim models, every one hardened
+
+KEEP IT FIXED
+kavach ci, also a GitHub Action, replays the attack library against your prompt and guard policy and fails the build if the breach rate rises.
+
+The utility gate and the approval scenes come from offline sample runs with scripted agents, and are labelled on screen.
+
+LINKS
+Live site: https://kavach.dualmindlab.tech
+Watch a recorded run: https://kavach.dualmindlab.tech/dashboard/?demo=demo1
 Docs: https://kavach.dualmindlab.tech/docs
+Source code: https://github.com/harshbhx/kavach
 
-0:00 The problem
-0:24 Kavach
-0:31 Seven agents, one room
-0:44 The loop: attack, detect, patch, audit
-0:58 The utility trap
-1:12 A real run on the dashboard
-1:36 Results
-1:46 Built with
+CHAPTERS
+0:00 The problem: a bot that acts
+0:17 Kavach: seven agents, one room
+0:35 The loop: attack, detect, patch, audit
+0:45 The dashboard, view by view
+1:03 The utility gate (offline sample)
+1:14 A person signs off in Band (offline sample)
+1:27 Results
+1:38 The CI gate, and links
 
-Built by Harsh Bhanushali, DualMind Labs.
+Built with Lyzr (the seven agents), Band (the room, and your sign-off) and Cloudflare (the site and the recorded runs).
+Built by Harsh Bhanushali for Diwali Festiverse: The Agent-to-Agent Hackathon (India Edition) by HiDevs, Security track.
+
+#AIAgents #AISecurity #PromptInjection
+```
 
 ## Tags
 
-kavach, ai agents, agent to agent, multi agent, llm security, prompt injection, ai red teaming, guardrails, ai safety, support bot, lyzr, band, agent37, cloudflare, hackathon, devpost, india
+```
+Kavach, AI agent security, prompt injection, AI red teaming, LLM security, multi-agent system, agent to agent, human in the loop, Lyzr, Band, Cloudflare, guardrails, OWASP LLM Top 10, CI, GitHub Actions, customer support bot, gpt-oss, HiDevs, Diwali Festiverse, hackathon
+```
 
-## Thumbnail
-
-`docs/assets/brand/kavach-devpost-thumbnail.png` (1200×800). For YouTube use the 1280×720 crop: `ffmpeg -i kavach-devpost-thumbnail.png -vf "scale=1280:-1,crop=1280:720" kavach-youtube-thumbnail.png`.
-
-## Visibility
-
-Unlisted is fine for Devpost. Turn comments off if you like; leave embedding on, or Devpost can't play it.
+Chapters are at least 10 seconds each, so YouTube shows them.
