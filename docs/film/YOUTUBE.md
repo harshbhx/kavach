@@ -31,7 +31,7 @@ RESULTS (headline run, recorded live, victim model gpt-oss-20b)
 • Breach rate, rounds 1 to 3: 83% → 0% → 0%
 • Everyday requests still served: 100%
 • Time to harden: 38 s
-• 8 recorded runs against 4 victim models, every one hardened
+• 10 recorded runs against 4 victim models, every one hardened
 
 KEEP IT FIXED
 kavach ci, also a GitHub Action, replays the attack library against your prompt and guard policy and fails the build if the breach rate rises.
