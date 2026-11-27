@@ -24,6 +24,7 @@ from kavach.models import (
     RunSummary,
     TargetConfig,
 )
+from kavach.orchestrator.approval import PendingApproval
 from kavach.orchestrator.audit import audit
 from kavach.orchestrator.events import EventBus
 from kavach.report.markdown import build_report
@@ -43,6 +44,7 @@ class RunState:
     final_report: dict | None = None
     report_md: str | None = None
     options: RunOptions | None = None  # set only on a bring-your-own-prompt run
+    approval: PendingApproval | None = None  # a patch waiting for a person (approval_required only)
 
 
 def policy_changes(old: dict, new: dict, prefix: str = "") -> list[str]:
@@ -392,6 +394,18 @@ class KavachRun:
             verdict = await blue.explain_audit(self.ctx, r, outcome, proposal.changelog)
             if outcome.decision == "approve":
                 await self.band.post("auditor", verdict.verdict_message, ["referee"], round=r)
+                decision = await self._human_approval(r, version, attempt, outcome)
+                if decision["decision"] == "reject":
+                    summary.vetoes += 1
+                    who, why = decision.get("by") or "a person", decision.get("reason")
+                    veto_reasons = [f"rejected_by_person: {who}" + (f": {why}" if why else "")]
+                    await self.band.post(
+                        "referee",
+                        f"↩️ {version} was rejected by {who}" + (f": {why}" if why else "") + ". Back to you.",
+                        ["patcher"],
+                        round=r,
+                    )
+                    continue
                 self.deployed = candidate
                 self.state.configs[version] = candidate
                 self._next_version += 1
@@ -418,6 +432,59 @@ class KavachRun:
                 [verdict.advice_to_patcher] if verdict.advice_to_patcher else []
             )
         summary.status = "unhardened"
+
+    async def _human_approval(self, r: int, version: str, attempt: int, outcome) -> dict:
+        """Wait for a person to approve a patch the Auditor passed. Returns {decision, by, source, reason}."""
+        if not self.s.approval_required:
+            return {"decision": "approve", "by": "auditor", "source": "auto", "reason": None}
+        pending = PendingApproval(version, r, attempt, asyncio.get_running_loop().create_future())
+        self.state.approval = pending
+        self.state.summary.awaiting_approval = version
+        timeout, fallback = self.s.approval_timeout_s, self.s.approval_on_timeout
+        util = round(outcome.utility.score * 100)
+        self.emit(
+            "approval.requested",
+            {
+                "version": version,
+                "attempt": attempt,
+                "replay": {"total": outcome.replay_total, "still_breaching": outcome.replay_still_breaching},
+                "utility": outcome.utility.score,
+                "timeout_s": timeout,
+                "on_timeout": fallback,
+            },
+            round=r,
+            agent="referee",
+        )
+        await self.band.post(
+            "referee",
+            f"🔏 {version} passed the Auditor: {outcome.replay_still_breaching} of {outcome.replay_total} exploits "
+            f"still land, utility {util}%. Reply `@Referee approve {version}` to ship it or `@Referee reject "
+            f"{version}` to send it back. No answer in {int(timeout)} s means {fallback}.",
+            ["owner"],
+            round=r,
+        )
+        t0 = time.monotonic()
+        try:
+            decision = await asyncio.wait_for(asyncio.shield(pending.future), timeout)
+        except TimeoutError:
+            decision = {
+                "decision": fallback,
+                "by": "timeout",
+                "source": "timeout",
+                "reason": f"no answer in {int(timeout)} s",
+            }
+        finally:
+            if not pending.future.done():
+                pending.future.cancel()
+            self.state.approval = None
+            self.state.summary.awaiting_approval = None
+        self.emit(
+            "approval.decided",
+            {"version": version, **decision, "waited_s": round(time.monotonic() - t0, 1)},
+            round=r,
+            agent="referee",
+        )
+        return decision
 
     async def _finish(self) -> None:
         rounds = [rs.model_dump() for rs in self.state.summary.rounds]

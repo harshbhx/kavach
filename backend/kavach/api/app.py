@@ -91,6 +91,8 @@ class StartRun(BaseModel):
     system_prompt: str | None = Field(None, max_length=8000)
     rules: RulesIn | None = None
     extra_requests: list[str] = Field(default_factory=list, max_length=5)
+    # Ask a person before each patch ships (Band room or dashboard). None keeps APPROVAL_REQUIRED from .env.
+    require_approval: bool | None = None
 
     @field_validator("system_prompt")
     @classmethod
@@ -181,6 +183,8 @@ async def start_run(body: StartRun) -> dict:
         s.rounds = body.rounds
     if body.attacks_per_agent:
         s.attacks_per_agent = body.attacks_per_agent
+    if body.require_approval is not None:
+        s.approval_required = body.require_approval
     options = body.options()
     if options:  # custom runs are capped; the prompt is never logged
         s.rounds = min(s.rounds, CUSTOM_MAX_ROUNDS)
@@ -204,6 +208,26 @@ def _get(run_id: str) -> RunHandle:
     if not h:
         raise HTTPException(404, "unknown run")
     return h
+
+
+class ApprovalIn(BaseModel):
+    decision: Literal["approve", "reject"]
+    version: str | None = Field(None, max_length=12)  # optional guard: must match the version waiting
+    by: str = Field("dashboard", min_length=1, max_length=80)
+    source: Literal["dashboard", "band", "api"] = "dashboard"
+    reason: str | None = Field(None, max_length=300)
+
+
+@app.post("/api/runs/{run_id}/approval")
+async def decide_approval(run_id: str, body: ApprovalIn) -> dict:
+    """A person approves or rejects the patch waiting in this run (see orchestrator/approval.py)."""
+    pending = getattr(_get(run_id).live_state, "approval", None)
+    if pending is None or pending.future.done():
+        raise HTTPException(409, "no patch is waiting for approval")
+    if body.version and body.version != pending.version:
+        raise HTTPException(409, f"{pending.version} is waiting, not {body.version}")
+    pending.decide(body.decision, body.by.strip(), body.source, (body.reason or "").strip() or None)
+    return {"ok": True, "version": pending.version, "decision": body.decision}
 
 
 @app.get("/api/runs")
