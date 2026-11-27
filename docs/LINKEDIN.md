@@ -16,7 +16,7 @@ Post this once the site is deployed and the 1:59 film is on YouTube, so every li
 5. Reply to comments in the first hour or two.
 6. Copy the post's link. Add it to the HiDevs form if there is a field for it, and share it in the HiDevs community.
 
-Only change a number if a newer recorded run changes it. If the skill packs get published on Finch before you post, change "ship as skill packs for Finch and AdaL" to "are published on Finch and ship as AdaL skills".
+Only change a number if a newer recorded run changes it. The packs are not published on Finch (that needs a signing wallet), and AdaL was not run. Keep the post's wording as it is; if that changes before you post, update the line that names them.
 
 ## Post text
 
@@ -36,7 +36,7 @@ Headline run: breach rate 83% → 0%, 100% of everyday customer requests still s
 
 It also runs as a GitHub Action that fails the build if a prompt change lets attacks back in.
 
-Built with @Lyzr (all seven agents) and @Band (the room where agents and people talk). The attack and hardening playbooks ship as skill packs for @Finch and @AdaL. Thanks to @HiDevs for running it.
+Built with @Lyzr (all seven agents) and @Band (the room where agents and people talk). The attack and hardening playbooks are skill packs in the Finch skill format, and they ship as AdaL project skills in the repo. Agent37 ran the target bot once in a sandbox. Thanks to @HiDevs for running it.
 
 Demo, code and the 2-minute film are in the first comment.
 
