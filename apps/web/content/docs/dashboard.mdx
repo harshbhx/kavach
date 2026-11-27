@@ -26,7 +26,9 @@ The teller’s counter: breach rate, utility against its 90% floor, exploits cau
 
 ## Activity bar
 
-Says what the agents are doing now, which of them have spoken this round and how long ago the last event arrived, so a slow model call never looks like a frozen page. When a run ends it becomes the verdict banner: HARDENED, HELD or STILL BREACHED, with the breach trend, utility and time to harden.
+When approval is on (`APPROVAL_REQUIRED=true`), a patch the Auditor passed takes this spot as a yellow banner with **Approve** and **Reject** buttons, the replay and utility numbers, and a countdown to the timeout policy. The same decision can come from the Band room, and the patch panel keeps a note of who decided.
+
+Otherwise it says what the agents are doing now, which of them have spoken this round and how long ago the last event arrived, so a slow model call never looks like a frozen page. When a run ends it becomes the verdict banner: HARDENED, HELD or STILL BREACHED, with the breach trend, utility and time to harden.
 
 ## The Kavach room
 

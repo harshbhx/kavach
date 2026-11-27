@@ -17,6 +17,7 @@ const PAGES = [
   ['AGENT_ROSTER.md', 'agents', 'The seven agents', 'What each agent receives, what it returns and how it falls back.'],
   ['API_CONTRACTS.md', 'api', 'API and events', 'REST endpoints, the SSE event stream and the Band message contract.'],
   ['SPONSORS.md', 'sponsors', 'Sponsor integrations', 'How Kavach uses Lyzr, Band, Agent37 and AdaL, with setup steps.'],
+  ['CI_MODE.md', 'ci-mode', 'CI mode', 'Fail a build when a prompt or guard-policy change raises the breach rate, from the command line or as a GitHub Action.'],
   ['bring-your-prompt.md', 'bring-your-prompt', 'Bring your own prompt', 'Paste your system prompt, set your rules, and get it attacked, patched and reported inside the DiwaliMart sandbox.'],
   ['PRD.md', 'product', 'Product spec', 'The problem, the users, the scope and what success looks like.'],
 ];

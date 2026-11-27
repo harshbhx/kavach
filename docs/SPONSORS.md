@@ -62,11 +62,11 @@ cd backend && make referee        # = uv run --extra live python -m kavach.band.
 - It reads the newest run from the API (`KAVACH_API`, default `http://127.0.0.1:8000`), or the recorded demo run when no run is live. Every number comes from the run's `RunSummary`; no model is asked for a score.
 - It is a custom `SimpleAdapter` with no LLM behind it: `answer()` is a pure function, unit-tested in `backend/tests/test_live_referee.py` against the real SDK classes.
 - Credentials: the `referee` entry in `agent_config.yaml` (override the path with `BAND_AGENT_CONFIG`).
-- Not done yet: approval gating (stretch C2), where a person approves a patch from the room.
+- **Approval from the room (built).** With `APPROVAL_REQUIRED=true`, a patch the Auditor passed waits: the Referee posts the numbers and mentions you, and `@Referee approve v2` or `@Referee reject v2 because ...` settles it (the live Referee forwards it to `POST /api/runs/{id}/approval`). The dashboard has the same buttons. A rejection goes to the Patcher's next attempt as a veto reason; a timeout follows `APPROVAL_ON_TIMEOUT`.
 
 ### What to show judges
 - The Band room in a split screen next to the dashboard during the video.
-- People can read and post in the room. Writing `@Referee status` (or `breaches`, `patch`, `report`) gets an answer from the live Referee when `make referee` is running. Approval gating from the room (stretch C2) is not built.
+- People can read and post in the room. Writing `@Referee status` (or `breaches`, `patch`, `report`) gets an answer from the live Referee when `make referee` is running, and with approval on, a person ships or rejects each patch from the room.
 
 ---
 

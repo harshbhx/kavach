@@ -140,6 +140,9 @@ See `.env.example` for the full list. Key flags:
 | `ATTACKS_PER_AGENT` | `3` | Attacks per Red attacker per round (6 per round) |
 | `MAX_PATCH_ATTEMPTS` | `3` | Auditor loop cap |
 | `UTILITY_THRESHOLD` | `0.9` | Patch acceptance |
+| `APPROVAL_REQUIRED` | `false` | Ask a person (Band room or dashboard) before each patch ships |
+| `APPROVAL_TIMEOUT_S` | `120` | How long to wait for that person |
+| `APPROVAL_ON_TIMEOUT` | `approve` | What happens with no answer: `approve` or `reject` |
 | `MAX_CONCURRENCY` | `6` | Orchestrator calls to the target in flight at once |
 | `TARGET_CONCURRENCY` | `2` | Model calls in flight inside the target (raise it on a paid model tier) |
 | `ATTACK_LIBRARY` | `standard` | `standard` (4 + 4 attacks per round) or `hard` (5 + 5, escalating levels) |

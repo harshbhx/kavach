@@ -223,7 +223,7 @@ Strong models refuse simple tricks, which is good news for real products. It doe
 | Sponsor | What it does here | Status |
 |---|---|---|
 | **Lyzr** | The seven agents are Lyzr Studio agents (role, goal, instructions, JSON output, session memory) called through the Lyzr inference API. `pnpm bootstrap` creates them. | In use |
-| **Band** | Each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room people can watch and join. `pnpm bootstrap` registers them. The **live Referee** (`make referee`) runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run. | In use; the live Referee is new and not yet in a recorded run |
+| **Band** | Each agent is a Band remote agent, and every handoff is an @mention message in one shared Kavach room people can watch and join. `pnpm bootstrap` registers them. The **live Referee** (`make referee`) runs on the Band SDK and answers anyone who writes `@Referee status`, `breaches`, `patch` or `report` in the room, with numbers read from the run. With approval on, a person ships or rejects each patch from the room: `@Referee approve v2`. | In use; the live Referee and approval are new and not yet in a recorded run |
 | **Agent37** | The target bot and its mock tools can run in an isolated sandbox so attacks have a safe blast radius (`scripts/deploy_target_agent37.sh`). | Deploy script included; the recorded runs used a local target |
 | **Finch** | Two skill packs in [`skills/`](skills) are the squads' playbooks: the Injector and Social Engineer get the attack pack's technique cards for their round on every call, and the Patcher gets the hardening pack's principles, guard template and prompt additions. Each run records the exact pack versions it used. | Live inputs to every run; publishing to the Finch market is next |
 | **AdaL** | The same two packs ship as AdaL project skills in `.adal/skills/`, and `AGENTS.md` and `docs/` are written so a coding agent can extend Kavach one ticket at a time. | Repo is set up for it |
@@ -268,9 +268,13 @@ Record the two-minute video from the site (Chrome needed): `pnpm --filter @kavac
 | `pnpm build` | Build the site, docs and the bundled dashboard demo |
 | `pnpm deploy:site` | Build and deploy the site to Cloudflare |
 | `pnpm lint` / `pnpm test` | Lint and test every package (Python and TypeScript) |
-| `make -C backend help` | Backend targets: `setup`, `check-setup`, `api`, `target`, `probe`, `band`, `smoke` |
+| `make -C backend referee` | The live Referee: answers `@Referee` in the Band room and forwards `approve` / `reject` |
+| `make -C backend gate` | CI mode on the hardened config: fails if its breach rate rises ([CI mode](docs/CI_MODE.md)) |
+| `make -C backend help` | Backend targets: `setup`, `check-setup`, `api`, `target`, `probe`, `band`, `smoke`, `referee`, `gate` |
 
 Headless run: `cd backend && uv run python -m kavach.cli run --rounds 3` writes events to `runs/<id>.jsonl` and the report to `runs/<id>.report.md`.
+
+A person in the loop: `APPROVAL_REQUIRED=true pnpm dev` makes every patch that passes the Auditor wait for a person, who approves or rejects it from the dashboard banner or from the Band room (`@Referee approve v2`, with `make -C backend referee` running). A rejection sends the Patcher back with the reason.
 
 ## Tech stack
 
@@ -297,9 +301,10 @@ The dashboard talks to the API like any client could. A few of the endpoints ([f
 | `GET` | `/api/runs/{id}/events` | The run as a server-sent event stream, resumable from any sequence number |
 | `GET` | `/api/runs/{id}/configs` | Every guardrail version so far, prompt and policy |
 | `GET` | `/api/runs/{id}/report.md` | The audit report |
+| `POST` | `/api/runs/{id}/approval` | Approve or reject the patch waiting for a person |
 | `POST` | `/api/runs/{id}/stop` | Stop a run |
 
-A run is a stream of typed events: `run.started`, `round.started`, `recon.dossier`, `attack.launched`, `target.response`, `toolcall.intercepted`, `breach.detected`, `round.breach_scored`, `monitor.report`, `patch.proposed`, `audit.result`, `patch.applied`, `round.scored`, `agent.message`, `band.room`, `report.ready`, `run.completed`. The same JSONL file powers the live view, the replays, the report and the browser demo.
+A run is a stream of typed events: `run.started`, `round.started`, `recon.dossier`, `attack.launched`, `target.response`, `toolcall.intercepted`, `breach.detected`, `round.breach_scored`, `monitor.report`, `patch.proposed`, `audit.result`, `approval.requested`, `approval.decided`, `patch.applied`, `round.scored`, `agent.message`, `band.room`, `report.ready`, `run.completed`. The same JSONL file powers the live view, the replays, the report and the browser demo.
 
 ## Repository layout
 
@@ -374,7 +379,8 @@ Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 - [x] **Bring your own prompt:** shipped as *Test your own prompt* in the dashboard.
 - [ ] **Bring your own agent:** declare your tools and policies, so the detectors and attacks are generated for your bot and tested against a sandbox copy.
-- [ ] **CI mode:** fail the build if the breach rate goes up after a prompt change.
+- [x] **CI mode:** `kavach ci` and a reusable GitHub Action fail a build when a prompt or policy change raises the breach rate ([CI mode](docs/CI_MODE.md)).
+- [x] **A person in the loop:** approve or reject each patch from the Band room or the dashboard.
 - [ ] **Publish the skill packs** to Finch.
 
 ## FAQ
@@ -421,7 +427,7 @@ All customer data is fake. The target's tools are pure functions over a local mo
 
 ## Docs
 
-[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Devpost story](docs/DEVPOST.md) · [Film kit](docs/film/README.md) · [Contributing](CONTRIBUTING.md)
+[PRD](docs/PRD.md) · [Architecture](docs/ARCHITECTURE.md) · [Target bot](docs/TARGET_BOT.md) · [Scoring](docs/SCORING.md) · [Agents](docs/AGENT_ROSTER.md) · [API](docs/API_CONTRACTS.md) · [Sponsors](docs/SPONSORS.md) · [Build plan](docs/BUILD_PLAN.md) · [CI mode](docs/CI_MODE.md) · [Demo and submission](docs/DEMO_AND_SUBMISSION.md) · [Finale kit](docs/FINALE.md) · [Devpost story](docs/DEVPOST.md) · [Film kit](docs/film/README.md) · [Contributing](CONTRIBUTING.md)
 
 ---
 

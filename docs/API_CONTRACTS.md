@@ -9,7 +9,7 @@ Three surfaces: (1) the Kavach API used by the dashboard, (2) the event envelope
 | Method | Path | Body / Query | Response |
 |---|---|---|---|
 | GET | `/api/health` | – | `{ ok, brain_provider, band_enabled, target_url, target_model, target_ok }` |
-| POST | `/api/runs` | `{ "mode": "live" \| "replay", "rounds"?: 3, "attacks_per_agent"?: 3, "replay_file"?: "demo_run.jsonl", "speed"?: 1.0, "system_prompt"?: "...", "rules"?: { "refund_limit_inr"?: 500, "allowed_coupons"?: ["DIWALI10"] }, "extra_requests"?: ["..."] }` | `201 { run_id }` · `409` if a run is active · `422` for invalid input |
+| POST | `/api/runs` | `{ "mode": "live" \| "replay", "rounds"?: 3, "attacks_per_agent"?: 3, "replay_file"?: "demo_run.jsonl", "speed"?: 1.0, "system_prompt"?: "...", "rules"?: { "refund_limit_inr"?: 500, "allowed_coupons"?: ["DIWALI10"] }, "extra_requests"?: ["..."], "require_approval"?: true }` | `201 { run_id }` · `409` if a run is active · `422` for invalid input |
 | GET | `/api/runs/{run_id}` | – | `RunSummary` (below) |
 | GET | `/api/runs/{run_id}/events` | `?from_seq=0` | **SSE** stream of `Event` (resends from `from_seq`, then live; an EventSource reconnect resumes after its `Last-Event-ID`) |
 | GET | `/api/runs/{run_id}/configs/{version}` | – | `TargetConfig` |
@@ -17,9 +17,10 @@ Three surfaces: (1) the Kavach API used by the dashboard, (2) the event envelope
 | GET | `/api/replays` | – | `[{ file, size }]`: the recordings in `runs/*.jsonl` |
 | GET | `/api/runs/{run_id}/report.md` | – | `text/markdown` attachment `kavach-report-{run_id}.md` |
 | POST | `/api/runs/{run_id}/stop` | – | `{ stopped: true }` |
+| POST | `/api/runs/{run_id}/approval` | `{ "decision": "approve" \| "reject", "version"?: "v2", "by"?: "Harsh", "source"?: "dashboard" \| "band" \| "api", "reason"?: "..." }` | `{ ok, version, decision }` · `409` if no patch is waiting or `version` doesn't match |
 | GET | `/api/runs` | – | `[{ run_id, mode, started_at, status }]` |
 
-`rounds` and `attacks_per_agent` accept 1 to 10. `system_prompt` (20 to 8000 characters), `rules` and `extra_requests` (up to 5) start a bring-your-own-prompt run, which is capped at 3 rounds and 3 attacks per agent; see [Bring your own prompt](bring-your-prompt.md).
+`require_approval` asks a person before each patch ships (see [Human approval](#human-approval) below); omitted, it follows `APPROVAL_REQUIRED`. `rounds` and `attacks_per_agent` accept 1 to 10. `system_prompt` (20 to 8000 characters), `rules` and `extra_requests` (up to 5) start a bring-your-own-prompt run, which is capped at 3 rounds and 3 attacks per agent; see [Bring your own prompt](bring-your-prompt.md).
 
 ```jsonc
 // RunSummary
@@ -34,7 +35,8 @@ Three surfaces: (1) the Kavach API used by the dashboard, (2) the event envelope
   ],
   "deployed_version": "v2",
   "band_room_url": "https://app.band.ai/...",   // null if Band disabled
-  "report_ready": false
+  "report_ready": false,
+  "awaiting_approval": null        // the version waiting for a person, when approval is required
 }
 ```
 
@@ -72,6 +74,8 @@ SSE: `event: <type>` + `data: <json envelope>`. Send a keep-alive comment every 
 | `patch.proposed` | `{ attempt, candidate_version, changelog, rationale, prompt_diff_stats: {added, removed}, policy_changes: [string] }` |
 | `audit.result` | `{ attempt, candidate_version, decision: "approve"\|"veto", replay: {total, still_breaching}, utility: {score, failed:[{id, why}]}, reasons: [string] }` |
 | `patch.applied` | `{ version, tth_seconds }` |
+| `approval.requested` | `{ version, attempt, replay: { total, still_breaching }, utility, timeout_s, on_timeout: "approve"\|"reject" }`: a patch the Auditor passed is waiting for a person |
+| `approval.decided` | `{ version, decision: "approve"\|"reject", by, source: "band"\|"dashboard"\|"api"\|"timeout"\|"auto", reason, waited_s }` |
 | `round.scored` | the round entry from `RunSummary.rounds` |
 | `report.ready` | `{ url: "/api/runs/{id}/report.md" }` |
 | `run.completed` | `{ final_breach_rate, final_utility, total_exploits, owasp_breakdown: {LLM06: 3, ...} }` |
@@ -127,3 +131,8 @@ referee:    { agent_id: "...", api_key: "..." }
 ```
 
 The same format as the Band SDK's `Agent.from_config(<key>)`, so the live Referee (`make referee`) reuses it. The keys are the internal agent names used everywhere in code and events: `recon, injection, social, monitor, patcher, auditor, referee`. Band display names (`Injector`, `Social Engineer`, …) are only labels in the Band UI.
+
+## Human approval
+
+With `APPROVAL_REQUIRED=true` (or `require_approval: true` on `POST /api/runs`), a patch the Auditor approved does not ship straight away. The run emits `approval.requested`, sets `RunSummary.awaiting_approval`, and the Referee asks in the Band room, mentioning the owner. A person settles it with `POST /api/runs/{run_id}/approval`: from the dashboard's banner, or from the room, where the live Referee (`make referee`) turns `@Referee approve v2` or `@Referee reject v2 because ...` into that call. A rejection counts as a veto: the reason goes to the Patcher's next attempt. With no answer in `APPROVAL_TIMEOUT_S` seconds the run follows `APPROVAL_ON_TIMEOUT` (`approve` by default, so unattended runs never stall). Code still decides whether a patch is good enough to ask about; a person only gets the final say on shipping it.
+
